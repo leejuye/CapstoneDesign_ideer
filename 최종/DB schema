@@ -1,0 +1,21 @@
+`uid` int(11) NOT NULL AUTO_INCREMENT COMMENT '사용자번호',
+  `regDate` datetime COMMENT '등록일',
+  `sidePhoto` varchar(17) COMMENT '측면 사진(파일명:년월일시분.파일명)'
+  `frontPhoto` varchar(17) COMMENT '정면 사진(파일명:년월일시분.파일명)',
+
+`frontShoulder` Float COMMENT '정면 어깨너비',
+`frontChest` Float COMMENT '정면 가슴너비',
+`frontWaist` Float COMMENT '정면 허리너비',
+`frontHip` Float COMMENT '정면 엉덩이너비',
+`frontFemoral` Float COMMENT '정면 허벅지너비',
+`frontCalf` Float COMMENT '정면 종아리너비',
+
+`sideChest` Float COMMENT '측면 가슴너비',
+`sideWaist` Float COMMENT '측면 허리너비',
+`sideHip` Float COMMENT '측면 엉덩이너비',
+`sideFemoral` Float COMMENT '측면 허벅지너비',
+'sideCalf` Float COMMENT '측면 종아리너비',
+
+'Weight' Float COMMENT '체중',
+'BMI' Float COMMENT 'BMI',
+  PRIMARY KEY (`uid`)
