@@ -1,0 +1,5 @@
+vendor/*
+!/vendor/vendor.js
+!/modules/default/**
+!/modules/node_helper
+!/modules/node_helper/**
