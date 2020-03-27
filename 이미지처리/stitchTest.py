@@ -7,8 +7,8 @@ def rotateImage(image, deg):
     dst = cv2.flip(dst, deg == 90)
     return dst
 
-leftImage = cv2.imread(r'./image/Bleft.jpg')
-rightImage = cv2.imread(r'./image/Bright.jpg')
+leftImage = cv2.imread(r'./image/left.jpg')
+rightImage = cv2.imread(r'./image/right.jpg')
 leftImage = rotateImage(imutils.resize(leftImage, width=400), 270)
 rightImage = rotateImage(imutils.resize(rightImage, width=400), 270)
 
