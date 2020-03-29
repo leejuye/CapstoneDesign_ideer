@@ -1,5 +1,0 @@
-라즈비안 다운
-https://www.raspberrypi.org/downloads/raspbian/
-
-balenaEtcher 다운
-https://www.balena.io/etcher/
