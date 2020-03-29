@@ -1,4 +1,0 @@
-# raspberry pi install list
-
-#import imutils
-sudo pip install imutils --target /usr/local/lib/python3.7/dist-packages/
