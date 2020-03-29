@@ -17,7 +17,8 @@ var defaultModules = [
 	"newsfeed",
 	"weatherforecast",
 	"updatenotification",
-	"weather"
+	"weather", 
+	"photo"
 ];
 
 /*************** DO NOT EDIT THE LINE BELOW ***************/
