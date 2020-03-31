@@ -7,15 +7,15 @@ class Stitcher:
         (kpsA, desA) = self.imageSIFT(imageA)
         (kpsB, desB) = self.imageSIFT(imageB)
 
-        # Brute-Force 특징점 매칭
+        # Brute-Force Feature Matching
         # http://www.gisdeveloper.co.kr/?p=6824
         bf = cv2.BFMatcher()
-        # 2순위 결과까지 반환
+        # top two matches
         matches = bf.knnMatch(desA, desB, 2)
         good = []
 
         for m, n in matches:
-            # 1순위 결과가 2순위 결과 * ratio 보다 가까운 값만 고려
+            # distance within a certain ratio of each other
             if m.distance < n.distance * ratio:
                 good.append(m)
 
@@ -34,7 +34,7 @@ class Stitcher:
         return None
 
     def imageSIFT(self, image):
-        # SIFT 이미지 특성 검출
+        # SIFT feature detector
         # https://blog.naver.com/samsjang/220643446825
         sift = cv2.xfeatures2d.SIFT_create()
         kps, des = sift.detectAndCompute(image, None)

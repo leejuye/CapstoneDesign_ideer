@@ -3,6 +3,7 @@ import os
 import sys
 import time
 
+# TODO : Error check
 filename = sys.argv[1]
 
 gp.setwarnings(False)
