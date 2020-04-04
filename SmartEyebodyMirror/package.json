@@ -69,6 +69,7 @@
     "lodash": "^4.17.15",
     "module-alias": "^2.2.2",
     "moment": "latest",
+    "python-shell": "^1.0.8",
     "request": "^2.88.0",
     "rrule": "^2.6.2",
     "rrule-alt": "^2.2.8",
