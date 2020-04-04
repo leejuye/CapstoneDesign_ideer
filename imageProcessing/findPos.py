@@ -21,7 +21,7 @@ def openPos(originImage, contourImage):
     height, width, _ = originImage.shape
 
     # image to blob
-    blob = cv2.dnn.blobFromImage(originImage, 1.0 / 255, (width, height), (0, 0, 0), swapRB=False, crop=False)
+    blob = cv2.dnn.blobFromImage(originImage, 1.0 / 127.5, (300, 300), (127.5, 127.5, 127.5), swapRB=True, crop=False)
     net.setInput(blob)
 
     # get result
