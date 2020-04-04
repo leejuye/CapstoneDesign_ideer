@@ -1,16 +1,17 @@
 import numpy as np
 import cv2
 import imutils
+import findPos as op
 
-print(cv2.__version__)
+# print(cv2.__version__)
 
-frontimg = cv2.imread(r'./image/front.jpg')
-sideimg = cv2.imread(r'./image/side.jpg')
-bgimg = cv2.imread(r'./image/background.jpg')
+frontimg = cv2.imread('./image/front.jpg')
+sideimg = cv2.imread('./image/side.jpg')
+bgimg = cv2.imread('./image/background.jpg')
 
 # img1 - img2 difference
-# difimg = cv2.subtract(bgimg, frontimg)
-difimg = cv2.subtract(bgimg, sideimg)
+difimg = cv2.subtract(bgimg, frontimg)
+# difimg = cv2.subtract(bgimg, sideimg)
 
 gray_difimg = cv2.cvtColor(difimg, cv2.COLOR_BGR2GRAY)
 
@@ -48,9 +49,15 @@ cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:10]
 screenCnt = None
 
 # image draw
-# image = cv2.drawContours(frontimg, cnts, -1, (0,255,0), 3)
-image = cv2.drawContours(sideimg, cnts, -1, (0,255,0), 3)
+image = cv2.drawContours(frontimg, cnts, -1, (0,255,0), 3)
+# image = cv2.drawContours(sideimg, cnts, -1, (0,255,0), 3)
 
-cv2.imshow("sobel", cv2.resize(image, (400, 700)))
+# find skeleton
+image = imutils.resize(frontimg, width=400)
+image_front = imutils.resize(cv2.imread('./image/front.jpg'), width=400)
+
+image_op = op.openPos(image_front, image)
+
+cv2.imshow("pose", cv2.resize(image_op, (400, 700)))
 cv2.waitKey(0)
 cv2.destroyAllWindows()
