@@ -9,14 +9,13 @@ Module.register("photo",{
 		// imageSrc = "./background.jpg"
 	},
 
-	socketNotificationReceived: function(notification, payload) {
-		if (payload.action == "status"){
-			this.config.text = "lululu";
-			console.log(payload);
+	socketNotificationReceived: function(notification, payload){
+		if(notification === "SUCCESS"){
+			this.config = payload;
 		}
-		else{
-			console.log("No.....");
-		}
+		this.updateDom();
+
+		console.log(this.config);
 	},
 
 	start: function() {
@@ -26,8 +25,6 @@ Module.register("photo",{
 	},
 
 	getDom: function() {
-		// var wrapper = document.createElement('img');
-		// wrapper.src = this.config.imageSrc;
 		var wrapper = document.createElement("div");
 		wrapper.innerHTML = this.config.text;
 		return wrapper;
