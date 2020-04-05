@@ -9,4 +9,4 @@ def to_node(type, message):
     sys.stdout.flush()
 
 
-to_node("status", "text: juye")
+to_node("status", "juye")

@@ -11,7 +11,7 @@ Module.register("photo",{
 
 	socketNotificationReceived: function(notification, payload){
 		if(notification === "SUCCESS"){
-			this.config = payload;
+			this.config.text = payload;
 		}
 		this.updateDom();
 
