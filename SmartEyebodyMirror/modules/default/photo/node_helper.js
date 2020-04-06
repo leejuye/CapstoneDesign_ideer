@@ -8,7 +8,8 @@ module.exports = NodeHelper.create({
 
 	python_start: function () {
 		const self = this;
-		const pyshell = new PythonShell("modules/default/" + self.name + "/test.py", { mode: "json", args: [JSON.stringify(this.config)]});
+		const pyshell = new PythonShell("modules/default/" + self.name + "/test.py",
+			{ mode: "json", args: [JSON.stringify(this.config)]});
 
 		pyshell.on("message", function (message) {
 			if (message.hasOwnProperty("status")){
@@ -33,3 +34,4 @@ module.exports = NodeHelper.create({
 	}
 
 });
+

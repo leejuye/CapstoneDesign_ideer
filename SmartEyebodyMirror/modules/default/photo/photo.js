@@ -14,8 +14,6 @@ Module.register("photo",{
 			this.config.text = payload;
 		}
 		this.updateDom();
-
-		console.log(this.config);
 	},
 
 	start: function() {

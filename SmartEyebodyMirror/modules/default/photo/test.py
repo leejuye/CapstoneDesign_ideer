@@ -1,5 +1,6 @@
 import sys
 import json
+import time
 
 def to_node(type, message):
     try:
@@ -8,5 +9,6 @@ def to_node(type, message):
         pass
     sys.stdout.flush()
 
+time.sleep(10)
+to_node("status", "success")
 
-to_node("status", "juye")
