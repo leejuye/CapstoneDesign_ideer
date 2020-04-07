@@ -6,10 +6,7 @@ BODY_PARTS = {"Head": 0, "Neck": 1, "RShoulder": 2, "RElbow": 3, "RWrist": 4,
               "RAnkle": 10, "LHip": 11, "LKnee": 12, "LAnkle": 13, "Chest": 14,
               "Background": 15}
 
-POSE_PAIRS = [["Head", "Neck"], ["Neck", "RShoulder"], ["RShoulder", "RElbow"],
-              ["RElbow", "RWrist"], ["Neck", "LShoulder"], ["LShoulder", "LElbow"],
-              ["LElbow", "LWrist"], ["Neck", "Chest"], ["Chest", "RHip"], ["RHip", "RKnee"],
-              ["RKnee", "RAnkle"], ["Chest", "LHip"], ["LHip", "LKnee"], ["LKnee", "LAnkle"]]
+POSE_PAIRS = [["LHip", "LKnee", 0.7], ["LKnee", "LAnkle", 0.4]]
 
 def openPos(originImage, contourImage):
     protoFile = "./pose/mpi/pose_deploy_linevec_faster_4_stages.prototxt"
@@ -21,7 +18,7 @@ def openPos(originImage, contourImage):
     height, width, _ = originImage.shape
 
     # image to blob
-    blob = cv2.dnn.blobFromImage(originImage, 1.0 / 127.5, (300, 300), (127.5, 127.5, 127.5), swapRB=True, crop=False)
+    blob = cv2.dnn.blobFromImage(originImage, 1.0 / 127.5, (width, height), (127.5, 127.5, 127.5), swapRB=True, crop=False)
     net.setInput(blob)
 
     # get result
@@ -50,6 +47,15 @@ def openPos(originImage, contourImage):
         else:
             points.append(None)
 
-    # TODO : draw horizontal line between points
+    retPoints = []
+    for pair in POSE_PAIRS:
+        partA = BODY_PARTS[pair[0]]
+        partB = BODY_PARTS[pair[1]]
 
-    return contourImage
+        cH, cW, _ = contourImage.shape
+        if points[partA] and points[partB]:
+            retPoints.append(points[partA][1] + int((points[partB][1] - points[partA][1]) * pair[2]))
+            # cv2.line(contourImage, (0, Y), (int(cW), Y), (0, 255, 0), 2)
+
+    # print(retPoints)
+    return retPoints
