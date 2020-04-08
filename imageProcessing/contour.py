@@ -9,6 +9,7 @@ frontimg = cv2.imread('./image/front.jpg')
 sideimg = cv2.imread('./image/side.jpg')
 bgimg = cv2.imread('./image/background.jpg')
 
+
 # img1 - img2 difference
 difimg = cv2.subtract(bgimg, frontimg)
 # difimg = cv2.subtract(bgimg, sideimg)
@@ -19,7 +20,7 @@ gray_difimg = cv2.cvtColor(difimg, cv2.COLOR_BGR2GRAY)
 gray_difimg = cv2.fastNlMeansDenoising(gray_difimg)
 
 # bilateralFilter(image, kernel size, color SD, distance SD)
-gray_difimg = cv2.bilateralFilter(gray_difimg, 3, 75, 75)
+gray_difimg = cv2.bilateralFilter(gray_difimg, 4, 75, 75)
 
 # adaptiveThreshold(src, maxValue, adaptiveMethod, thresholdType, blockSize, C)
 th1 = cv2.adaptiveThreshold(gray_difimg, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 9, 2)
@@ -34,7 +35,7 @@ img_sobel_y = cv2.convertScaleAbs(img_sobel_y)
 
 img_sobel = cv2.addWeighted(img_sobel_x, 1, img_sobel_y, 1, 0)
 
-# image copy (laplacian.copy())
+# image copy
 # finding contours
 img_sobel = imutils.resize(img_sobel, width=400)
 cnts = cv2.findContours(img_sobel.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
@@ -65,8 +66,9 @@ for j in Ypoints:
     arr.sort()
     arrLen = len(arr) - len(arr) % 2
     for i in range(0, arrLen, 2):
-        cv2.line(image, (arr[i][0], arr[i][1]), (arr[i+1][0], arr[i+1][1]), (0, 255, 0), 2)
+        cv2.line(image, (arr[i][0], arr[i][1]), (arr[i + 1][0], arr[i + 1][1]), (0, 255, 0), 2)
 
 cv2.imshow("line", cv2.resize(image, (400, 700)))
+
 cv2.waitKey(0)
 cv2.destroyAllWindows()
