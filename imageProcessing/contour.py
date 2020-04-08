@@ -9,7 +9,6 @@ frontimg = cv2.imread('./image/front.jpg')
 sideimg = cv2.imread('./image/side.jpg')
 bgimg = cv2.imread('./image/background.jpg')
 
-
 # img1 - img2 difference
 difimg = cv2.subtract(bgimg, frontimg)
 # difimg = cv2.subtract(bgimg, sideimg)
@@ -64,11 +63,10 @@ for j in Ypoints:
         if y == j:
             arr.append((x, y))
     arr.sort()
-    print(arr)
-    for i in range(0, len(arr), 2):
+    arrLen = len(arr) - len(arr) % 2
+    for i in range(0, arrLen, 2):
         cv2.line(image, (arr[i][0], arr[i][1]), (arr[i+1][0], arr[i+1][1]), (0, 255, 0), 2)
 
 cv2.imshow("line", cv2.resize(image, (400, 700)))
-
 cv2.waitKey(0)
 cv2.destroyAllWindows()
