@@ -2,7 +2,6 @@ import numpy as np
 import cv2
 import imutils
 import sys
-import findPos as op
 
 # print(cv2.__version__)
 
@@ -50,30 +49,7 @@ def main():
     image = cv2.drawContours(frontimg, cnts, -1, (0, 255, 0), 1)
     # image = cv2.drawContours(sideimg, cnts, -1, (0,255,0), 3)
 
-    # find skeleton
-    image = imutils.resize(frontimg, width=400)
-    image_front = imutils.resize(cv2.imread('./image/front.jpg'), width=400)
-
-    # y Value
-    Ypoints = op.openPos(image_front, image)
-    # print(Ypoints)
-
-    for j in Ypoints:
-        arr = []
-        for i in cnts[0]:
-            x, y = i[0]
-            if y == j:
-                arr.append((x, y))
-        arr.sort()
-        arrLen = len(arr) - len(arr) % 2
-        for i in range(0, arrLen, 2):
-            cv2.line(image, (arr[i][0], arr[i][1]), (arr[i + 1][0], arr[i + 1][1]), (0, 255, 0), 2)
-
-    # cv2.imshow("line", cv2.resize(image, (400, 700)))
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
-
-    cv2.imwrite("result.jpg", cv2.resize(image, (400, 700)))
+    cv2.imwrite("result.jpg", cv2.resize(frontimg, (400, 700)))
 
 if __name__ == "__main__":
     #time.sleep(5)
