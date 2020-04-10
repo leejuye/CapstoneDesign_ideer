@@ -2,6 +2,14 @@ import numpy as np
 import cv2
 import imutils
 import sys
+import json
+
+def to_node(type, message):
+    try:
+        print(json.dumps({type: message}))
+    except Exception:
+        pass
+    sys.stdout.flush()
 
 # print(cv2.__version__)
 
@@ -50,4 +58,5 @@ image = cv2.drawContours(frontimg, cnts, -1, (0, 255, 0), 1)
 
 cv2.imwrite("/home/joy/SmartEyebodyMirror/modules/default/photo/image/result.jpg", cv2.resize(frontimg, (400, 700)))
 
+to_node("status", "result")
 
