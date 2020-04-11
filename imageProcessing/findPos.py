@@ -6,7 +6,7 @@ BODY_PARTS = {"Head": 0, "Neck": 1, "RShoulder": 2, "RElbow": 3, "RWrist": 4,
               "Background": 15}
 
 POSE_PAIRS = [["LHip", "LKnee", 0.7], ["LKnee", "LAnkle", 0.4], ["LShoulder", "LShoulder", 1.0],
-              ["LHip", "LKnee", 0.2], ["Neck", "Chest", 0.7]]
+              ["LHip", "LKnee", 0.2], ["Chest", "Chest", 1.0]]
 
 def openPos(originImage, contourImage):
     protoFile = "./pose/mpi/pose_deploy_linevec_faster_4_stages.prototxt"
@@ -57,4 +57,5 @@ def openPos(originImage, contourImage):
             Y = points[partA][1] + int((points[partB][1] - points[partA][1]) * pair[2])
             retPoints.append(Y)
 
+    retPoints.sort()
     return retPoints
