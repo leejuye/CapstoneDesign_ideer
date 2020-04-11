@@ -49,10 +49,10 @@ def contour(backImage, image):
     return image, cnts
 
 
-def line(image, cnts, Ypoints):
-    for j in range(0, len(Ypoints)):
+def line(image, cnts, Ypoints, isSide):
+    for j in range(isSide, len(Ypoints)):
         arr = []
-        for i in cnts[0]:
+        for i in cnts:
             x, y = i[0]
             if y == Ypoints[j] and (len(arr) == 0 or arr[-1][0] + 3 <= x):
                 arr.append((x, y))
@@ -77,8 +77,8 @@ imageFront = imutils.resize(cv2.imread('./image/front.jpg'), width=400)
 # y Value
 Ypoints = op.openPos(imageFront, frontContour)
 
-line(frontContour, cntsFront, Ypoints)
-line(sideContour, cntsSide, Ypoints)
+line(frontContour, cntsFront[0], Ypoints, 0)
+line(sideContour, cntsSide[0], Ypoints, 1)
 
 cv2.imshow("front", cv2.resize(frontContour, (400, 700)))
 cv2.imshow("side", cv2.resize(sideContour, (400, 700)))
