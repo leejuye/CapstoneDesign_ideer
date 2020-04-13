@@ -62,6 +62,62 @@ var config = {
 			module: "photo",
 			position: "middle_center"
 		},
+		{
+			module: "MMM-Hotword",
+			position: "top_center",
+			config: {
+				chimeOnFinish: null,
+				mic: {
+					recordProgram: "arecord",
+					device: "plughw:0"
+				},
+				models: [
+					{
+						hotwords    : "smart_mirror",
+						file        : "smart_mirror.umdl",
+						sensitivity : "10",
+					},
+				],
+				commands: {
+					"smart_mirror": {
+						notificationExec: {
+							notification: "ASSISTANT_ACTIVATE",
+							payload: (detected, afterRecord) => {
+								return {profile:"default"}
+							}
+						},
+						restart:false,
+						afterRecordLimit:0
+					}
+				}
+			}
+		},
+		{
+			module: "MMM-AssistantMk2",
+			position: "top_center",
+			config: {
+				deviceLocation: {
+					coordinates: {
+						latitude: 37.5650168, // -90.0 - +90.0
+						longitude: 126.8491231, // -180.0 - +180.0
+					},
+				},
+				record: {
+					recordProgram : "arecord",  
+					device        : "plughw:0",
+				},
+				notifications: {
+					ASSISTANT_ACTIVATED: "HOTWORD_PAUSE",
+					ASSISTANT_DEACTIVATED: "HOTWORD_RESUME",
+				},
+				useWelcomeMessage: "brief today",
+				profiles: {
+					"default" : {
+						lang: "en-US"
+					}
+				},
+			}
+		},
 		// {
 		// 	module: "currentweather",
 		// 	position: "top_right",

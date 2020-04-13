@@ -9,6 +9,12 @@ Module.register("photo",{
 		imageSrc: "/modules/default/photo/image/background.jpg",
 	},
 
+	start: function() {
+	 	this.current_user = null;
+	 	// this.sendSocketNotification("CONFIG", this.config);
+	 	Log.info("Starting module: " + this.name);
+	},
+
 	socketNotificationReceived: function(notification, payload){
 	 	if(notification === "SUCCESS"){
 	 		this.config.imageSrc = "/modules/default/photo/image/" + payload + ".jpg";
@@ -16,10 +22,13 @@ Module.register("photo",{
 	 	this.updateDom();
 	},
 
-	start: function() {
-	 	this.current_user = null;
-	 	this.sendSocketNotification("CONFIG", this.config);
-	 	Log.info("Starting module: " + this.name);
+	notificationReceived: function (notification, payload, sender) {
+		if(notification === "PYTHON_START"){
+	 		Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
+			this.sendSocketNotification("CONFIG", this.config);
+	 	} else {
+			Log.log(this.name + " received a 'system' notification: " + notification);
+		}
 	},
 
 	getDom: function() {
