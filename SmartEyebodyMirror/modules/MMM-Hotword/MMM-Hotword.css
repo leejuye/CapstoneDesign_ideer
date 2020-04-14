@@ -1,0 +1,53 @@
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
+#HOTWORD {
+  height:48px;
+  width:48px;
+  box-sizing:border-box;
+  line-height: 100%;
+  font-size:48px;
+  padding:0;
+  margin:0;
+  display:flex;
+}
+
+#HOTWORD_ICON {
+  color:#FFF;
+  display:inline-block;
+}
+
+#HOTWORD_DETECTED {
+  color:#FFF;
+  font-size:24px;
+  display:none;
+}
+
+#HOTWORD_DETECTED.detected {
+  padding:0 10px 0 10px;
+  background-color:rgba(255,255,255,0.5);
+  border-radius:24px;
+  display:inline-block;
+}
+
+#HOTWORD_ICON > * {
+  display:none;
+}
+
+
+#HOTWORD_ICON.start #HOTWORD_ICON_WAITING {
+  display:inline-block;
+  animation: blinker 2s linear infinite;
+}
+
+#HOTWORD_ICON.detected #HOTWORD_ICON_DETECTED {
+  display:inline-block;
+}
+
+
+#HOTWORD_ICON.finished #HOTWORD_ICON_DISABLED {
+  display:inline-block;
+}
