@@ -39,10 +39,6 @@ var config = {
 		// 	position: "top_bar"
 		// },
 		// {
-		// 	module: "clock",
-		// 	position: "top_left"
-		// },
-		// {
 		// 	module: "calendar",
 		// 	header: "US Holidays",
 		// 	position: "top_left",
@@ -58,6 +54,10 @@ var config = {
 		// 	module: "compliments",
 		// 	position: "lower_third"
 		// },
+		{
+		 	module: "clock",
+		 	position: "top_center"
+		},
 		{
 			module: "photo",
 			position: "middle_center"
@@ -103,7 +103,7 @@ var config = {
 					},
 				},
 				record: {
-					recordProgram : "arecord",  
+					recordProgram : "arecord",
 					device        : "plughw:0",
 				},
 				notifications: {
