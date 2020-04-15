@@ -12,32 +12,32 @@ Module.register("compliments", {
 	defaults: {
 		compliments: {
 			anytime: [
-				"Hey there sexy!"
+				"안녕하세요"
 			],
 			morning: [
-				"Good morning, handsome!",
-				"Enjoy your day!",
-				"How was your sleep?"
+				"안녕하세요",
+				"좋은 아침입니다!",
+				"원하는 기능을 \n말해주세요."
 			],
 			afternoon: [
-				"Hello, beauty!",
-				"You look sexy!",
-				"Looking good today!"
+				"안녕하세요",
+				"좋은 점심입니다!",
+				"원하는 기능을 \n말해주세요."
 			],
 			evening: [
-				"Wow, you look hot!",
-				"You look nice!",
-				"Hi, sexy!"
+				"안녕하세요",
+				"좋은 저녁입니다!",
+				"원하는 기능을 \n말해주세요."
 			]
 		},
-		updateInterval: 30000,
+		updateInterval: 4000,
 		remoteFile: null,
 		fadeSpeed: 4000,
-		morningStartTime: 3,
+		morningStartTime: 5,
 		morningEndTime: 12,
 		afternoonStartTime: 12,
 		afternoonEndTime: 17,
-		random: true
+		random: false
 	},
   lastIndexUsed:-1,
 	// Set currentweather from module
@@ -169,7 +169,7 @@ Module.register("compliments", {
 // Override dom generator.
 	getDom: function() {
 		var wrapper = document.createElement("div");
-		wrapper.className = this.config.classes ? this.config.classes : "thin xlarge bright pre-line";
+		wrapper.className = this.config.classes ? this.config.classes : "thin large bright pre-line";
 		// get the compliment text 
 		var complimentText = this.randomCompliment();
 		// split it into parts on newline text 

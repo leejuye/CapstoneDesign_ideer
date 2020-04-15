@@ -50,10 +50,10 @@ var config = {
 		// 		]
 		// 	}
 		// },
-		// {
-		// 	module: "compliments",
-		// 	position: "lower_third"
-		// },
+		{
+		    module: "compliments",
+		 	position: "lower_third"
+		},
 		{
 		 	module: "clock",
 		 	position: "top_center"
