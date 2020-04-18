@@ -3,6 +3,7 @@ import cv2
 import imutils
 import sys
 import json
+import os
 
 def to_node(type, message):
     try:
@@ -11,11 +12,10 @@ def to_node(type, message):
         pass
     sys.stdout.flush()
 
-# print(cv2.__version__)
-
-frontimg = cv2.imread('/home/joy/SmartEyebodyMirror/modules/default/photo/image/front.jpg')
-sideimg = cv2.imread('/home/joy/SmartEyebodyMirror/modules/default/photo/image/side.jpg')
-bgimg = cv2.imread('/home/joy/SmartEyebodyMirror/modules/default/photo/image/background.jpg')
+curPath = os.path.dirname(os.path.abspath(__file__))
+frontimg = cv2.imread(curPath + '/image/front.jpg')
+sideimg = cv2.imread(curPath + '/image/side.jpg')
+bgimg = cv2.imread(curPath + '/image/background.jpg')
 
 # img1 - img2 difference
 difimg = cv2.subtract(bgimg, frontimg)
@@ -56,7 +56,6 @@ frontimg = imutils.resize(frontimg, width=400)
 image = cv2.drawContours(frontimg, cnts, -1, (0, 255, 0), 1)
 # image = cv2.drawContours(sideimg, cnts, -1, (0,255,0), 3)
 
-cv2.imwrite("/home/joy/SmartEyebodyMirror/modules/default/photo/image/result.jpg", cv2.resize(frontimg, (400, 700)))
+cv2.imwrite(curPath + "/image/result.jpg", cv2.resize(frontimg, (400, 700)))
 
 to_node("status", "result")
-
