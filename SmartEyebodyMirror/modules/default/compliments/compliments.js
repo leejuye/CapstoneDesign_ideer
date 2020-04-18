@@ -11,37 +11,35 @@ Module.register("compliments", {
 	// Module config defaults.
 	defaults: {
 		compliments: {
-			anytime: [
-				"Hey there sexy!"
-			],
 			morning: [
-				"Good morning, handsome!",
-				"Enjoy your day!",
-				"How was your sleep?"
+				"안녕하세요",
+				"좋은 아침입니다!",
+				"원하는 기능을 \n말해주세요."
 			],
 			afternoon: [
-				"Hello, beauty!",
-				"You look sexy!",
-				"Looking good today!"
+				"안녕하세요",
+				"좋은 점심입니다!",
+				"원하는 기능을 \n말해주세요."
 			],
 			evening: [
-				"Wow, you look hot!",
-				"You look nice!",
-				"Hi, sexy!"
+				"안녕하세요",
+				"좋은 저녁입니다!",
+				"원하는 기능을 \n말해주세요."
 			]
 		},
-		updateInterval: 30000,
+		updateInterval: 4000,
 		remoteFile: null,
 		fadeSpeed: 4000,
-		morningStartTime: 3,
+		morningStartTime: 5,
 		morningEndTime: 12,
 		afternoonStartTime: 12,
 		afternoonEndTime: 17,
-		random: true
+		random: false
 	},
   lastIndexUsed:-1,
 	// Set currentweather from module
 	currentWeatherType: "",
+	compInterval: null,
 
 	// Define required scripts.
 	getScripts: function() {
@@ -50,7 +48,7 @@ Module.register("compliments", {
 
 	// Define start sequence.
 	start: function() {
-		Log.info("Starting module: " + this.name);
+		Log.info("@@@@@@@Starting module: " + this.name);
 
 		this.lastComplimentIndex = -1;
 
@@ -63,7 +61,7 @@ Module.register("compliments", {
 		}
 
 		// Schedule update timer.
-		setInterval(function() {
+		this.compInterval = setInterval(function() {
 			self.updateDom(self.config.fadeSpeed);
 		}, this.config.updateInterval);
 	},
@@ -120,7 +118,7 @@ Module.register("compliments", {
 			compliments.push.apply(compliments, this.config.compliments[this.currentWeatherType]);
 		}
 
-		compliments.push.apply(compliments, this.config.compliments.anytime);
+		// compliments.push.apply(compliments, this.config.compliments.anytime);
 
 		return compliments;
 	},
@@ -158,9 +156,10 @@ Module.register("compliments", {
 			index = this.randomIndex(compliments);
 		}
 		else{
-			// no, sequetial
-			// if doing sequential,  don't fall off the end
-			index = (this.lastIndexUsed >= (compliments.length-1))?0: ++this.lastIndexUsed
+			index = ++this.lastIndexUsed;
+			if (index == compliments.length - 1) {
+				clearInterval(this.compInterval);
+			}
 		}
 
 		return compliments[index];
@@ -169,10 +168,10 @@ Module.register("compliments", {
 // Override dom generator.
 	getDom: function() {
 		var wrapper = document.createElement("div");
-		wrapper.className = this.config.classes ? this.config.classes : "thin xlarge bright pre-line";
-		// get the compliment text 
+		wrapper.className = this.config.classes ? this.config.classes : "thin large bright pre-line";
+		// get the compliment text
 		var complimentText = this.randomCompliment();
-		// split it into parts on newline text 
+		// split it into parts on newline text
 		var parts= complimentText.split('\n')
 		// create a span to hold it all
 		var compliment=document.createElement('span')

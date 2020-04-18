@@ -17,7 +17,7 @@ Module.register("clock",{
 		clockBold: false,
 		showDate: true,
 		showWeek: false,
-		dateFormat: "dddd, LL",
+		dateFormat: "YYYY.MM.DD hh:mm:ss dddd",
 
 		/* specific to the analog clock */
 		analogSize: "200px",
@@ -91,13 +91,13 @@ Module.register("clock",{
 
 		var dateWrapper = document.createElement("div");
 		var timeWrapper = document.createElement("div");
-		var secondsWrapper = document.createElement("sup");
+		var secondsWrapper = document.createElement("div");
 		var periodWrapper = document.createElement("span");
 		var weekWrapper = document.createElement("div");
 		// Style Wrappers
-		dateWrapper.className = "date normal medium";
-		timeWrapper.className = "time bright large light";
-		secondsWrapper.className = "dimmed";
+		dateWrapper.className = "date bright medium light";
+		timeWrapper.className = "date bright medium light";
+		secondsWrapper.className = "date bright medium light";
 		weekWrapper.className = "week dimmed medium";
 
 		// Set content of wrappers.
@@ -209,7 +209,7 @@ Module.register("clock",{
 		if (this.config.displayType === "digital") {
 			// Display only a digital clock
 			wrapper.appendChild(dateWrapper);
-			wrapper.appendChild(timeWrapper);
+			//wrapper.appendChild(timeWrapper);
 			wrapper.appendChild(weekWrapper);
 		} else if (this.config.displayType === "analog") {
 			// Display only an analog clock

@@ -185,9 +185,12 @@ sup {
 }
 
 .region.top.right,
-.region.top.left,
-.region.top.center {
+.region.top.left {
   top: 100%;
+},
+
+.region.top.center {
+  top: -200%;
 }
 
 .region.bottom {
