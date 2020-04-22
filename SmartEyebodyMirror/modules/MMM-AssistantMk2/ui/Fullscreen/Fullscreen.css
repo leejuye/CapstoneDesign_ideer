@@ -70,7 +70,7 @@
   background-repeat: no-repeat;
   background-size: 230%;
 }
-#AMK2.static #AMK2_STATUS.reply {
+#AMK2_STATUS.reply.static  {
   background-image:url('../../resources/reply-think.png');
 }
 
@@ -80,7 +80,7 @@
   background-repeat: no-repeat;
   background-size: 230%;
 }
-#AMK2.static #AMK2_STATUS.error {
+#AMK2_STATUS.error.static {
   background-image:url('../../resources/confirmation-error.png');
 }
 
@@ -90,7 +90,7 @@
   background-repeat: no-repeat;
   background-size: 230%;
 }
-#AMK2.static #AMK2_STATUS.think {
+#AMK2_STATUS.think.static {
   background-image:url('../../resources/reply-think.png');
 }
 
@@ -100,7 +100,7 @@
   background-repeat: no-repeat;
   background-size: 230%;
 }
-#AMK2.static #AMK2_STATUS.continue {
+#AMK2_STATUS.continue.static {
   background-image:url('../../resources/continue-listen.png');
 }
 
@@ -110,7 +110,7 @@
   background-repeat: no-repeat;
   background-size: 230%;
 }
-#AMK2.static #AMK2_STATUS.listen {
+#AMK2_STATUS.listen.static {
   background-image:url('../../resources/continue-listen.png');
 }
 
@@ -120,7 +120,7 @@
   background-repeat: no-repeat;
   background-size: 230%;
 }
-#AMK2.static #AMK2_STATUS.confirmation {
+#AMK2_STATUS.confirmation.static {
   background-image:url('../../resources/confirmation-error.png');
 }
 
@@ -130,8 +130,9 @@
   background-repeat: no-repeat;
   background-size: contain;
 }
-#AMK2.static #AMK2_STATUS.standby,
-#AMK2.static-standby #AMK2_STATUS.standby {
+
+#AMK2_STATUS.standby.static,
+#AMK2_STATUS.standby.static-standby {
   background-image:url('../../resources/standby.png');
 }
 
@@ -141,7 +142,7 @@
   background-repeat: no-repeat;
   background-size: 195%;
 }
-#AMK2.static #AMK2_STATUS.hook {
+#AMK2_STATUS.hook.static {
   background-image:url('../../resources/hook.png');
 }
 

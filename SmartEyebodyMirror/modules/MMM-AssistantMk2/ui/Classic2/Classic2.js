@@ -50,7 +50,6 @@ class AssistantResponse extends AssistantResponseClass{
     /** Help Word box**/
     var help = document.createElement("div")
     help.id = "AMK2_HELP"
-    //help.id.add("hidden")
    
     var helpbox = document.createElement("div")
     helpbox.id = "AMK2_HELPBOX"

@@ -21,13 +21,6 @@ var recipe = {
             callback: "command_q",
             description: module.translate("QUERY_HELP")
           })
-          if (module.config.developer) {
-            module.sendNotification("TELBOT_REGISTER_COMMAND", {
-              command: "demo",
-              callback: "telegramCommand",
-              description: module.translate("DEMO_HELP")
-            })
-          }
           module.sendNotification("TELBOT_REGISTER_COMMAND", {
             command: "query",
             callback: "telegramCommand",

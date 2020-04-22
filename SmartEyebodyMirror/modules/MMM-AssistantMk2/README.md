@@ -3,30 +3,18 @@
 `MMM-AssistantMk2` is an embedded Google assistant on MagicMirror.
 
 ## NEW UPDATES
-**3.1.2 (17/03/2020)**
- * **FIX**: No sound response issue when custom action is used.
- * **FIX**: correct youtube search link.
- * **ADD**: Add A2D stop command (beta)
- 
-**3.1.1-2 (06/03/2020)**
- * **ADD/MODIFY**: `ui: "Fullscreen"`
-   * `position: "fullscreen_above"` is now ui like `Google Home`
- * **MODIFY**: user interface priority order Assistant2Display -> AMk2
- * **ADD**: move native sound to class
+**3.2.1 (16/04/2020)**
+ * **FIX**: Send A2D response only on no hooked response
+ * **FIX**: repository change owner
+ * **ADD**: preprared recipe with-radio_fr.js recipe for A2D Radio (FR Only)
+ * **ADD**: npm run rebuild -> REFRESH installation on MagicMirror version change
 
-**3.1.1-1 (05/03/2020)**
- * **FIX**: correct audio cutting response for mpg321 (test)
- * **ADD**: add cvlc audio out support (vlc using)
-
-**3.1.1-0 (02/03/2020)**
- * **ADD**: add new function for addons-recipe (socketExec, onSocketExec)
- * **FIX**: continous conversation bug - infinite loop on no user response
- * **FIX**: double chimed on TRANSCRIPTION_FAILS retry
- * **FIX**: ability to set no chime on activate assistant
- * **FIX**: touching the keyword "try to say" activates the assistant for the suggested search (Fullscreen and Classic2 ui)
- * **ADD**: ASSISTANT_WEB server for activate with keyword
- * **MOTIFY** : search KEYWORD/ TRYTOSAY translation script to improve performance
- * **FIX**: correct screen parser log
+**3.2.0 (09/04/2020)**
+ * **ADD**: Chinese_simplified translate (thx to @wlmqpsc)
+ * **ADD**: ability to play personnal sound on recipes soundExec command (see wiki)
+ * **FIX**: no fade in animation on first use in Fullscreen ui
+ * **DEL**: full addon code and cleanning
+ * **ADD**: add control if A2D used
 
 ## [**Preview Video**](https://youtu.be/e7Xg95mL8JE)
 
@@ -50,9 +38,9 @@
 - pre-built recipes are served.
 - Easier `custom action` managing.
 
-## Installation & Guides
-Read the docs in [wiki](https://github.com/eouia/MMM-AssistantMk2/wiki)
-
+## Installation, update & Guides
+Read the docs in [wiki](https://github.com/eouia/MMM-AssistantMk2/wiki)<br>
+[简体中文 Chinese_simplified](./translations/Chinese_simplified/README_zh-CN.md)
 ## Update from 2.x
 Not easy. Remove existence then reinstall fresh.
 - You'd better backup your `credentials.json` and profiles.
@@ -64,7 +52,37 @@ cd ~/MagicMirror/modules/MMM-AssistantMk2
 npm run update
 ```
 
+## Update on new MagicMirror version (exemple v2.10.x to v2.11.x)
+```sh
+cd ~/MagicMirror/modules/MMM-AssistantMk2
+npm run rebuild
+```
+
 ## UPDATE HISTORY
+**3.1.2 (17/03/2020)**
+ * **FIX**: No sound response issue when custom action is used.
+ * **FIX**: correct youtube search link.
+ * **ADD**: Add A2D stop command (beta)
+
+**3.1.1-2 (06/03/2020)**
+ * **ADD/MODIFY**: `ui: "Fullscreen"`
+   * `position: "fullscreen_above"` is now ui like `Google Home`
+ * **MODIFY**: user interface priority order Assistant2Display -> AMk2
+ * **ADD**: move native sound to class
+
+**3.1.1-1 (05/03/2020)**
+ * **FIX**: correct audio cutting response for mpg321 (test)
+ * **ADD**: add cvlc audio out support (vlc using)
+
+**3.1.1-0 (02/03/2020)**
+ * **ADD**: add new function for addons-recipe (socketExec, onSocketExec)
+ * **FIX**: continous conversation bug - infinite loop on no user response
+ * **FIX**: double chimed on TRANSCRIPTION_FAILS retry
+ * **FIX**: ability to set no chime on activate assistant
+ * **FIX**: touching the keyword "try to say" activates the assistant for the suggested search (Fullscreen and Classic2 ui)
+ * **ADD**: ASSISTANT_WEB server for activate with keyword
+ * **MOTIFY** : search KEYWORD/ TRYTOSAY translation script to improve performance
+ * **FIX**: correct screen parser log
 
 **3.1.0-3 (07/02/2020)**
  * **BUG**: correct issue with no response audio and play-sound (freeze)
@@ -98,13 +116,12 @@ npm run update
 - MacOS Catalina 10.15.2 / MacBookPro 2017 15" / nodeJS v11.12.0 / npm v6.9.0
 - debian 10 / nodeJS v10.18.0 / npm v6.13.4
 
-
-
-
 ## Credits
 - Author :
   - @eouia
   - @bugsounet
   - @Anonym-tsk
+- Chinese simplified translate :
+  - @wlmqpsc
 - License : MIT
   - **By terms of Google Assistant SDK, You are not allowed to use or provide this module for commercial purpose.**

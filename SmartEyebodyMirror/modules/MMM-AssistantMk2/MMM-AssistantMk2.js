@@ -55,7 +55,7 @@ Module.register("MMM-AssistantMk2", {
       autoUpdateAction: false,
       // actionLocale: "en", // multi language action is not supported yet
     },
-    addons: false,
+    useA2D: true,
     recipes: [],
     transcriptionHooks: {},
     actions: {},
@@ -95,7 +95,7 @@ Module.register("MMM-AssistantMk2", {
     if (this.config.ui) {
       var ui = this.config.ui + "/" + this.config.ui + '.js'
       return [
-       "/modules/MMM-AssistantMk2/library/response.class.js",
+       "/modules/MMM-AssistantMk2/components/response.js",
        "/modules/MMM-AssistantMk2/ui/" + ui
       ]
     }
@@ -115,7 +115,7 @@ Module.register("MMM-AssistantMk2", {
   start: function () {
     const helperConfig = [
       "debug", "recipes", "customActionConfig", "assistantConfig", "micConfig",
-      "responseConfig", "addons"
+      "responseConfig", "useA2D"
     ]
     this.helperConfig = {}
     if (this.config.debug) log = _log
@@ -159,6 +159,10 @@ Module.register("MMM-AssistantMk2", {
       },
       playChime: (chime) => {
         return this.playChime(chime)
+      },
+      A2D: (response)=> {
+        if (this.config.useA2D)
+         return this.Assistant2Display(response)
       }
     }
     this.assistantResponse = new AssistantResponse(this.helperConfig["responseConfig"], callbacks)
@@ -309,9 +313,6 @@ Module.register("MMM-AssistantMk2", {
         this.assistantResponse.fullscreen(true)
         this.assistantActivate({ type: "TEXT", key: magicQuery}, Date.now())
         break
-      case "ASSISTANT_DEMO":
-        if (this.config.developer) this.demo()
-        break
     }
     this.doPlugin("onAfterNotificationReceived", {notification:noti, payload:payload})
   },
@@ -327,11 +328,11 @@ Module.register("MMM-AssistantMk2", {
         break
       case "INITIALIZED":
         log("Initialized.")
+        this.sendNotification("ASSISTANT_READY")
         this.assistantResponse.status("standby")
         this.doPlugin("onReady")
         break
       case "ASSISTANT_RESULT":
-        if (this.config.addons) this.Assistant2Display(payload)
         if (payload.session && this.session.hasOwnProperty(payload.session)) {
           var session = this.session[payload.session]
           if (typeof session.callback == "function") {
@@ -407,6 +408,7 @@ Module.register("MMM-AssistantMk2", {
   assistantActivate: function(payload, session) {
     if (this.myStatus.actual != "standby" && !payload.force) return log("Assistant is busy.")
     this.doPlugin("onBeforeActivated", payload)
+    if (this.config.useA2D) this.sendNotification("A2D_AMK2_BUSY")
     this.lastQuery = null
     var options = {
       type: "TEXT",
@@ -433,6 +435,7 @@ Module.register("MMM-AssistantMk2", {
 
   endResponse: function() {
     this.doPlugin("onAfterInactivated")
+    if (this.config.useA2D) this.sendNotification("A2D_AMK2_READY")
   },
 
   postProcess: function (response, callback_done=()=>{}, callback_none=()=>{}) {
@@ -601,57 +604,11 @@ Module.register("MMM-AssistantMk2", {
         if (snde.chime == "open") this.assistantResponse.playChime("open")
         if (snde.chime == "close") this.assistantResponse.playChime("close")
       }
+      if (snde.sound && typeof snde.sound == 'string') {
+        this.assistantResponse.playChime(snde.sound, true)
+      }
       if (snde.say && typeof snde.say == 'string' && this.config.responseConfig.myMagicWord) {
           this.notificationReceived("ASSISTANT_SAY", snde.say , this.name)
-      }
-    }
-
-/** return a socket notification for addons **/
-/** socketExec: {
- *    socket: "socket notification to send",
- *    payload: "payload",
- *   }
-**/
-    if (command.hasOwnProperty("socketExec")) {
-      var soe = command.socketExec
-      if (soe.socket) {
-        var fsoen = (typeof soe.socket == "function") ?  soe.soket(param, from) : soe.socket
-        var soep = (soe.payload) ? ((typeof soe.payload == "function") ?  soe.payload(param, from) : soe.payload) : null
-        var fsoep = (typeof soep == "object") ? Object.assign({}, soep) : soep
-        log (`Command ${commandId} is executed (socketExec).`)
-        this.sendSocketNotification(fsoen, fsoep)
-      }
-      else log (`Command ${commandId} syntax error (socketExec).`)
-    }
-
-/** compare socket notification received to socket notification wanted and return another socket notification for addons **/
-/** onSocketExec: {
- *    "Name1" : {
- *      received: "socket noti received",
- *      socket: "send this socket noti",
- *      payload: "Optional", or {}
- *      status: "AMk2 assistant status compare" // standby, continue, ...
- *      execAssistant: true // for execute assistant -- socket is not needed
- *    }
- *  }
-**/
-    if (command.hasOwnProperty("onSocketExec")) {
-      var osoe = command.onSocketExec
-      for (var x in osoe) {
-        if (osoe[x].received && (param.notification == osoe[x].received)) {
-          if ((osoe[x].status && osoe[x].status == this.myStatus.actual) || !osoe[x].status) {
-            if (osoe[x].execAssistant) {
-              this.notificationReceived("ASSISTANT_ACTIVATE", { type: "MIC", profile: "default" })
-              log (`Command ${x} of ${commandId} is executed (onSocketExec).`)
-            } else if (osoe[x].socket) {
-              var fosoen = (typeof osoe[x].socket == "function") ?  osoe[x].socket(param, from) : osoe[x].socket
-              var osoep = (osoe[x].payload) ? ((typeof osoe[x].payload == "function") ?  osoe[x].payload(param, from) : osoe[x].payload) : null
-              var fosoep = (typeof osoep == "object") ? Object.assign({}, osoep) : osoep
-              log (`Command ${x} of ${commandId} is executed (onSocketExec).`)
-              this.sendSocketNotification(fosoen, fosoep)
-            }
-          }
-        }
       }
     }
   },
@@ -671,37 +628,15 @@ Module.register("MMM-AssistantMk2", {
       handler.reply("TEXT", this.translate("SAY_REPLY") + handler.args)
       this.notificationReceived("ASSISTANT_SAY", handler.args, "MMM-TelegramBot")
     }
-    if (command == "demo") {
-      handler.reply("TEXT", this.translate("DEMO_REPLY"))
-      this.notificationReceived("ASSISTANT_DEMO", null, "MMM-TelegramBot")
-    }
-  },
-
-  /** demo for check if icons are ok ... **/
-
-  demo: function() {
-    var allStatus = [ "hook", "standby", "reply", "error", "think", "continue", "listen", "confirmation" ]
-    var myStatus = document.getElementById("AMK2_STATUS")
-    this.assistantResponse.fullscreen(true)
-    var i = 0
-    for (let [item,value] of Object.entries(allStatus)) {
-      setTimeout(() => {
-        this.assistantResponse.status(value)
-        if (value == "listen") this.assistantResponse.playChime("beep")
-        this.assistantResponse.showTranscription("icon: " + value)
-        if (item == 7) setTimeout(() => {
-          this.assistantResponse.status("standby")
-          this.assistantResponse.showTranscription(" ")
-          this.assistantResponse.fullscreen(false, this.myStatus)
-        } , 4000)
-      }, 1000 + i)
-      i += 4000
-    }
   },
 
 /** Send needed part of response screen to MMM-Assistant2Display **/
-
   Assistant2Display: function(response) {
+    if (response.lastQuery.secretMode || response.lastQuery.sayMode) return
+
+    if (response.transcription && ((response.transcription.transcription == "stop") || (response.transcription.transcription == "stoppe")))
+      return this.sendNotification("A2D_STOP")
+
     var opt = {
       "photos": null,
       "urls": null,
@@ -717,9 +652,7 @@ Module.register("MMM-AssistantMk2", {
       opt.trysay= response.screen.trysay
       opt.help= response.screen.help
       log("Send A2D Response.")
-      this.sendNotification("ASSISTANT2DISPLAY", opt)
+      this.sendNotification("A2D", opt)
     }
-    if (response.transcription && ((response.transcription.transcription == "stop") || (response.transcription.transcription == "stoppe")))
-      this.sendNotification("A2D_STOP")
   }
 })

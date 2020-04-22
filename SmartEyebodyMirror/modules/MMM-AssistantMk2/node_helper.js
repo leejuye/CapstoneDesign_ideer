@@ -9,7 +9,6 @@ const url = require("url")
 const Assistant = require("./components/assistant.js")
 const ScreenParser = require("./components/screenParser.js")
 const ActionManager = require("./components/actionManager.js")
-const ConstructorAddons = require("./components/constructorAddons.js")
 const Sound = require("./components/sound.js")
 
 
@@ -61,12 +60,6 @@ module.exports = NodeHelper.create({
         this.sound.play(payload)
         break
     }
-    if (this.config.addons)
-      this.addons.sendToAddons(noti,payload,(send,params)=>{ this.addonsCallback(send,params) })
-  },
-  
-  addonsCallback: function(send,params) {
-    if (send) this.sendSocketNotification(send,params)
   },
 
   tunnel: function(payload) {
@@ -140,10 +133,7 @@ module.exports = NodeHelper.create({
     else log("Use HTML5 for audio response")
     this.assistantWeb()
     console.log("[AMK2] AssistantMk2 is initialized.")
-    if (this.config.addons) {
-      this.addons = new ConstructorAddons(this.config)
-      log ("Assistant2Display Started")
-    }
+    if (this.config.useA2D) log ("Assistant2Display Started")
   },
 
   cleanUptmp: function() {
@@ -173,7 +163,7 @@ module.exports = NodeHelper.create({
           log(`RECIPE_ERROR (${recipes[i]}):`, e.message)
         }
       }
-      if (this.config.actions && Object.keys(this.config.actions).length > 1) {
+      if (this.config.actions && Object.keys(this.config.actions).length > 0) {
         var actionConfig = Object.assign({}, this.config.customActionConfig)
         actionConfig.actions = Object.assign({}, this.config.actions)
         actionConfig.projectId = this.config.assistantConfig.projectId
@@ -193,21 +183,20 @@ module.exports = NodeHelper.create({
   /** http://127.0.0.1:8080/activatebytext/?query=<request> **/
   /** For Fullscreen UI keyword link **/
   assistantWeb: function() {
-    var self = this
-    this.expressApp.get("/activatebytext", function(req, res) {
+    this.expressApp.get("/activatebytext", (req, res)=> {
       var response = {
         success: true
       }
-      if (self.config.debug) console.log("[AMK2:WEB] Hello Web!")
+      if (this.config.debug) console.log("[AMK2:WEB] Hello Web!")
       var query = url.parse(req.url, true).query
       if (query.query) {
         response.query = JSON.parse(JSON.stringify(query.query))
-        self.sendSocketNotification("ASSISTANT_WEB", response.query)
-        if (self.config.debug) console.log(`[AMK2:WEB][SEND] ${response.query}`)
+        this.sendSocketNotification("ASSISTANT_WEB", response.query)
+        if (this.config.debug) console.log(`[AMK2:WEB][SEND] ${response.query}`)
       } else {
         response.success= false,
         response.error= "query_is_empty"
-        if (self.config.debug) console.log(`[AMK2:WEB][ERROR] ${response.error}`)
+        if (this.config.debug) console.log(`[AMK2:WEB][ERROR] ${response.error}`)
       }
       return res.send(response)
     })

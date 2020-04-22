@@ -32,5 +32,6 @@ git pull
 #fresh package.json
 git checkout package.json
 Installer_info "Installing..."
+Installer_error "Electron Rebuild and Check audio step are not needed !"
 # launch installer
 npm install

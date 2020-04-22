@@ -9,7 +9,5 @@
   "SAY_REPLY" : "AssistantMk2 va répèter le texte suivant: ",
   "SAY_HELP" : "Vous pouvez demander à `AssistantMk2` de dire du texte avec cette commande.",
   "QUERY_REPLY" : "AssistantMk2 va être activé.",
-  "QUERY_HELP" : "Vous pouvez commander `AssistantMk2` par texte avec cette commande.",
-  "DEMO_HELP" : "Permet d'activer le test d'icônes animées.",
-  "DEMO_REPLY" : "L'animation va être activée."
+  "QUERY_HELP" : "Vous pouvez commander `AssistantMk2` par texte avec cette commande."
 }

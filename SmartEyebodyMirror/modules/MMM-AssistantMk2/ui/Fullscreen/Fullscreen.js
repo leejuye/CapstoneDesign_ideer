@@ -6,8 +6,7 @@
 class AssistantResponse extends AssistantResponseClass{
   getDom () {
     var dom = super.getDom()
-    dom.classList.add("hidden")
-    if(this.fullscreenAbove) dom.classList.add("fullscreen_above")
+    dom.className= "hidden out"
 
     var contener = document.createElement("div")
     contener.id = "AMK2_CONTENER"
@@ -25,6 +24,8 @@ class AssistantResponse extends AssistantResponseClass{
     contener.appendChild(logo)
     
     dom.appendChild(contener)
+
+    this.modulePosition()
 
     super.getDom()
     return dom
@@ -52,23 +53,18 @@ class AssistantResponse extends AssistantResponseClass{
     clearTimeout(this.displayTimer)
     this.displayTimer = null
     if (active && !(this.secretMode || this.sayMode)) {
-      MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate(function(module) {
+      MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {
         module.hide(15, {lockString: "AMK2_LOCKED"})
+        AMK2.className= "in" + (this.fullscreenAbove ? " fullscreen_above": "")
       })
-      AMK2.classList.remove("hidden")
-      AMK2.classList.add("in")
     } else  if(!(this.secretMode || this.sayMode)) {
       if (status && status.actual == "standby") { // only on standby mode
-        AMK2.classList.remove("in")
-        AMK2.classList.add("out")
+        AMK2.className= "out" + (this.fullscreenAbove ? " fullscreen_above": "")
         this.displayTimer = setTimeout (() => {
-          if (status.actual == "standby") { // check again for hidden
-            MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate(function(module) {
+            MM.getModules().exceptWithClass("MMM-AssistantMk2").enumerate((module)=> {
               module.show(1000, {lockString: "AMK2_LOCKED"})
-              AMK2.classList.remove("out")
-              AMK2.classList.add("hidden")
+              AMK2.className= "hidden out"
             })
-          }
         }, 1000) // timeout set to 1s for fadeout
       }
     }
