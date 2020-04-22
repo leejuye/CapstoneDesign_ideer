@@ -51,7 +51,10 @@ var config = {
 		// 	}
 		// },
 		{
-		    module: "compliments",
+			module: "MMM-Dynamic-Modules",
+		},
+		{
+		  module: "compliments",
 		 	position: "lower_third"
 		},
 		{
