@@ -5,20 +5,20 @@
 
 Module.register("photo",{
 	defaults: {
-		text: "photo module test",
-		imageSrc: "/modules/default/photo/image/background.jpg",
+		text: "photo module test"
 	},
 
 	start: function() {
 	 	this.current_user = null;
-	 	// this.sendSocketNotification("CONFIG", this.config);
+	 	this.sendSocketNotification("CONFIG", this.config);
 	 	Log.info("Starting module: " + this.name);
 	},
 
 	socketNotificationReceived: function(notification, payload){
 	 	if(notification === "SUCCESS"){
-	 		this.config.imageSrc = "/modules/default/photo/image/" + payload + ".jpg";
-	 	}
+	 		this.config.imageSrc = "/modules/default/photo/image/" + payload.front + ".jpg";
+			//this.config.imageSrc2 = "/modules/default/photo/image/" + payload.side + ".jpg";
+		}
 	 	this.updateDom();
 	},
 
@@ -36,7 +36,12 @@ Module.register("photo",{
 		// wrapper.innerHTML = this.config.text;
 		var wrapper = document.createElement("img");
 		wrapper.src = this.config.imageSrc;
-		wrapper.className = this.name;
+		wrapper.className = "frontImg";
+
+		/*var wrapper2 = document.createElement("img");
+		wrapper2.src = this.config.imageSrc2;
+		wrapper2.className = "sideImg";*/
+
 		return wrapper;
 	},
 
