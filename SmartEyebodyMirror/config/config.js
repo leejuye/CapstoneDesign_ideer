@@ -31,16 +31,94 @@ var config = {
 			     // true, force serveronly mode, because you want to.. no UI on this device
 
 	modules: [
+		{
+		    module: "compliments",
+		 	position: "lower_third"
+		},
+		{
+		 	module: "clock",
+		 	position: "top_center"
+		},
+		{
+			module: "photo",
+			position: "middle_center"
+		},
+		{
+			module: "MMM-AssistantMk2",
+			position: "top_center",
+			config: {
+			  assistantConfig: {
+				latitude: 51.508530,
+				longitude: -0.076132,
+			  },
+			
+			micConfig: {
+				recorder: "arecord",
+				device: "plughw:0",
+			},
+			defaultProfile: "default",
+			profiles: {
+  				"default": {
+    				profileFile: "default.json",
+    				lang: "en-US"
+  				}
+			},
+			useA2D: true,
+			},
+		},
+		{
+			module: 'MMM-Snowboy',
+			config: {
+			  debug: false,
+			  AudioGain: 2.0,
+			  Frontend: true,
+			  Model: "smart_mirror",
+			  Sensitivity: null,
+			  micConfig: {
+				recorder: "arecord",
+				device: "plughw:0"
+			  },
+			  onDetected: {
+				notification: "ASSISTANT_ACTIVATE",
+				parameters: {
+				  type: "MIC",
+				  profile: "default",
+				  chime: true
+				 }
+			  }
+			}
+		},
+		/*{
+			module: "Hello-Lucy",
+			position: "top_right",
+			disabled: false,
+			config: {
+				keyword: 'HELLO LUCY',              // keyword to activate listening for a command/sentence
+				timeout: 15,                        // timeout listening for a command/sentence
+				standByMethod: 'DPMS',              // 'DPMS' = anything else than RPi or 'PI'
+				microphone: "0,0",                  // run "arecord -l" card # and device # mine is "0,0"
+				//sounds: ["1.mp3", "11.mp3"],        // welcome sound at startup. Add several for a random greetings
+				confirmationSound: "ding.mp3",      // name and extension of sound file
+				startHideAll: false,                 // All modules start as hidden EXCEPT PAGE ONE
+				// *** Page One is your default startup page *** This overrides startHideAll: true,
+				pageOneModules: ["Hello-Lucy","MMM-EasyPix"],                     // default modules to show on page one/startup
+				pageTwoModules: ["Hello-Lucy", "MMM-BMW-DS", "MMM-EventHorizon"], // modules to show on page two
+				pageThreeModules: ["Hello-Lucy", "MMM-Lunartic"],                 // modules to show on page three
+				pageFourModules: ["Hello-Lucy", "MMM-PC-Stats"],                  // modules to show on page four
+				pageFiveModules: ["Hello-Lucy", "MMM-Searchlight"],               // modules to show on page five
+				pageSixModules: ["Hello-Lucy", "MMM-NOAA3"],                      // modules to show on page six
+				pageSevenModules: ["Hello-Lucy", "MMM-Recipe"],                   // modules to show on page seven
+				pageEightModules: ["Hello-Lucy", "MMM-rfacts"],                   // modules to show on page eight
+				pageNineModules: ["Hello-Lucy", "MMM-History"],                   // modules to show on page nine
+				pageTenModules: ["Hello-Lucy", "MMM-HardwareMonitor"]            // modules to show on page ten
+			}
+		},*/
 		// {
 		// 	module: "alert",
 		// },
 		// {
 		// 	module: "updatenotification",
 		// 	position: "top_bar"
-		// },
-		// {
-		// 	module: "clock",
-		// 	position: "top_left"
 		// },
 		// {
 		// 	module: "calendar",
@@ -54,14 +132,6 @@ var config = {
 		// 		]
 		// 	}
 		// },
-		// {
-		// 	module: "compliments",
-		// 	position: "lower_third"
-		// },
-		{
-			module: "photo",
-			position: "middle_center"
-		},
 		// {
 		// 	module: "currentweather",
 		// 	position: "top_right",

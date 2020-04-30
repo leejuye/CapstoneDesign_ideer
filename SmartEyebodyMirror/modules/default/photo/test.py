@@ -3,21 +3,23 @@ import cv2
 import imutils
 import sys
 import json
+import os
 
-
-def to_node(type, src):
+def to_node(type, message):
     try:
-        print(json.dumps({type: src}))
+        print(json.dumps({type: message}))
     except Exception:
         pass
     sys.stdout.flush()
 
-
-frontimg = cv2.imread('/modules/default/photo/front.jpg')
-bgimg = cv2.imread('/modules/default/photo/background.jpg')
+curPath = os.path.dirname(os.path.abspath(__file__))
+frontimg = cv2.imread(curPath + '/image/front.jpg')
+sideimg = cv2.imread(curPath + '/image/side.jpg')
+bgimg = cv2.imread(curPath + '/image/background.jpg')
 
 # img1 - img2 difference
 difimg = cv2.subtract(bgimg, frontimg)
+# difimg = cv2.subtract(bgimg, sideimg)
 
 gray_difimg = cv2.cvtColor(difimg, cv2.COLOR_BGR2GRAY)
 
@@ -52,6 +54,9 @@ screenCnt = None
 # image draw
 frontimg = imutils.resize(frontimg, width=400)
 image = cv2.drawContours(frontimg, cnts, -1, (0, 255, 0), 1)
+# image = cv2.drawContours(sideimg, cnts, -1, (0,255,0), 3)
 
-cv2.imwrite("result.jpg", cv2.resize(frontimg, (400, 700)))
-to_node("status", "/modules/default/photo/result.jpg")
+cv2.imwrite(curPath + "/image/result.jpg", cv2.resize(frontimg, (400, 700)))
+
+to_node("status", "result")
+
