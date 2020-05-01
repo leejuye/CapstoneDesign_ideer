@@ -12,9 +12,10 @@ module.exports = NodeHelper.create({
 			{ mode: "json", args: [JSON.stringify(this.config)]});
 
 		pyshell.on("message", function (message) {
-			if (message.hasOwnProperty("status")){
-				console.log("[" + self.name + "] " + "User " + message.status);
-				self.sendSocketNotification("SUCCESS", message.status);
+			if (message.hasOwnProperty("front") && message.hasOwnProperty("side")){
+				console.log("[" + self.name + "] " + "User " + message.front);
+				console.log("[" + self.name + "] " + "User " + message.side);
+				self.sendSocketNotification("SUCCESS", message);
 			}
 		});
 		pyshell.end(function (err) {
@@ -30,7 +31,13 @@ module.exports = NodeHelper.create({
 				pythonStarted = true;
 				this.python_start();
 			};
-		};
+		} else if(notification === "PREVIEW") {
+			PythonShell.run("modules/default/photo/preview.py", {args: [payload]},
+			function (err, result) {
+				if (err) throw err;
+				console.log(result);
+			});
+		}
 	}
 
 });

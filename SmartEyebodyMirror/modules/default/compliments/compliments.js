@@ -11,37 +11,37 @@ Module.register("compliments", {
 	// Module config defaults.
 	defaults: {
 		compliments: {
-			anytime: [
-				"Hey there sexy!"
-			],
 			morning: [
-				"Good morning, handsome!",
-				"Enjoy your day!",
-				"How was your sleep?"
+				"안녕하세요",
+				"좋은 아침입니다!",
+				"원하는 기능을 \n말해주세요."
 			],
 			afternoon: [
-				"Hello, beauty!",
-				"You look sexy!",
-				"Looking good today!"
+				"안녕하세요",
+				"좋은 점심입니다!",
+				"원하는 기능을 \n말해주세요."
 			],
 			evening: [
-				"Wow, you look hot!",
-				"You look nice!",
-				"Hi, sexy!"
+				"안녕하세요",
+				"좋은 저녁입니다!",
+				"원하는 기능을 \n말해주세요."
 			]
 		},
-		updateInterval: 30000,
-		remoteFile: null,
+		updateInterval: 4000,
+		remoteFile: "description.json",
 		fadeSpeed: 4000,
-		morningStartTime: 3,
+		morningStartTime: 5,
 		morningEndTime: 12,
 		afternoonStartTime: 12,
 		afternoonEndTime: 17,
-		random: true
+		random: false
 	},
   lastIndexUsed:-1,
 	// Set currentweather from module
 	currentWeatherType: "",
+
+	compInterval: null,
+	descCommand: null,
 
 	// Define required scripts.
 	getScripts: function() {
@@ -58,16 +58,42 @@ Module.register("compliments", {
 		if (this.config.remoteFile !== null) {
 			this.complimentFile(function(response) {
 				self.config.compliments = JSON.parse(response);
-				self.updateDom();
+				//self.updateDom();
 			});
 		}
 
 		// Schedule update timer.
-		setInterval(function() {
+		this.compInterval = setInterval(function() {
 			self.updateDom(self.config.fadeSpeed);
 		}, this.config.updateInterval);
 	},
 
+	// Override notification handler.
+	notificationReceived: function(notification, payload, sender) {
+		if (notification === "COMPLIMENTS") {
+			Log.log(this.name + " received a module notification: " + notification + " from sender: " + sender.name);
+
+			var self = this;
+			self.updateDom()
+
+			this.descCommand = payload;
+			this.lastIndexUsed = -1;
+
+			this.compInterval = setInterval(function() {
+				self.updateDom(self.config.fadeSpeed);
+			}, this.config.updateInterval);
+
+			// Position setting
+			this.sendNotification('CHANGE_POSITIONS',
+				modules = {
+					'compliments':{
+							visible: 'true',
+							position: 'top_right',
+					}
+				}
+			);
+		}
+	},
 	/* randomIndex(compliments)
 	 * Generate a random index for a list of compliments.
 	 *
@@ -104,7 +130,10 @@ Module.register("compliments", {
 		var hour = moment().hour();
 		var compliments;
 
-		if (hour >= this.config.morningStartTime && hour < this.config.morningEndTime && this.config.compliments.hasOwnProperty("morning")) {
+		// description setting
+		if(this.descCommand == "noKeyword") {
+			compliments = this.config.compliments.noKeyword.slice(0);
+		} else if (hour >= this.config.morningStartTime && hour < this.config.morningEndTime && this.config.compliments.hasOwnProperty("morning")) {
 			compliments = this.config.compliments.morning.slice(0);
 		} else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {
 			compliments = this.config.compliments.afternoon.slice(0);
@@ -120,7 +149,7 @@ Module.register("compliments", {
 			compliments.push.apply(compliments, this.config.compliments[this.currentWeatherType]);
 		}
 
-		compliments.push.apply(compliments, this.config.compliments.anytime);
+		// compliments.push.apply(compliments, this.config.compliments.anytime);
 
 		return compliments;
 	},
@@ -158,9 +187,12 @@ Module.register("compliments", {
 			index = this.randomIndex(compliments);
 		}
 		else{
-			// no, sequetial
-			// if doing sequential,  don't fall off the end
-			index = (this.lastIndexUsed >= (compliments.length-1))?0: ++this.lastIndexUsed
+			index = ++this.lastIndexUsed;
+			if (index == compliments.length - 1) {
+				clearInterval(this.compInterval);
+			} else if (index >= compliments.length){
+				return '';
+			}
 		}
 
 		return compliments[index];
@@ -169,10 +201,10 @@ Module.register("compliments", {
 // Override dom generator.
 	getDom: function() {
 		var wrapper = document.createElement("div");
-		wrapper.className = this.config.classes ? this.config.classes : "thin xlarge bright pre-line";
-		// get the compliment text 
+		wrapper.className = this.config.classes ? this.config.classes : "thin large bright pre-line";
+		// get the compliment text
 		var complimentText = this.randomCompliment();
-		// split it into parts on newline text 
+		// split it into parts on newline text
 		var parts= complimentText.split('\n')
 		// create a span to hold it all
 		var compliment=document.createElement('span')
@@ -214,12 +246,4 @@ Module.register("compliments", {
 		};
 		this.currentWeatherType = weatherIconTable[data.weather[0].icon];
 	},
-
-	// Override notification handler.
-	notificationReceived: function(notification, payload, sender) {
-		if (notification === "CURRENTWEATHER_DATA") {
-			this.setCurrentWeatherType(payload.data);
-		}
-	},
-
 });

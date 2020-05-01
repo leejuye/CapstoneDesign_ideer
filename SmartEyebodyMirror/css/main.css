@@ -54,8 +54,8 @@ body {
 }
 
 .large {
-  font-size: 65px;
-  line-height: 65px;
+  font-size: 50px;
+  line-height: 50px;
 }
 
 .xlarge {
@@ -185,9 +185,12 @@ sup {
 }
 
 .region.top.right,
-.region.top.left,
-.region.top.center {
+.region.top.left {
   top: 100%;
+},
+
+.region.top.center {
+  top: -200%;
 }
 
 .region.bottom {

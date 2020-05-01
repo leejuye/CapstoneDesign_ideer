@@ -1,0 +1,216 @@
+/*  AMK2 UI  **
+** Bugsounet ** 
+**************/
+
+/* icons */
+#AMK2_STATUS {
+  width: 150px;
+  height:100px;
+  margin-top: 2px;
+  margin-left: 5px;
+  border-radius: 20px;
+  background-color:#f3f3f3;
+  background-image:url('../../resources/AMk2_Small.png');
+  background-position : 5px -6px;
+  background-repeat: no-repeat;
+  background-size: 90%;
+}
+
+#AMK2_STATUS.reply {
+  background-image:url('../../resources/reply.gif');
+  background-position: -60px;
+  background-repeat: no-repeat;
+  background-size: 180%;
+}
+#AMK2_STATUS.reply.static {
+  background-image:url('../../resources/reply-think.png');
+}
+
+#AMK2_STATUS.error {
+  background-image:url('../../resources/error.gif');
+  background-position: -60px;
+  background-repeat: no-repeat;
+  background-size: 180%;
+}
+#AMK2_STATUS.error.static {
+  background-image:url('../../resources/confirmation-error.png');
+}
+
+#AMK2_STATUS.think {
+  background-image:url('../../resources/think.gif');
+  background-position: -60px;
+  background-repeat: no-repeat;
+  background-size: 180%;
+}
+#AMK2_STATUS.think.static {
+  background-image:url('../../resources/reply-think.png');
+}
+
+#AMK2_STATUS.continue {
+  background-image:url('../../resources/continue.gif');
+  background-position: -60px;
+  background-repeat: no-repeat;
+  background-size: 180%;
+}
+#AMK2_STATUS.continue.static {
+  background-image:url('../../resources/continue-listen.png');
+}
+
+#AMK2_STATUS.listen {
+  background-image:url('../../resources/listen.gif');
+  background-position: -60px;
+  background-repeat: no-repeat;
+  background-size: 180%;
+}
+#AMK2_STATUS.listen.static {
+  background-image:url('../../resources/continue-listen.png');
+}
+
+#AMK2_STATUS.confirmation {
+  background-image:url('../../resources/confirmation.gif');
+  background-position: -60px;
+  background-repeat: no-repeat;
+  background-size: 180%;
+}
+#AMK2_STATUS.confirmation.static {
+  background-image:url('../../resources/confirmation-error.png');
+}
+
+#AMK2_STATUS.standby {
+  background-image:url('../../resources/standby.gif');
+  background-position: 10px -10px;
+  background-repeat: no-repeat;
+  background-size: 85%;
+}
+#AMK2_STATUS.standby.static,
+#AMK2_STATUS.standby.static-standby {
+  background-image:url('../../resources/standby.png');
+}
+
+#AMK2_STATUS.hook {
+  background-image:url('../../resources/hook.gif');
+  background-position : -53px -41px;
+  background-repeat: no-repeat;
+  background-size: 170%;
+}
+#AMK2_STATUS.hook.static {
+  background-image:url('../../resources/hook.png');
+}
+
+#AMK2.hidden {
+  display: none
+}
+
+#AMK2_HELPER {
+  position:absolute;
+  width:100%;
+  height:100%;
+  bottom:0;
+  display:block;
+}
+
+#AMK2_HELPER.hidden {
+   display:none;
+}
+
+#AMK2_RESULT_WINDOW {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#AMK2_HELPER.hidden #AMK2_RESULT_WINDOW {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 1s, opacity 1s linear;
+}
+
+#AMK2_SCREENOUTPUT {
+    order: 1;
+    flex: 1 1 auto;
+    border: none;
+}
+
+/* transscription */
+#AMK2_CONTENER {
+    order: 2;
+    flex: none;
+    height: 100px;
+    background-color: #f3f3f3; /* better than #181818 */
+    color: #000;
+}
+
+#AMK2_CONTENER2 {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+#AMK2_LOGO {
+  width: 150px;
+  height:100px;
+  display:inline-block;
+  background-image:url('../../resources/AMk2_Small.png');
+  background-position : 2px -5px;
+  background-repeat: no-repeat;
+  background-size: 90%;
+ }
+
+#AMK2_TRANSCRIPTION {
+    flex: 1 1 auto;
+}
+
+#AMK2_TRANSCRIPTION p {
+  margin-top: 23px;
+  font-size: x-large;
+}
+
+#AMK2_TRANSCRIPTION p.error {
+  color:#FF6633;
+  text-align:left;
+}
+
+#AMK2_TRANSCRIPTION.hidden {
+  display: none
+}
+
+#AMK2_HELP {
+    height: 100%;
+    font-size: small;
+}
+
+#AMK2_HELP.hidden {
+  display: none
+}
+
+#AMK2_HELPBOX {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#AMK2_TRYSAY {
+    order: 0;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    font-style: italic;
+    font-weight: bold;
+}
+
+#AMK2_WORDBOX {
+    height: 100%;
+}
+
+#AMK2_WORD {
+    font-size: x-small;
+    order: auto;
+    flex: 1;
+    display: flex;
+    height: 20px;
+    align-items: center;
+    min-width: 140px;
+    margin-right: 10px;
+}
+

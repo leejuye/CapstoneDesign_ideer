@@ -31,16 +31,190 @@ var config = {
 			     // true, force serveronly mode, because you want to.. no UI on this device
 
 	modules: [
+		{
+			module: "MMM-Dynamic-Modules",
+		},
+		{
+		  module: "compliments",
+		 	position: "lower_third"
+		},
+		{
+		 	module: "clock",
+		 	position: "top_center"
+		},
+		{
+			module: "photo",
+			position: "middle_center"
+		},
+		{
+			module: "MMM-AssistantMk2",
+			position: "top_left",  // fullscreen_above, top_left
+			config: {
+				ui: "Simple",	// Fullscreen, Classic, Classic2, Simple
+				assistantConfig: {
+					latitude: 51.508530,
+					longitude: -0.076132,
+			  	},
+				responseConfig: {
+					useHTML5: true,
+					useScreenOutput: true,
+					useAudioOutput: true,
+					useChime: true,
+					timer: 5000,
+					myMagicWord: true,
+					delay: 0.5,
+					//Your prefer sound play program. By example, if you are running this on OSX, `afplay` could be available.
+					//needed if you don't use HTML5
+					playProgram: "mpg321",
+					chime: {
+					  beep: "beep.mp3",
+					  error: "error.mp3",
+					  continue: "continue.mp3",
+					  open: "Google_beep_open.mp3",
+					  close: "Google_beep_close.mp3",
+					},
+					// false - animated icons, 'standby' - static icons only for standby state, true - all static icons
+					useStaticIcons: false,
+				},
+				micConfig: {
+					recorder: "arecord",
+					device: "plughw:0",
+				},
+				defaultProfile: "default",
+				profiles: {
+  					"default": {
+    					profileFile: "default.json",
+    					lang: "ko-KR"  // ko-KR, en-US
+  					}
+				},
+				/*recipes: [
+					"test_with_soundExec.js",
+					"Reboot-Restart-Shutdown.js",
+					"actions.js"
+				],*/
+				transcriptionHooks: {
+					"HOOK_1": {
+						pattern: [
+							"종료해 줘", "종료해", "종료"
+						],
+						command: "MIRROR_END"
+					},
+					"HOOK_2": {
+						pattern: [
+							"촬영해 줘", "촬영해", "촬영"
+						],
+						command: "CAMERA_START"
+					},
+					"HOOK_TEST": {
+						pattern: [
+							"테스트"
+						],
+						command: "TEST"
+					},
+				},
+				actions: {},
+				commands: {
+					"MIRROR_END": {
+						soundExec: {
+							chime: "close"
+						},
+						shellExec: {
+							exec: "shutdown now"
+						},
+					},
+					"CAMERA_START": {
+						notificationExec: {
+							notification: "TAKE_PIC",
+							payload: "test.jpg"
+							/*payload: {
+								title:"TEST", 
+							  	message:"This is a test."
+							}*/
+						}
+					},
+					"TEST": {
+						moduleExec: {
+							module: ["MMM-AssistantMk2"],
+							exec: (module, params, key) => {
+							  	setTimeout(()=>{
+									module.sendNotification("SHOW_ALERT", { 
+										message:"it's works !", 
+										timer:2000 
+									})
+								}, 100)
+							}
+						},
+						soundExec: {
+							chime: "open",
+							say: "it's really works !" // message should be set to your language !
+						},
+						notificationExec: {
+							notification: "SHOW_ALERT",
+							payload: {
+								title:"TEST", 
+							  	message:"This is a test."
+							}
+						}
+					},
+				},
+				plugins: {},
+				responseHooks: {},
+				useA2D: true,
+			},
+		},
+		{
+			module: 'MMM-Snowboy',
+			config: {
+			  debug: false,
+			  AudioGain: 2.0,
+			  Frontend: true,
+			  Model: "smart_mirror",
+			  Sensitivity: null,
+			  micConfig: {
+				recorder: "arecord",
+				device: "plughw:0"
+			  },
+			  onDetected: {
+				notification: "ASSISTANT_ACTIVATE",
+				parameters: {
+				  type: "MIC",
+				  profile: "default",
+				  chime: true
+				 }
+			  }
+			}
+		},
+		/*{
+			module: "Hello-Lucy",
+			position: "top_right",
+			disabled: false,
+			config: {
+				keyword: 'HELLO LUCY',              // keyword to activate listening for a command/sentence
+				timeout: 15,                        // timeout listening for a command/sentence
+				standByMethod: 'DPMS',              // 'DPMS' = anything else than RPi or 'PI'
+				microphone: "0,0",                  // run "arecord -l" card # and device # mine is "0,0"
+				//sounds: ["1.mp3", "11.mp3"],        // welcome sound at startup. Add several for a random greetings
+				confirmationSound: "ding.mp3",      // name and extension of sound file
+				startHideAll: false,                 // All modules start as hidden EXCEPT PAGE ONE
+				// *** Page One is your default startup page *** This overrides startHideAll: true,
+				pageOneModules: ["Hello-Lucy","MMM-EasyPix"],                     // default modules to show on page one/startup
+				pageTwoModules: ["Hello-Lucy", "MMM-BMW-DS", "MMM-EventHorizon"], // modules to show on page two
+				pageThreeModules: ["Hello-Lucy", "MMM-Lunartic"],                 // modules to show on page three
+				pageFourModules: ["Hello-Lucy", "MMM-PC-Stats"],                  // modules to show on page four
+				pageFiveModules: ["Hello-Lucy", "MMM-Searchlight"],               // modules to show on page five
+				pageSixModules: ["Hello-Lucy", "MMM-NOAA3"],                      // modules to show on page six
+				pageSevenModules: ["Hello-Lucy", "MMM-Recipe"],                   // modules to show on page seven
+				pageEightModules: ["Hello-Lucy", "MMM-rfacts"],                   // modules to show on page eight
+				pageNineModules: ["Hello-Lucy", "MMM-History"],                   // modules to show on page nine
+				pageTenModules: ["Hello-Lucy", "MMM-HardwareMonitor"]            // modules to show on page ten
+			}
+		},*/
 		// {
 		// 	module: "alert",
 		// },
 		// {
 		// 	module: "updatenotification",
 		// 	position: "top_bar"
-		// },
-		// {
-		// 	module: "clock",
-		// 	position: "top_left"
 		// },
 		// {
 		// 	module: "calendar",
@@ -54,14 +228,6 @@ var config = {
 		// 		]
 		// 	}
 		// },
-		// {
-		// 	module: "compliments",
-		// 	position: "lower_third"
-		// },
-		{
-			module: "photo",
-			position: "middle_center"
-		},
 		// {
 		// 	module: "currentweather",
 		// 	position: "top_right",
