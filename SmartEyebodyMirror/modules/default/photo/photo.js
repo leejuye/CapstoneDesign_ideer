@@ -5,20 +5,20 @@
 
 Module.register("photo",{
 	defaults: {
-		text: "photo module test",
-		imageSrc: "/modules/default/photo/image/background.jpg",
+		text: "photo module test"
 	},
 
 	start: function() {
 	 	this.current_user = null;
-	 	// this.sendSocketNotification("CONFIG", this.config);
+	 	this.sendSocketNotification("PREVIEW", "1231412421.jpg");
 	 	Log.info("Starting module: " + this.name);
 	},
 
 	socketNotificationReceived: function(notification, payload){
 	 	if(notification === "SUCCESS"){
-	 		this.config.imageSrc = "/modules/default/photo/image/" + payload + ".jpg";
-	 	}
+	 		this.config.imageSrc = "/modules/default/photo/image/" + payload.front + ".jpg";
+			//this.config.imageSrc2 = "/modules/default/photo/image/" + payload.side + ".jpg";
+		}
 	 	this.updateDom();
 	},
 
@@ -26,8 +26,10 @@ Module.register("photo",{
 		if(notification === "PYTHON_START"){
 	 		Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 			this.sendSocketNotification("CONFIG", this.config);
-	 	} else {
-			Log.log(this.name + " received a 'system' notification: " + notification);
+	 	} else if(notification === "TAKE_PIC") {
+			Log.log(this.name + " received a notification: TAKE_PIC");
+			// payload : file name
+			this.sendSocketNotification("PREVIEW", payload);
 		}
 	},
 
@@ -36,7 +38,12 @@ Module.register("photo",{
 		// wrapper.innerHTML = this.config.text;
 		var wrapper = document.createElement("img");
 		wrapper.src = this.config.imageSrc;
-		wrapper.className = this.name;
+		wrapper.className = "frontImg";
+
+		/*var wrapper2 = document.createElement("img");
+		wrapper2.src = this.config.imageSrc2;
+		wrapper2.className = "sideImg";*/
+
 		return wrapper;
 	},
 
