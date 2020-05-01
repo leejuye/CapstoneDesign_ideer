@@ -31,7 +31,13 @@ module.exports = NodeHelper.create({
 				pythonStarted = true;
 				this.python_start();
 			};
-		};
+		} else if(notification === "PREVIEW") {
+			PythonShell.run("modules/default/photo/preview.py", {args: [payload]},
+			function (err, result) {
+				if (err) throw err;
+				console.log(result);
+			});
+		}
 	}
 
 });

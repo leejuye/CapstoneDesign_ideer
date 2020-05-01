@@ -10,7 +10,7 @@ Module.register("photo",{
 
 	start: function() {
 	 	this.current_user = null;
-	 	this.sendSocketNotification("CONFIG", this.config);
+	 	this.sendSocketNotification("PREVIEW", "1231412421.jpg");
 	 	Log.info("Starting module: " + this.name);
 	},
 
@@ -26,8 +26,10 @@ Module.register("photo",{
 		if(notification === "PYTHON_START"){
 	 		Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 			this.sendSocketNotification("CONFIG", this.config);
-	 	} else {
-			Log.log(this.name + " received a 'system' notification: " + notification);
+	 	} else if(notification === "TAKE_PIC") {
+			Log.log(this.name + " received a notification: TAKE_PIC");
+			// payload : file name
+			this.sendSocketNotification("PREVIEW", payload);
 		}
 	},
 
