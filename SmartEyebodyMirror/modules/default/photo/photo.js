@@ -26,8 +26,7 @@ Module.register("photo",{
 		if(notification === "PYTHON_START"){
 	 		Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 			this.sendSocketNotification("CONFIG", this.config);
-		 } 
-		else {
+		} else {
 			Log.log(this.name + " received a 'system' notification: " + notification);
 		}
 	},

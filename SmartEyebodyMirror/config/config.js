@@ -39,14 +39,15 @@ var config = {
 		 	module: "clock",
 		 	position: "top_center"
 		},
-		{
+		/*{
 			module: "photo",
 			position: "middle_center"
-		},
+		},*/
 		{
 			module: "MMM-AssistantMk2",
-			position: "top_center",
+			position: "top_left",  // fullscreen_above, top_left
 			config: {
+				ui: "Simple",	// Fullscreen, Classic, Classic2, Simple
 				assistantConfig: {
 					latitude: 51.508530,
 					longitude: -0.076132,
@@ -80,7 +81,7 @@ var config = {
 				profiles: {
   					"default": {
     					profileFile: "default.json",
-    					lang: "ko-KR" // ko-KR, en-US
+    					lang: "ko-KR"  // ko-KR, en-US
   					}
 				},
 				/*recipes: [
@@ -90,16 +91,16 @@ var config = {
 				],*/
 				transcriptionHooks: {
 					"HOOK_1": {
-						pattern: "종료해 줘",
+						pattern: [
+							"종료해 줘", "종료해", "종료"
+						],
 						command: "MIRROR_END"
 					},
 					"HOOK_2": {
-						pattern: "종료해",
-						command: "MIRROR_END"
-					},
-					"HOOK_3": {
-						pattern: "종료",
-						command: "MIRROR_END"
+						pattern: [
+							"테스트"
+						],
+						command: "TEST"
 					},
 				},
 				actions: {},
@@ -107,10 +108,34 @@ var config = {
 					"MIRROR_END": {
 						soundExec: {
 							chime: "close"
-						  },
+						},
 						shellExec: {
 							exec: "shutdown now"
-						}, 
+						},
+					},
+					"TEST": {
+						moduleExec: {
+							module: ["MMM-AssistantMk2"],
+							exec: (module, params, key) => {
+							  	setTimeout(()=>{
+									module.sendNotification("SHOW_ALERT", { 
+										message:"it's works !", 
+										timer:2000 
+									})
+								}, 100)
+							}
+						},
+						soundExec: {
+							chime: "open",
+							say: "it's really works !" // message should be set to your language !
+						},
+						notificationExec: {
+							notification: "SHOW_ALERT",
+							payload: {
+								title:"TEST", 
+							  	message:"This is a test."
+							}
+						}
 					},
 				},
 				plugins: {},
