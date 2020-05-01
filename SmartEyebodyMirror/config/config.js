@@ -47,23 +47,75 @@ var config = {
 			module: "MMM-AssistantMk2",
 			position: "top_center",
 			config: {
-			  assistantConfig: {
-				latitude: 51.508530,
-				longitude: -0.076132,
-			  },
-			
-			micConfig: {
-				recorder: "arecord",
-				device: "plughw:0",
-			},
-			defaultProfile: "default",
-			profiles: {
-  				"default": {
-    				profileFile: "default.json",
-    				lang: "en-US"
-  				}
-			},
-			useA2D: true,
+				assistantConfig: {
+					latitude: 51.508530,
+					longitude: -0.076132,
+			  	},
+				responseConfig: {
+					useHTML5: true,
+					useScreenOutput: true,
+					useAudioOutput: true,
+					useChime: true,
+					timer: 5000,
+					myMagicWord: true,
+					delay: 0.5,
+					//Your prefer sound play program. By example, if you are running this on OSX, `afplay` could be available.
+					//needed if you don't use HTML5
+					playProgram: "mpg321",
+					chime: {
+					  beep: "beep.mp3",
+					  error: "error.mp3",
+					  continue: "continue.mp3",
+					  open: "Google_beep_open.mp3",
+					  close: "Google_beep_close.mp3",
+					},
+					// false - animated icons, 'standby' - static icons only for standby state, true - all static icons
+					useStaticIcons: false,
+				},
+				micConfig: {
+					recorder: "arecord",
+					device: "plughw:0",
+				},
+				defaultProfile: "default",
+				profiles: {
+  					"default": {
+    					profileFile: "default.json",
+    					lang: "ko-KR" // ko-KR, en-US
+  					}
+				},
+				/*recipes: [
+					"test_with_soundExec.js",
+					"Reboot-Restart-Shutdown.js",
+					"actions.js"
+				],*/
+				transcriptionHooks: {
+					"HOOK_1": {
+						pattern: "종료해 줘",
+						command: "MIRROR_END"
+					},
+					"HOOK_2": {
+						pattern: "종료해",
+						command: "MIRROR_END"
+					},
+					"HOOK_3": {
+						pattern: "종료",
+						command: "MIRROR_END"
+					},
+				},
+				actions: {},
+				commands: {
+					"MIRROR_END": {
+						soundExec: {
+							chime: "close"
+						  },
+						shellExec: {
+							exec: "shutdown now"
+						}, 
+					},
+				},
+				plugins: {},
+				responseHooks: {},
+				useA2D: true,
 			},
 		},
 		{

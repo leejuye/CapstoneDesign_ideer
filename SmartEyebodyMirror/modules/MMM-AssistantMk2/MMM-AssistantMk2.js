@@ -31,7 +31,7 @@ Module.register("MMM-AssistantMk2", {
       useAudioOutput: true,
       useChime: true,
       timer: 5000,
-      myMagicWord: false,
+      myMagicWord: true,
       delay: 0.5,
       //Your prefer sound play program. By example, if you are running this on OSX, `afplay` could be available.
       //needed if you don't use HTML5
