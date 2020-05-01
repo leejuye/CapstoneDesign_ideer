@@ -39,10 +39,10 @@ var config = {
 		 	module: "clock",
 		 	position: "top_center"
 		},
-		/*{
+		{
 			module: "photo",
 			position: "middle_center"
-		},*/
+		},
 		{
 			module: "MMM-AssistantMk2",
 			position: "top_left",  // fullscreen_above, top_left
@@ -98,6 +98,12 @@ var config = {
 					},
 					"HOOK_2": {
 						pattern: [
+							"촬영해 줘", "촬영해", "촬영"
+						],
+						command: "CAMERA_START"
+					},
+					"HOOK_TEST": {
+						pattern: [
 							"테스트"
 						],
 						command: "TEST"
@@ -112,6 +118,16 @@ var config = {
 						shellExec: {
 							exec: "shutdown now"
 						},
+					},
+					"CAMERA_START": {
+						notificationExec: {
+							notification: "TAKE_PIC",
+							payload: "test.jpg"
+							/*payload: {
+								title:"TEST", 
+							  	message:"This is a test."
+							}*/
+						}
 					},
 					"TEST": {
 						moduleExec: {
