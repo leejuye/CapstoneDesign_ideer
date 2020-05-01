@@ -28,7 +28,7 @@ Module.register("compliments", {
 			]
 		},
 		updateInterval: 4000,
-		remoteFile: null,
+		remoteFile: "description.json",
 		fadeSpeed: 4000,
 		morningStartTime: 5,
 		morningEndTime: 12,
@@ -39,7 +39,9 @@ Module.register("compliments", {
   lastIndexUsed:-1,
 	// Set currentweather from module
 	currentWeatherType: "",
+
 	compInterval: null,
+	descCommand: null,
 
 	// Define required scripts.
 	getScripts: function() {
@@ -48,7 +50,7 @@ Module.register("compliments", {
 
 	// Define start sequence.
 	start: function() {
-		Log.info("@@@@@@@Starting module: " + this.name);
+		Log.info("Starting module: " + this.name);
 
 		this.lastComplimentIndex = -1;
 
@@ -56,7 +58,7 @@ Module.register("compliments", {
 		if (this.config.remoteFile !== null) {
 			this.complimentFile(function(response) {
 				self.config.compliments = JSON.parse(response);
-				self.updateDom();
+				//self.updateDom();
 			});
 		}
 
@@ -66,6 +68,32 @@ Module.register("compliments", {
 		}, this.config.updateInterval);
 	},
 
+	// Override notification handler.
+	notificationReceived: function(notification, payload, sender) {
+		if (notification === "COMPLIMENTS") {
+			Log.log(this.name + " received a module notification: " + notification + " from sender: " + sender.name);
+
+			var self = this;
+			self.updateDom()
+
+			this.descCommand = payload;
+			this.lastIndexUsed = -1;
+
+			this.compInterval = setInterval(function() {
+				self.updateDom(self.config.fadeSpeed);
+			}, this.config.updateInterval);
+
+			// Position setting
+			this.sendNotification('CHANGE_POSITIONS',
+				modules = {
+					'compliments':{
+							visible: 'true',
+							position: 'top_right',
+					}
+				}
+			);
+		}
+	},
 	/* randomIndex(compliments)
 	 * Generate a random index for a list of compliments.
 	 *
@@ -102,7 +130,10 @@ Module.register("compliments", {
 		var hour = moment().hour();
 		var compliments;
 
-		if (hour >= this.config.morningStartTime && hour < this.config.morningEndTime && this.config.compliments.hasOwnProperty("morning")) {
+		// description setting
+		if(this.descCommand == "noKeyword") {
+			compliments = this.config.compliments.noKeyword.slice(0);
+		} else if (hour >= this.config.morningStartTime && hour < this.config.morningEndTime && this.config.compliments.hasOwnProperty("morning")) {
 			compliments = this.config.compliments.morning.slice(0);
 		} else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {
 			compliments = this.config.compliments.afternoon.slice(0);
@@ -159,6 +190,8 @@ Module.register("compliments", {
 			index = ++this.lastIndexUsed;
 			if (index == compliments.length - 1) {
 				clearInterval(this.compInterval);
+			} else if (index >= compliments.length){
+				return '';
 			}
 		}
 
@@ -213,12 +246,4 @@ Module.register("compliments", {
 		};
 		this.currentWeatherType = weatherIconTable[data.weather[0].icon];
 	},
-
-	// Override notification handler.
-	notificationReceived: function(notification, payload, sender) {
-		if (notification === "CURRENTWEATHER_DATA") {
-			this.setCurrentWeatherType(payload.data);
-		}
-	},
-
 });
