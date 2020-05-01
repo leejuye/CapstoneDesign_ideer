@@ -30,6 +30,8 @@ Module.register("photo",{
 			Log.log(this.name + " received a notification: TAKE_PIC");
 			// payload : file name
 			this.sendSocketNotification("PREVIEW", payload);
+		} else {
+			Log.log(this.name + " received a 'system' notification: " + notification);
 		}
 	},
 

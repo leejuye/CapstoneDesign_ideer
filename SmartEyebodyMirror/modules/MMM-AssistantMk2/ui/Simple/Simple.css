@@ -1,0 +1,109 @@
+/*  AMK2 UI  **
+** Bugsounet **
+**************/
+
+/* icons */
+#AMK2_STATUS {
+  min-height:64px;
+  min-width:64px;
+  border-radius:32px;
+  padding:4px;
+  background-color:#333;
+  text-align:center;
+  display:inline-block;
+  line-height:100%;
+  box-sizing: border-box;
+  background-image:url('../../resources/standby.png');
+  background-position: 5px 5px;
+  background-repeat: no-repeat;
+  background-size: 85%;
+}
+
+#AMK2_STATUS.reply {
+  background-image:url('../../resources/speaker_white.png');
+}
+
+
+#AMK2_STATUS.continue,
+#AMK2_STATUS.listen {
+  background-image:url('../../resources/mic_white.png');
+}
+
+#AMK2_STATUS.standby {
+  background-image:url('../../resources/standby.gif');
+}
+#AMK2_STATUS.standby.static,
+#AMK2_STATUS.standby.static-standby {
+  background-image:url('../../resources/standby.png');
+}
+
+#AMK2.hidden {
+  display: none
+}
+
+/* Assistant output */
+#AMK2_HELPER {
+    position: fixed;
+    height: 94%;
+    overflow: auto;
+    border: none;
+    width: 100%;
+    left: 0;
+}
+
+#AMK2_HELPER.hidden {
+   display:none;
+}
+
+#AMK2_RESULT_WINDOW {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+#AMK2_HELPER.hidden #AMK2_RESULT_WINDOW {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 1s, opacity 1s linear;
+}
+
+#AMK2_SCREENOUTPUT {
+  height:100%;
+  border:none;
+}
+
+/* transscription */
+#AMK2_CONTENER {
+    display: flex;
+}
+
+#AMK2_TRANSCRIPTION {
+    height: 64px;
+    vertical-align: top;
+    margin-left: 4px;
+    font-size: x-large;
+}
+
+#AMK2_TRANSCRIPTION p {
+    height: 64px;
+    box-sizing: border-box;
+    min-height: 64px;
+    min-width: 64px;
+    box-sizing: border-box;
+    line-height: 59px;
+    background-color: #333;
+    color: #FFF;
+    border-radius: 32px;
+    padding: 0 8px;
+    margin: 0px;
+}
+
+#AMK2_TRANSCRIPTION p.error {
+  color:#FF6633;
+  text-align:left;
+}
+
+#AMK2_TRANSCRIPTION.hidden {
+  display: none
+}
