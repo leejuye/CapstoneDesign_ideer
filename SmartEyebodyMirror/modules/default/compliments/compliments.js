@@ -75,6 +75,7 @@ Module.register("compliments", {
 				ret = "top_right";
 				break;
 			case "frontStart":
+			case "frontResult":
 				ret = "bottom_right";
 				break;
 			default:
@@ -86,7 +87,7 @@ Module.register("compliments", {
 	// Override notification handler.
 	notificationReceived: function(notification, payload, sender) {
 		if (notification === "COMPLIMENTS") {
-			Log.log(this.name + " received a module notification: " + notification + " from sender: " + sender.name);
+			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload);
 
 			clearInterval(this.compInterval);
 
@@ -154,6 +155,8 @@ Module.register("compliments", {
 			compliments = this.config.compliments.noKeyword.slice(0);
 		} else if (this.descCommand == "frontStart") {
 			compliments = this.config.compliments.frontStart.slice(0);
+		} else if (this.descCommand == "frontResult") {
+			compliments = this.config.compliments.frontResult.slice(0);
 		} else if (hour >= this.config.morningStartTime && hour < this.config.morningEndTime && this.config.compliments.hasOwnProperty("morning")) {
 			compliments = this.config.compliments.morning.slice(0);
 		} else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {

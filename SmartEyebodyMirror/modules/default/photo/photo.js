@@ -26,6 +26,9 @@ Module.register("photo",{
 	 	if(notification === "SUCCESS"){
 	 		this.config.imageSrc = "/modules/default/photo/image/" + payload.front + ".jpg";
 			//this.config.imageSrc2 = "/modules/default/photo/image/" + payload.side + ".jpg";
+		} else if(notification === "PREVIEW_DONE") {
+			this.config.imageSrc = "/modules/default/photo/image/" + payload;
+			this.sendNotification("COMPLIMENTS","frontResult");
 		}
 	 	this.updateDom();
 	},
