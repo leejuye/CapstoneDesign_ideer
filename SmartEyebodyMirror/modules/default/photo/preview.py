@@ -1,4 +1,5 @@
 import numpy as np
+import cv2
 import sys
 import json
 import os
@@ -8,6 +9,9 @@ from PIL import Image
 
 
 curPath = os.path.dirname(os.path.abspath(__file__))
+
+mtx = np.array([[627.021, 0, 665.068], [0, 630.526, 304.938], [0, 0, 1]])
+dist = np.array([-0.287568, 0.081128, 0.006437, -0.001159])
 
 cam = picamera.PiCamera()
 
@@ -36,6 +40,19 @@ o = cam.add_overlay(pad.tobytes(), size=img.size, fullscreen = False , window = 
 # the preview
 o.layer = 3
 
-time.sleep(20)
+time.sleep(6)
 cam.stop_preview()
 cam.capture(curPath + "/image/" + sys.argv[1])
+
+img = cv2.imread(curPath + "/image/" + sys.argv[1])
+
+h, w = img.shape[:2]
+newCameraMtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
+
+newImg = cv2.undistort(img, mtx, dist, None, newCameraMtx)
+
+x,y,w,h = roi
+newImg = newImg[y:y+h, x:x+w]
+
+
+cv2.imwrite(curPath + "/image/result_" + sys.argv[1], newImg)
