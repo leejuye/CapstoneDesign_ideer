@@ -246,4 +246,37 @@ Module.register("compliments", {
 		};
 		this.currentWeatherType = weatherIconTable[data.weather[0].icon];
 	},
+
+	// Override notification handler.
+	notificationReceived: function(notification, payload, sender) {
+		switch(notification){
+			case "CURRENTWEATHER_DATA":
+				this.setCurrentWeatherType(payload.data)
+				break
+			case "SHUTDOWN_REQUEST":
+				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
+				this.config.text = payload
+				setTimeout(() => {
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+				}, 500)
+				break
+			case "SAY_YES":
+				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
+				switch(this.config.text){
+					case "shutdown":
+						this.sendNotification("ASSISTANT_COMMAND", {
+							command: "SHUTDOWN_FORCE"
+						})
+						break
+				}
+				this.config.text = ""
+			case "SAY_NO":
+				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
+				switch(this.config.text){
+					case "shutdown":
+						break
+				}
+				this.config.text = ""
+		}
+	},
 });

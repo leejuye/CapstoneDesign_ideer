@@ -32,10 +32,7 @@ var config = {
 
 	modules: [
 		{
-			module: "MMM-Dynamic-Modules",
-		},
-		{
-		  module: "compliments",
+		    module: "compliments",
 		 	position: "lower_third"
 		},
 		{
@@ -60,7 +57,7 @@ var config = {
 					useScreenOutput: true,
 					useAudioOutput: true,
 					useChime: true,
-					timer: 5000,
+					timer: 0,
 					myMagicWord: true,
 					delay: 0.5,
 					//Your prefer sound play program. By example, if you are running this on OSX, `afplay` could be available.
@@ -93,43 +90,75 @@ var config = {
 					"actions.js"
 				],*/
 				transcriptionHooks: {
-					"HOOK_1": {
-						pattern: [
-							"종료해 줘", "종료해", "종료"
-						],
-						command: "MIRROR_END"
-					},
-					"HOOK_2": {
-						pattern: [
-							"촬영해 줘", "촬영해", "촬영"
-						],
+					"CAMERA": {
+						pattern: "(촬영|촬영해|촬영해줘)",  // No spaces
 						command: "CAMERA_START"
 					},
-					"HOOK_TEST": {
-						pattern: [
-							"테스트"
-						],
+					"SHUTDOWN": {
+						pattern: "(종료|종료해|종료해줘)",
+						command: "SHUTDOWN_REQUEST"
+					},
+					"SHUTDOWN_FORCE": {
+						pattern: "shutdown",
+						command: "SHUTDOWN_FORCE"
+					},
+					"YES": {
+						pattern: "응",
+						command: "YES"
+					},
+					"NO": {
+						pattern: "아니",
+						command: "NO"
+					},
+					"TEST": {
+						pattern: "테스트",
 						command: "TEST"
 					},
 				},
 				actions: {},
 				commands: {
-					"MIRROR_END": {
+					"CAMERA_START": {
+						notificationExec: {
+							notification: "TAKE_PIC",
+							payload: "test.jpg"
+						}
+					},
+					"SHUTDOWN_REQUEST": {
+						soundExec: {
+							chime: "open"
+						},
+						notificationExec: {
+							notification: "SHUTDOWN_REQUEST",
+							payload: "shutdown"
+						},
+						/*shellExec: {
+							exec: "shutdown now"
+						},*/
+					},
+					"SHUTDOWN_FORCE": {
 						soundExec: {
 							chime: "close"
 						},
 						shellExec: {
 							exec: "shutdown now"
-						},
+						}
 					},
-					"CAMERA_START": {
+					"YES": {
+						soundExec: {
+							chime: "open"
+						},
 						notificationExec: {
-							notification: "TAKE_PIC",
-							payload: "test.jpg"
-							/*payload: {
-								title:"TEST", 
-							  	message:"This is a test."
-							}*/
+							notification: "SAY_YES",
+							payload: "true"
+						}
+					},
+					"NO": {
+						soundExec: {
+							chime: "close"
+						},
+						notificationExec: {
+							notification: "SAY_NO",
+							payload: "false"
 						}
 					},
 					"TEST": {
