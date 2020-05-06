@@ -32,6 +32,9 @@ var config = {
 
 	modules: [
 		{
+		    module: "MMM-Dynamic-Modules"
+		},
+		{
 		    module: "compliments",
 		 	position: "lower_third"
 		},
@@ -39,10 +42,10 @@ var config = {
 		 	module: "clock",
 		 	position: "top_center"
 		},
-		{
+		/*{
 			module: "photo",
 			position: "middle_center"
-		},
+		},*/
 		{
 			module: "MMM-AssistantMk2",
 			position: "top_left",  // fullscreen_above, top_left
@@ -75,7 +78,7 @@ var config = {
 				},
 				micConfig: {
 					recorder: "arecord",
-					device: "plughw:0",
+					device: "plughw:1",  // You should use yours
 				},
 				defaultProfile: "default",
 				profiles: {
@@ -89,13 +92,13 @@ var config = {
 					"Reboot-Restart-Shutdown.js",
 					"actions.js"
 				],*/
-				transcriptionHooks: {
+				transcriptionHooks: {	// Recognize all words that contain patterns.
 					"CAMERA": {
-						pattern: "(촬영|촬영해|촬영해줘)",  // No spaces
+						pattern: "(촬영|찍어)",  // No spaces
 						command: "CAMERA_START"
 					},
 					"SHUTDOWN": {
-						pattern: "(종료|종료해|종료해줘)",
+						pattern: "(종료|꺼 줘)",  // No spaces but ok in this case
 						command: "SHUTDOWN_REQUEST"
 					},
 					"SHUTDOWN_FORCE": {
@@ -131,9 +134,6 @@ var config = {
 							notification: "SHUTDOWN_REQUEST",
 							payload: "shutdown"
 						},
-						/*shellExec: {
-							exec: "shutdown now"
-						},*/
 					},
 					"SHUTDOWN_FORCE": {
 						soundExec: {
@@ -201,7 +201,7 @@ var config = {
 			  Sensitivity: null,
 			  micConfig: {
 				recorder: "arecord",
-				device: "plughw:0"
+				device: "plughw:1"  // You should use yours
 			  },
 			  onDetected: {
 				notification: "ASSISTANT_ACTIVATE",

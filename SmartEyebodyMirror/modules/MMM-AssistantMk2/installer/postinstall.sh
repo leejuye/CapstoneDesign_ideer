@@ -88,6 +88,14 @@ Installer_yesno "Do you want to execute electron rebuild" && (
 )
 echo
 
+Installer_info "Snowboy detector embed version"
+Installer_warning "If you want to use it, remove your other detector !"
+Installer_warning "like: MMM-HotWord or MMM-Snowboy"
+Installer_yesno "Do you want to use it ?" && (
+  npm install @bugsounet/snowboy --save-dev
+  Installer_success "@bugsounet/snowboy library installed"
+)
+
 # pulse audio and mmap issue
 if Installer_is_installed "pulseaudio"; then
   if [ "$os_name" == "raspbian" ]; then

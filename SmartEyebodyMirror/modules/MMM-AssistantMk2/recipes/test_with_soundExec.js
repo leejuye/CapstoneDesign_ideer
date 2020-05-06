@@ -7,7 +7,7 @@
 var recipe = {
   transcriptionHooks: {
     "HOOKING_TEST": {
-      pattern: "test power",
+      pattern: "test",
       command: "MYMAGICWORD"
     },
   },
@@ -24,19 +24,8 @@ var recipe = {
       soundExec: {
         chime: "open",
         say: "it's really works !" // message should be set to your language !
-      },
-      notificationExec: {
-        notification: "SHOW_ALERT",
-        payload: {
-          title:"TEST", 
-          message:"This is a test."
-        }
-      }
     }
   }
 }
-
-Log.log("##### This is test_with_soundExec.js #####");
-console.log("##### This is test_with_soundExec.js #####");
 
 exports.recipe = recipe // Don't remove this line.
