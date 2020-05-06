@@ -21,7 +21,7 @@ class SOUND {
   init () {
     let opts = {"player": this.config.playProgram}
     this.player = playSound(opts)
-    log(this.config.playProgram + " Initialized")
+    console.log("[AMK2:SOUND] " + this.config.playProgram + " Initialized")
   }
 
   play (file, chimed) {
