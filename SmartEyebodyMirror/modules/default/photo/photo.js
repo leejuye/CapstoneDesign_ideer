@@ -10,7 +10,15 @@ Module.register("photo",{
 
 	start: function() {
 	 	this.current_user = null;
+
+		// TEST
 	 	this.sendSocketNotification("PREVIEW", "1231412421.jpg");
+		var self = this;
+		setTimeout(function() {
+			self.sendNotification("COMPLIMENTS", "frontStart");
+		}, 3000);
+		// TEST END
+
 	 	Log.info("Starting module: " + this.name);
 	},
 
@@ -18,6 +26,9 @@ Module.register("photo",{
 	 	if(notification === "SUCCESS"){
 	 		this.config.imageSrc = "/modules/default/photo/image/" + payload.front + ".jpg";
 			//this.config.imageSrc2 = "/modules/default/photo/image/" + payload.side + ".jpg";
+		} else if(notification === "PREVIEW_DONE") {
+			this.config.imageSrc = "/modules/default/photo/image/" + payload;
+			this.sendNotification("COMPLIMENTS","frontResult");
 		}
 	 	this.updateDom();
 	},
@@ -29,6 +40,7 @@ Module.register("photo",{
 	 	} else if(notification === "TAKE_PIC") {
 			Log.log(this.name + " received a notification: TAKE_PIC");
 			// payload : file name
+			this.sendNotification("COMPLIMENTS", "frontStart");
 			this.sendSocketNotification("PREVIEW", payload);
 		} else {
 			Log.log(this.name + " received a 'system' notification: " + notification);

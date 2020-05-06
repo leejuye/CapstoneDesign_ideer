@@ -32,10 +32,12 @@ module.exports = NodeHelper.create({
 				this.python_start();
 			};
 		} else if(notification === "PREVIEW") {
+			var self = this;
 			PythonShell.run("modules/default/photo/preview.py", {args: [payload]},
 			function (err, result) {
 				if (err) throw err;
-				console.log(result);
+				console.log("RERERERERERERE");
+				self.sendSocketNotification("PREVIEW_DONE",payload);
 			});
 		}
 	}

@@ -27,16 +27,16 @@ Module.register("compliments", {
 				"원하는 기능을 \n말해주세요."
 			]
 		},
-		updateInterval: 4000,
+		updateInterval: 2500,
 		remoteFile: "description.json",
-		fadeSpeed: 4000,
+		fadeSpeed: 2000,
 		morningStartTime: 5,
 		morningEndTime: 12,
 		afternoonStartTime: 12,
 		afternoonEndTime: 17,
 		random: false
 	},
-  lastIndexUsed:-1,
+	lastIndexUsed:-1,
 	// Set currentweather from module
 	currentWeatherType: "",
 
@@ -67,14 +67,34 @@ Module.register("compliments", {
 			self.updateDom(self.config.fadeSpeed);
 		}, this.config.updateInterval);
 	},
+	// Module location
+	getLocation: function() {
+		var ret;
+		switch (this.descCommand) {
+			case "noKeyword":
+				ret = "top_right";
+				break;
+			case "frontStart":
+			case "frontResult":
+				ret = "bottom_right";
+				break;
+			default:
+				ret = "middle_center"
+		}
+		return ret;
+	},
 
 	// Override notification handler.
 	notificationReceived: function(notification, payload, sender) {
 		if (notification === "COMPLIMENTS") {
-			Log.log(this.name + " received a module notification: " + notification + " from sender: " + sender.name);
+			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload);
 
+			clearInterval(this.compInterval);
+
+			// Remove last compliment
+			this.lastIndexUsed = 123;
 			var self = this;
-			self.updateDom()
+			self.updateDom();
 
 			this.descCommand = payload;
 			this.lastIndexUsed = -1;
@@ -88,7 +108,7 @@ Module.register("compliments", {
 				modules = {
 					'compliments':{
 							visible: 'true',
-							position: 'top_right',
+							position: this.getLocation(),
 					}
 				}
 			);
@@ -133,6 +153,10 @@ Module.register("compliments", {
 		// description setting
 		if(this.descCommand == "noKeyword") {
 			compliments = this.config.compliments.noKeyword.slice(0);
+		} else if (this.descCommand == "frontStart") {
+			compliments = this.config.compliments.frontStart.slice(0);
+		} else if (this.descCommand == "frontResult") {
+			compliments = this.config.compliments.frontResult.slice(0);
 		} else if (hour >= this.config.morningStartTime && hour < this.config.morningEndTime && this.config.compliments.hasOwnProperty("morning")) {
 			compliments = this.config.compliments.morning.slice(0);
 		} else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {
