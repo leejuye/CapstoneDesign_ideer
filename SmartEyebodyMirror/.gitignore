@@ -59,6 +59,11 @@ Temporary Items
 .directory
 .Trash-*
 
+/modules/**
+!/modules/default
+!/modules/default/**
+!/modules/README.md**
+
 # Ignore changes to the custom css files.
 /css/custom.css
 
