@@ -29,5 +29,8 @@
 	],
 	"frontResult": [
 		"정면 사진이 올바르게 촬영되었나요?\n(대답은 '응/아니'로 해주세요.)"
-	]
+	],
+	"shutdownRequest": [
+		"Do you want shutdown?"
+	],
 }

@@ -27,16 +27,16 @@ Module.register("compliments", {
 				"원하는 기능을 \n말해주세요."
 			]
 		},
-		updateInterval: 2500,
+		updateInterval: 4000,
 		remoteFile: "description.json",
-		fadeSpeed: 2000,
+		fadeSpeed: 4000,
 		morningStartTime: 5,
 		morningEndTime: 12,
 		afternoonStartTime: 12,
 		afternoonEndTime: 17,
 		random: false
 	},
-	lastIndexUsed:-1,
+  lastIndexUsed:-1,
 	// Set currentweather from module
 	currentWeatherType: "",
 
@@ -67,37 +67,16 @@ Module.register("compliments", {
 			self.updateDom(self.config.fadeSpeed);
 		}, this.config.updateInterval);
 	},
-	// Module location
-	getLocation: function() {
-		var ret;
-		switch (this.descCommand) {
-			case "noKeyword":
-				ret = "top_right";
-				break;
-			case "frontStart":
-			case "frontResult":
-				ret = "bottom_right";
-				break;
-			default:
-				ret = "middle_center"
-		}
-		return ret;
-	},
 
 	// Override notification handler.
 	notificationReceived: function(notification, payload, sender) {
 		if (notification === "COMPLIMENTS") {
-			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload);
+			Log.log(this.name + " received a module notification: " + notification + " from sender: " + sender.name);
 
-			clearInterval(this.compInterval);
-
-			// Remove last compliment
-			this.lastIndexUsed = 123;
 			var self = this;
-			self.updateDom();
+			self.updateDom()
 
 			this.descCommand = payload;
-			console.log(payload);
 			this.lastIndexUsed = -1;
 
 			this.compInterval = setInterval(function() {
@@ -105,14 +84,14 @@ Module.register("compliments", {
 			}, this.config.updateInterval);
 
 			// Position setting
-			this.sendNotification('CHANGE_POSITIONS',
-				modules = {
-					'compliments':{
-							visible: 'true',
-							position: this.getLocation(),
-					}
-				}
-			);
+		//	this.sendNotification('CHANGE_POSITIONS',
+		//		modules = {
+		//			'compliments':{
+		//					visible: 'true',
+		//					position: 'top_right',
+		//			}
+		//		}
+		//	);
 		}
 	},
 	/* randomIndex(compliments)
@@ -154,12 +133,6 @@ Module.register("compliments", {
 		// description setting
 		if(this.descCommand == "noKeyword") {
 			compliments = this.config.compliments.noKeyword.slice(0);
-		} else if(this.descCommand == "shutdownRequest") {
-                        compliments = this.config.compliments.shutdownRequest.s$
-                } else if (this.descCommand == "frontStart") {
-			compliments = this.config.compliments.frontStart.slice(0);
-		} else if (this.descCommand == "frontResult") {
-			compliments = this.config.compliments.frontResult.slice(0);
 		} else if (hour >= this.config.morningStartTime && hour < this.config.morningEndTime && this.config.compliments.hasOwnProperty("morning")) {
 			compliments = this.config.compliments.morning.slice(0);
 		} else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {
@@ -168,6 +141,9 @@ Module.register("compliments", {
 			compliments = this.config.compliments.evening.slice(0);
 		}
 
+		if (this.descCommand == "shutdownRequest") {
+			compliments = this.config.compliments.shutdownRequest.slice(0);
+		}
 		if (typeof compliments === "undefined") {
 			compliments = new Array();
 		}
@@ -277,6 +253,7 @@ Module.register("compliments", {
 	// Override notification handler.
 	notificationReceived: function(notification, payload, sender) {
 		switch(payload){
+//		switch(notification){
 			case "CURRENTWEATHER_DATA":
 				this.setCurrentWeatherType(payload.data)
 				break

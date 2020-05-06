@@ -131,8 +131,8 @@ var config = {
 							chime: "open"
 						},
 						notificationExec: {
-							notification: "SHUTDOWN_REQUEST",
-							payload: "shutdown"
+							notification: "COMPLIMENTS",
+							payload: "shutdownRequest"
 						},
 					},
 					"SHUTDOWN_FORCE": {
@@ -197,8 +197,8 @@ var config = {
 			  debug: false,
 			  AudioGain: 2.0,
 			  Frontend: true,
-			  Model: "smart_mirror",
-			  Sensitivity: null,
+			  Model: "jarvis",
+			  Sensitivity: 1.0,
 			  micConfig: {
 				recorder: "arecord",
 				device: "plughw:1"  // You should use yours
