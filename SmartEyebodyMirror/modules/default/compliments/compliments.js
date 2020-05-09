@@ -86,32 +86,67 @@ Module.register("compliments", {
 
 	// Override notification handler.
 	notificationReceived: function(notification, payload, sender) {
-		if (notification === "COMPLIMENTS") {
-			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload);
+		switch(notification){
+			case "COMPLIMENTS":
+				Log.log(this.name + " received a module notification: " + notification + " payload: " + payload);
 
-			clearInterval(this.compInterval);
+				clearInterval(this.compInterval);
 
-			// Remove last compliment
-			this.lastIndexUsed = 123;
-			var self = this;
-			self.updateDom();
+				// Remove last compliment
+				this.lastIndexUsed = 123;
+				var self = this;
+				self.updateDom();
 
-			this.descCommand = payload;
-			this.lastIndexUsed = -1;
+				this.descCommand = payload;
+				this.lastIndexUsed = -1;
 
-			this.compInterval = setInterval(function() {
-				self.updateDom(self.config.fadeSpeed);
-			}, this.config.updateInterval);
+				this.compInterval = setInterval(function() {
+					self.updateDom(self.config.fadeSpeed);
+				}, this.config.updateInterval);
 
-			// Position setting
-			this.sendNotification('CHANGE_POSITIONS',
-				modules = {
-					'compliments':{
-							visible: 'true',
-							position: this.getLocation(),
+				// Position setting
+				this.sendNotification('CHANGE_POSITIONS',
+					modules = {
+						'compliments':{
+								visible: 'true',
+								position: this.getLocation(),
+						}
 					}
+				);
+				if (payload === "frontResult") {
+					this.config.text = "frontResult";
 				}
-			);
+				break
+			case "SHUTDOWN_REQUEST":
+				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
+				this.config.text = "shutdown"
+				setTimeout(() => {
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+				}, 500)
+				break
+			case "SAY_YES":
+				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
+				switch(this.config.text){
+					case "shutdown":
+						this.sendNotification("ASSISTANT_COMMAND", {
+							command: "SHUTDOWN_FORCE"
+						})
+						break
+					case "frontResult":
+						
+						break
+				}
+				this.config.text = ""
+			case "SAY_NO":
+				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
+				switch(this.config.text){
+					case "shutdown":
+						break
+					case "frontResult":
+						this.sendNotification("TAKE_PIC", "test.jpg")
+						break
+				}
+				this.config.text = ""
 		}
 	},
 	/* randomIndex(compliments)
@@ -271,36 +306,4 @@ Module.register("compliments", {
 		this.currentWeatherType = weatherIconTable[data.weather[0].icon];
 	},
 
-	// Override notification handler.
-	notificationReceived: function(notification, payload, sender) {
-		switch(notification){
-			case "CURRENTWEATHER_DATA":
-				this.setCurrentWeatherType(payload.data)
-				break
-			case "SHUTDOWN_REQUEST":
-				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
-				this.config.text = payload
-				setTimeout(() => {
-					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-				}, 500)
-				break
-			case "SAY_YES":
-				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
-				switch(this.config.text){
-					case "shutdown":
-						this.sendNotification("ASSISTANT_COMMAND", {
-							command: "SHUTDOWN_FORCE"
-						})
-						break
-				}
-				this.config.text = ""
-			case "SAY_NO":
-				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
-				switch(this.config.text){
-					case "shutdown":
-						break
-				}
-				this.config.text = ""
-		}
-	},
 });

@@ -12,11 +12,11 @@ Module.register("photo",{
 	 	this.current_user = null;
 
 		// TEST
-	 	this.sendSocketNotification("PREVIEW", "1231412421.jpg");
+	 	/*this.sendSocketNotification("PREVIEW", "1231412421.jpg");
 		var self = this;
 		setTimeout(function() {
 			self.sendNotification("COMPLIMENTS", "frontStart");
-		}, 3000);
+		}, 3000);*/
 		// TEST END
 
 	 	Log.info("Starting module: " + this.name);
@@ -29,6 +29,9 @@ Module.register("photo",{
 		} else if(notification === "PREVIEW_DONE") {
 			this.config.imageSrc = "/modules/default/photo/image/" + payload;
 			this.sendNotification("COMPLIMENTS","frontResult");
+			setTimeout(() => {
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+			}, 5000)
 		}
 	 	this.updateDom();
 	},
@@ -40,6 +43,8 @@ Module.register("photo",{
 	 	} else if(notification === "TAKE_PIC") {
 			Log.log(this.name + " received a notification: TAKE_PIC");
 			// payload : file name
+			this.config.imageSrc = "";
+			this.updateDom();
 			this.sendNotification("COMPLIMENTS", "frontStart");
 			this.sendSocketNotification("PREVIEW", payload);
 		} else {
