@@ -34,7 +34,8 @@ Module.register("compliments", {
 		morningEndTime: 12,
 		afternoonStartTime: 12,
 		afternoonEndTime: 17,
-		random: false
+		random: false,
+		noSayCnt: 0
 	},
 	lastIndexUsed:-1,
 	// Set currentweather from module
@@ -133,7 +134,7 @@ Module.register("compliments", {
 						})
 						break
 					case "frontResult":
-						
+						// sideStart
 						break
 				}
 				this.config.text = ""
@@ -147,6 +148,25 @@ Module.register("compliments", {
 						break
 				}
 				this.config.text = ""
+			case "ASSISTANT_ERROR":
+				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
+				switch(this.config.text){
+					case "shutdown":
+						break
+					case "frontResult":
+						this.config.noSayCnt++;
+						if (this.config.noSayCnt === 2) {
+							this.sendNotification("ASSISTANT_COMMAND", {
+								command: "SHUTDOWN_FORCE"
+							})
+							this.config.noSayCnt = 0;
+							break
+						}
+						setTimeout(() => {
+							this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"})
+						}, 3000)
+						break
+				}
 		}
 	},
 	/* randomIndex(compliments)
