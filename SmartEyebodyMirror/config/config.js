@@ -35,6 +35,9 @@ var config = {
 		    module: "MMM-Dynamic-Modules"
 		},
 		{
+		    module: "hideshow"
+		},
+		{
 		    module: "compliments",
 		 	position: "lower_third"
 		},
@@ -135,21 +138,13 @@ var config = {
 							payload: "shutdownRequest"
 						},
 					},
-					"SHUTDOWN_FORCE": {
-						soundExec: {
-							chime: "close"
-						},
-						shellExec: {
-							exec: "shutdown now"
-						}
-					},
 					"YES": {
 						soundExec: {
 							chime: "open"
 						},
 						notificationExec: {
-							notification: "SAY_YES",
-							payload: "true"
+							notification: "COMPLIMENTS",
+							payload: "sayYes"
 						}
 					},
 					"NO": {
@@ -157,8 +152,8 @@ var config = {
 							chime: "close"
 						},
 						notificationExec: {
-							notification: "SAY_NO",
-							payload: "false"
+							notification: "COMPLIMENTS",
+							payload: "sayNo"
 						}
 					},
 					"TEST": {
@@ -166,11 +161,11 @@ var config = {
 							module: ["MMM-AssistantMk2"],
 							exec: (module, params, key) => {
 							  	setTimeout(()=>{
-									module.sendNotification("SHOW_ALERT", { 
-										message:"it's works !", 
-										timer:2000 
-									})
-								}, 100)
+									module.sendNotification("SHOW_ALERT", {
+										message:"it's works !",
+										timer:2000
+									});
+								}, 100);
 							}
 						},
 						soundExec: {
@@ -180,7 +175,7 @@ var config = {
 						notificationExec: {
 							notification: "SHOW_ALERT",
 							payload: {
-								title:"TEST", 
+								title:"TEST",
 							  	message:"This is a test."
 							}
 						}
@@ -192,7 +187,7 @@ var config = {
 			},
 		},
 		{
-			module: 'MMM-Snowboy',
+			module: "MMM-Snowboy",
 			config: {
 			  debug: false,
 			  AudioGain: 2.0,
@@ -200,12 +195,12 @@ var config = {
 			  Model: "jarvis",
 			  Sensitivity: 1.0,
 			  micConfig: {
-				recorder: "arecord",
-				device: "plughw:1"  // You should use yours
+					recorder: "arecord",
+					device: "plughw:1"  // You should use yours
 			  },
 			  onDetected: {
-				notification: "ASSISTANT_ACTIVATE",
-				parameters: {
+					notification: "ASSISTANT_ACTIVATE",
+					parameters: {
 				  type: "MIC",
 				  profile: "default",
 				  chime: true

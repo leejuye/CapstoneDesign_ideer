@@ -27,7 +27,7 @@ Module.register("compliments", {
 				"원하는 기능을 \n말해주세요."
 			]
 		},
-		updateInterval: 2500,
+		updateInterval: 500,
 		remoteFile: "description.json",
 		fadeSpeed: 2000,
 		morningStartTime: 5,
@@ -71,15 +71,15 @@ Module.register("compliments", {
 	getLocation: function() {
 		var ret;
 		switch (this.descCommand) {
-			case "noKeyword":
-				ret = "top_right";
-				break;
-			case "frontStart":
-			case "frontResult":
-				ret = "bottom_right";
-				break;
-			default:
-				ret = "middle_center"
+		case "noKeyword":
+			ret = "top_right";
+			break;
+		case "frontStart":
+		case "frontResult":
+			ret = "bottom_right";
+			break;
+		default:
+			ret = "middle_center";
 		}
 		return ret;
 	},
@@ -104,12 +104,40 @@ Module.register("compliments", {
 				self.updateDom(self.config.fadeSpeed);
 			}, this.config.updateInterval);
 
-			// Position setting
-			this.sendNotification('CHANGE_POSITIONS',
+			switch(payload){
+			case "CURRENTWEATHER_DATA":
+				this.setCurrentWeatherType(payload.data);
+				break;
+			case "shutdownRequest":
+				this.config.text = payload;
+				setTimeout(() => {
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+				}, 500);
+				break;
+			case "shutdownNow":
+				this.config.text = payload;
+				break;
+			case "sayYes":
+				switch(this.config.text){
+				case "shutdownRequest":
+					this.sendNotification("HIDE_ALL_MODULES");
+					break;
+				}
+				this.config.text = "";
+			case "sayNo":
+				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
+				switch(this.config.text){
+				case "shutdownRequest":
+					break;
+				}
+				this.config.text = "";
+			}
+
+			this.sendNotification("CHANGE_POSITIONS",
 				modules = {
-					'compliments':{
-							visible: 'true',
-							position: this.getLocation(),
+					"compliments":{
+						visible: "true",
+						position: this.getLocation(),
 					}
 				}
 			);
@@ -155,8 +183,10 @@ Module.register("compliments", {
 		if(this.descCommand == "noKeyword") {
 			compliments = this.config.compliments.noKeyword.slice(0);
 		} else if(this.descCommand == "shutdownRequest") {
-                        compliments = this.config.compliments.shutdownRequest.s$
-                } else if (this.descCommand == "frontStart") {
+			compliments = this.config.compliments.shutdownRequest.slice(0);
+		} else if(this.descCommand == "shutdownNow") {
+			compliments = this.config.compliments.shutdownNow.slice(0);
+		} else if (this.descCommand == "frontStart") {
 			compliments = this.config.compliments.frontStart.slice(0);
 		} else if (this.descCommand == "frontResult") {
 			compliments = this.config.compliments.frontResult.slice(0);
@@ -207,7 +237,7 @@ Module.register("compliments", {
 		// get the current time of day compliments list
 		var compliments = this.complimentArray();
 		// variable for index to next message to display
-		let index=0
+		let index=0;
 		// are we randomizing
 		if(this.config.random){
 			// yes
@@ -218,29 +248,29 @@ Module.register("compliments", {
 			if (index == compliments.length - 1) {
 				clearInterval(this.compInterval);
 			} else if (index >= compliments.length){
-				return '';
+				return "";
 			}
 		}
 
 		return compliments[index];
 	},
 
-// Override dom generator.
+	// Override dom generator.
 	getDom: function() {
 		var wrapper = document.createElement("div");
 		wrapper.className = this.config.classes ? this.config.classes : "thin large bright pre-line";
 		// get the compliment text
 		var complimentText = this.randomCompliment();
 		// split it into parts on newline text
-		var parts= complimentText.split('\n')
+		var parts= complimentText.split("\n");
 		// create a span to hold it all
-		var compliment=document.createElement('span')
-                // process all the parts of the compliment text
+		var compliment=document.createElement("span");
+		// process all the parts of the compliment text
 		for (part of parts){
 			// create a text element for each part
-			compliment.appendChild(document.createTextNode(part))
+			compliment.appendChild(document.createTextNode(part));
 			// add a break `
-			compliment.appendChild(document.createElement('BR'))
+			compliment.appendChild(document.createElement("BR"));
 		}
 		// remove the last break
 		compliment.lastElementChild.remove();
@@ -272,38 +302,5 @@ Module.register("compliments", {
 			"50n": "night_alt_cloudy_windy"
 		};
 		this.currentWeatherType = weatherIconTable[data.weather[0].icon];
-	},
-
-	// Override notification handler.
-	notificationReceived: function(notification, payload, sender) {
-		switch(payload){
-			case "CURRENTWEATHER_DATA":
-				this.setCurrentWeatherType(payload.data)
-				break
-			case "shutdownRequest":
-				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
-				this.config.text = payload
-				setTimeout(() => {
-					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-				}, 500)
-				break
-			case "SAY_YES":
-				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
-				switch(this.config.text){
-					case "shutdown":
-						this.sendNotification("ASSISTANT_COMMAND", {
-							command: "SHUTDOWN_FORCE"
-						})
-						break
-				}
-				this.config.text = ""
-			case "SAY_NO":
-				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
-				switch(this.config.text){
-					case "shutdown":
-						break
-				}
-				this.config.text = ""
-		}
 	},
 });

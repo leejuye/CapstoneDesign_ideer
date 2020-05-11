@@ -31,6 +31,9 @@
 		"정면 사진이 올바르게 촬영되었나요?\n(대답은 '응/아니'로 해주세요.)"
 	],
 	"shutdownRequest": [
-		"Do you want shutdown?"
+		"종료하시겠습니까?\n(대답은 '응/아니'로 해주세요.)"
 	],
+	"shutdownNow": [
+		"종료합니다. Bi Deer~"
+	]
 }
