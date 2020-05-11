@@ -11,8 +11,12 @@ from picamera.array import PiRGBArray
 
 curPath = os.path.dirname(os.path.abspath(__file__))
 
+overlay = None
 # initialize the camera and grab a reference to the raw camera capture
-overlay = cv2.imread(curPath +'/overlay_front.png')
+if sys.argv[1][len(sys.argv[1])-5] == 't':
+    overlay = cv2.imread(curPath + '/overlay_front.png')
+else:
+    overlay = cv2.imread(curPath + '/overlay_side.png')
 
 overlay = cv2.resize(overlay, (480, 640))
 # overlay = cv2.cvtColor(overlay, cv2.COLOR_RGB2RGBA)
