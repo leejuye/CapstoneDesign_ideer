@@ -47,6 +47,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     
     image = dst
     added_image = cv2.add(image,overlay)
+    added_image = np.fliplr(added_image)
     # show the frame
     cv2.namedWindow(winName)
     cv2.moveWindow(winName, 20, 50)
