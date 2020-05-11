@@ -1,48 +1,69 @@
+# import the necessary packages
 import numpy as np
 import cv2
 import sys
 import json
 import os
-import picamera
+from picamera import PiCamera
 import time
 from PIL import Image
-
+from picamera.array import PiRGBArray
 
 curPath = os.path.dirname(os.path.abspath(__file__))
 
-cam = picamera.PiCamera()
+overlay = None
+# initialize the camera and grab a reference to the raw camera capture
+if sys.argv[1][len(sys.argv[1])-5] == 't':
+    overlay = cv2.imread(curPath + '/overlay_front.png')
+else:
+    overlay = cv2.imread(curPath + '/overlay_side.png')
 
-cam.resolution = (480, 640)
-cam.framerate = 24
-cam.start_preview(fullscreen=False, window=(20, 100, 480, 640))
+overlay = cv2.resize(overlay, (480, 640))
+# overlay = cv2.cvtColor(overlay, cv2.COLOR_RGB2RGBA)
 
-# Load the arbitrarily sized image
-img = Image.open(curPath +'/overlay.png')
-# Create an image padded to the required size with
-# mode 'RGB'
-pad = Image.new('RGBA', (
-    ((img.size[0] + 31) // 32) * 32,
-    ((img.size[1] + 15) // 16) * 16,
-    ))
-# Paste the original image into the padded one
-pad.paste(img, (0, 0))
+camera = PiCamera()
+camera.resolution = (480, 640)
+camera.framerate = 32
 
-# Add the overlay with the padded image as the source,
-# but the original image's dimensions
-
-o = cam.add_overlay(pad.tobytes(), size=img.size, fullscreen = False , window = (20, 100, 480, 600))
-# By default, the overlay is in layer 0, beneath the
-# preview (which defaults to layer 2). Here we make
-# the new overlay semi-transparent, then move it above
-# the preview
-o.layer = 3
-
-time.sleep(20)
-cam.stop_preview()
-cam.capture(curPath + "/image/" + sys.argv[1])
+rawCapture = PiRGBArray(camera, size=(480, 640))
 
 mtx = np.array([[412.9634173, 0., 226.99121613], [0., 412.39697781, 280.22672336], [0., 0., 1.]])
 dist = np.array([[-3.70615012e-01, 2.39676247e-01, 1.30295455e-04, 1.03008073e-03, -1.23421190e-01]])
+# allow the camera to warmup
+time.sleep(0.1)
+# capture frames from the camera
+winName = "view"
+cnt = 0
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+    # grab the raw NumPy array representing the image, then initialize the timestamp
+    # and occupied/unoccupied text
+    image = frame.array
+    h,  w = image.shape[:2]
+    newcameramtx, roi=cv2.getOptimalNewCameraMatrix(mtx,dist,(w,h),0,(w,h))
+
+    # undistort
+    mapx,mapy = cv2.initUndistortRectifyMap(mtx,dist,None,newcameramtx,(w,h),5)
+    dst = cv2.remap(image,mapx,mapy,cv2.INTER_LINEAR)
+
+    # crop the image
+    x,y,w,h = roi
+    dst = dst[y:y+h, x:x+w]
+    
+    image = dst
+    added_image = cv2.add(image,overlay)
+    added_image = np.fliplr(added_image)
+    # show the frame
+    cv2.namedWindow(winName)
+    cv2.moveWindow(winName, 20, 50)
+    cv2.imshow(winName, added_image)
+    key = cv2.waitKey(1) & 0xFF
+    cnt = cnt+1
+    # clear the stream in preparation for the next frame
+    rawCapture.truncate(0)
+    # if the `q` key was pressed, break from the loop
+    if key == ord("q") or cnt == 100:
+        camera.capture(curPath + "/image/" + sys.argv[1])
+        break
 
 img = cv2.imread(curPath + "/image/" + sys.argv[1])
 
