@@ -47,7 +47,12 @@ Module.register("photo",{
 			//this.config.imageSrc2 = "/modules/default/photo/image/" + payload.side + ".jpg";
 		} else if(notification === "PREVIEW_DONE") {
 			this.config.imageSrc = "/modules/default/photo/image/" + payload;
-			this.sendNotification("COMPLIMENTS","frontResult");
+			if(payload.indexOf("front") != -1) {
+				Log.log("front result");
+				this.sendNotification("COMPLIMENTS","frontResult"); 
+			}else {
+				this.sendNotification("COMPLIMENTS","sideResult");
+			}
 			setTimeout(() => {
 					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 			}, 8000)
