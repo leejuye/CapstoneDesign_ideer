@@ -164,24 +164,24 @@ Module.register("compliments", {
 				}
 				this.config.text = "";
 			}
-			if(notification==="ASSISTANT_ERROR") {
-				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
-				switch(this.config.text){
-				case "shutdown":
+		}
+		if(notification==="ASSISTANT_ERROR") {
+			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
+			switch(this.config.text){
+			case "shutdown":
+				break;
+			case "frontResult":
+				this.config.noSayCnt++;
+				if (this.config.noSayCnt === 2) {
+					this.sendNotification("ASSISTANT_COMMAND", {
+						command: "SHUTDOWN_FORCE"
+					});
+					this.config.noSayCnt = 0;
 					break;
-				case "frontResult":
-					this.config.noSayCnt++;
-					if (this.config.noSayCnt === 2) {
-						this.sendNotification("ASSISTANT_COMMAND", {
-							command: "SHUTDOWN_FORCE"
-						});
-						this.config.noSayCnt = 0;
-						break;
-					}
-					setTimeout(() => {
-						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-					}, 3000);
 				}
+				setTimeout(() => {
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+				}, 3000);
 			}
 		}
 	},
