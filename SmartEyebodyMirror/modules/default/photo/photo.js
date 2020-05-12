@@ -10,13 +10,13 @@ Module.register("photo",{
 	fileName: null,
 	start: function() {
 	 	this.current_user = null;
-
+		
 		// TEST
-	 	this.sendSocketNotification("PREVIEW", "1231412421.jpg");
+	 	/*this.sendSocketNotification("PREVIEW", "1231412421.jpg");
 		var self = this;
 		setTimeout(function() {
 			self.sendNotification("COMPLIMENTS", "frontStart");
-		}, 3000);
+		}, 3000);*/
 		// TEST END
 
 	 	Log.info("Starting module: " + this.name);
@@ -48,6 +48,9 @@ Module.register("photo",{
 		} else if(notification === "PREVIEW_DONE") {
 			this.config.imageSrc = "/modules/default/photo/image/" + payload;
 			this.sendNotification("COMPLIMENTS","frontResult");
+			setTimeout(() => {
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+			}, 8000)
 		}
 	 	this.updateDom();
 	},
@@ -57,8 +60,22 @@ Module.register("photo",{
 	 		Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 			this.sendSocketNotification("CONFIG", this.config);
 	 	} else if(notification === "TAKE_PIC") {
-			this.initFileName();
 			Log.log(this.name + " received a notification: " + notification);
+			this.config.imageSrc = "";
+			this.updateDom();
+			this.sendNotification("COMPLIMENTS", "frontStart");
+			this.sendSocketNotification("PREVIEW", payload);
+		} else if (notification === "FRONT_RESULT") {
+			Log.log(this.name + " received a 'system' notification: " + notification);
+			if (payload === "tryAgain") {
+				this.config.imageSrc = "";
+				this.updateDom();
+				this.sendNotification("COMPLIMENTS", "tryAgain");
+				setTimeout(() => {
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+				}, 10000)
+			}
+			this.initFileName();
 			this.sendNotification("COMPLIMENTS", "frontStart");
 			this.sendSocketNotification("PREVIEW", fileName + '_front.jpg');
 		} else if(notification === "TAKE_PIC_SIDE") {
