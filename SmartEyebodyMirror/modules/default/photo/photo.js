@@ -63,8 +63,9 @@ Module.register("photo",{
 			Log.log(this.name + " received a notification: " + notification);
 			this.config.imageSrc = "";
 			this.updateDom();
+			this.initFileName();
 			this.sendNotification("COMPLIMENTS", "frontStart");
-			this.sendSocketNotification("PREVIEW", payload);
+			this.sendSocketNotification("PREVIEW", this.fileName + '_front.jpg');
 		} else if (notification === "FRONT_RESULT") {
 			Log.log(this.name + " received a 'system' notification: " + notification);
 			if (payload === "tryAgain") {
@@ -75,13 +76,10 @@ Module.register("photo",{
 					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 				}, 10000)
 			}
-			this.initFileName();
-			this.sendNotification("COMPLIMENTS", "frontStart");
-			this.sendSocketNotification("PREVIEW", fileName + '_front.jpg');
 		} else if(notification === "TAKE_PIC_SIDE") {
 			Log.log(this.name + " received a notification: " + notification);
 			this.sendNotification("COMPLIMENTS", "sideStart");
-			this.sendSocketNotification("PREVIEW", fileName + '_side.jpg');
+			this.sendSocketNotification("PREVIEW", this.fileName + '_side.jpg');
 		} else {
 			Log.log(this.name + " received a 'system' notification: " + notification);
 		}
