@@ -34,7 +34,9 @@ Module.register("compliments", {
 		morningEndTime: 12,
 		afternoonStartTime: 12,
 		afternoonEndTime: 17,
-		random: false
+		random: false,
+		noSayCnt: 0,
+		badFrontCnt: 0
 	},
 	lastIndexUsed:-1,
 	// Set currentweather from module
@@ -86,6 +88,7 @@ Module.register("compliments", {
 
 	// Override notification handler.
 	notificationReceived: function(notification, payload, sender) {
+
 		if (notification === "COMPLIMENTS") {
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload);
 
@@ -99,15 +102,30 @@ Module.register("compliments", {
 			this.descCommand = payload;
 			console.log(payload);
 			this.lastIndexUsed = -1;
-
-			this.compInterval = setInterval(function() {
-				self.updateDom(self.config.fadeSpeed);
-			}, this.config.updateInterval);
+      
+      this.compInterval = setInterval(function() {
+        self.updateDom(self.config.fadeSpeed);
+      }, this.config.updateInterval);
+      
+      this.sendNotification('CHANGE_POSITIONS',
+        modules = {
+          'compliments':{
+              visible: 'true',
+              position: this.getLocation(),
+          }
+        }
+      );
 
 			switch(payload){
 			case "CURRENTWEATHER_DATA":
 				this.setCurrentWeatherType(payload.data);
 				break;
+      case "frontResult" :
+          this.config.text = "frontResult";
+          break;
+      case "tryAgain":
+        this.sendNotification("COMPLIMENTS", "sayFunction"); 
+        break;
 			case "shutdownRequest":
 				this.config.text = payload;
 				setTimeout(() => {
@@ -122,6 +140,9 @@ Module.register("compliments", {
 				case "shutdownRequest":
 					this.sendNotification("HIDE_ALL_MODULES");
 					break;
+          case "frontResult":
+            //sideStart
+            break;
 				}
 				this.config.text = "";
 			case "sayNo":
@@ -129,18 +150,39 @@ Module.register("compliments", {
 				switch(this.config.text){
 				case "shutdownRequest":
 					break;
+          case "frontResult":
+            this.config.badFrontCnt++;
+						if (this.config.badFrontCnt === 3) {
+							this.sendNotification("FRONT_RESULT", "tryAgain");
+							// this.descCommand = "tryAgain";
+							// this.updateDom(5000);
+							this.config.badFrontCnt = 0;
+						} else {
+							this.sendNotification("TAKE_PIC", "test.jpg");
+						}
+            break;
 				}
 				this.config.text = "";
 			}
-
-			this.sendNotification("CHANGE_POSITIONS",
-				modules = {
-					"compliments":{
-						visible: "true",
-						position: this.getLocation(),
+if(notification==="ASSISTANT_ERROR") {
+				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
+				switch(this.config.text){
+					case "shutdown":
+						break
+					case "frontResult":
+						this.config.noSayCnt++;
+						if (this.config.noSayCnt === 2) {
+							this.sendNotification("ASSISTANT_COMMAND", {
+								command: "SHUTDOWN_FORCE"
+							})
+							this.config.noSayCnt = 0;
+							break
+						}
+						setTimeout(() => {
+							this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"})
+						}, 3000)
 					}
-				}
-			);
+				);
 		}
 	},
 	/* randomIndex(compliments)
@@ -190,6 +232,10 @@ Module.register("compliments", {
 			compliments = this.config.compliments.frontStart.slice(0);
 		} else if (this.descCommand == "frontResult") {
 			compliments = this.config.compliments.frontResult.slice(0);
+		} else if (this.descCommand == "tryAgain") {
+			compliments = this.config.compliments.tryAgain.slice(0);
+		} else if (this.descCommand == "sayFunction") {
+			compliments = this.config.compliments.sayFunction.slice(0);
 		} else if (hour >= this.config.morningStartTime && hour < this.config.morningEndTime && this.config.compliments.hasOwnProperty("morning")) {
 			compliments = this.config.compliments.morning.slice(0);
 		} else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {

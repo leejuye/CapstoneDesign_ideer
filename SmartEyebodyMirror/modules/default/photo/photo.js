@@ -7,19 +7,38 @@ Module.register("photo",{
 	defaults: {
 		text: "photo module test"
 	},
-
+	fileName: null,
 	start: function() {
 	 	this.current_user = null;
-
+		
 		// TEST
-	 	this.sendSocketNotification("PREVIEW", "1231412421.jpg");
+	 	/*this.sendSocketNotification("PREVIEW", "1231412421.jpg");
 		var self = this;
 		setTimeout(function() {
 			self.sendNotification("COMPLIMENTS", "frontStart");
-		}, 3000);
+		}, 3000);*/
 		// TEST END
 
 	 	Log.info("Starting module: " + this.name);
+	},
+
+	fillZero: function(num, digits) {
+		num = num.toString();
+		var prefix = '';
+		while(num.length + prefix.length < digits) {
+			prefix += '0';
+		}
+		return prefix + num;
+	},
+
+	initFileName: function() {
+		var d = new Date();
+		this.fileName = this.fillZero(d.getFullYear(), 4) +
+			this.fillZero(d.getMonth() + 1, 2) +
+			this.fillZero(d.getDate(), 2) +
+			this.fillZero(d.getHours(), 2) +
+			this.fillZero(d.getMinutes(), 2) +
+			this.fillZero(d.getSeconds(), 2);
 	},
 
 	socketNotificationReceived: function(notification, payload){
@@ -29,6 +48,9 @@ Module.register("photo",{
 		} else if(notification === "PREVIEW_DONE") {
 			this.config.imageSrc = "/modules/default/photo/image/" + payload;
 			this.sendNotification("COMPLIMENTS","frontResult");
+			setTimeout(() => {
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+			}, 8000)
 		}
 	 	this.updateDom();
 	},
@@ -38,10 +60,26 @@ Module.register("photo",{
 	 		Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 			this.sendSocketNotification("CONFIG", this.config);
 	 	} else if(notification === "TAKE_PIC") {
-			Log.log(this.name + " received a notification: TAKE_PIC");
-			// payload : file name
+			Log.log(this.name + " received a notification: " + notification);
+			this.config.imageSrc = "";
+			this.updateDom();
+			this.initFileName();
 			this.sendNotification("COMPLIMENTS", "frontStart");
-			this.sendSocketNotification("PREVIEW", payload);
+			this.sendSocketNotification("PREVIEW", this.fileName + '_front.jpg');
+		} else if (notification === "FRONT_RESULT") {
+			Log.log(this.name + " received a 'system' notification: " + notification);
+			if (payload === "tryAgain") {
+				this.config.imageSrc = "";
+				this.updateDom();
+				this.sendNotification("COMPLIMENTS", "tryAgain");
+				setTimeout(() => {
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+				}, 10000)
+			}
+		} else if(notification === "TAKE_PIC_SIDE") {
+			Log.log(this.name + " received a notification: " + notification);
+			this.sendNotification("COMPLIMENTS", "sideStart");
+			this.sendSocketNotification("PREVIEW", this.fileName + '_side.jpg');
 		} else {
 			Log.log(this.name + " received a 'system' notification: " + notification);
 		}

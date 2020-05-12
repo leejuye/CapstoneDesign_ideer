@@ -45,10 +45,10 @@ var config = {
 		 	module: "clock",
 		 	position: "top_center"
 		},
-		/*{
+		{
 			module: "photo",
 			position: "middle_center"
-		},*/
+		},
 		{
 			module: "MMM-AssistantMk2",
 			position: "top_left",  // fullscreen_above, top_left
@@ -124,6 +124,9 @@ var config = {
 				actions: {},
 				commands: {
 					"CAMERA_START": {
+						soundExec: {
+							chime: "open"
+						},
 						notificationExec: {
 							notification: "TAKE_PIC",
 							payload: "test.jpg"
