@@ -39,6 +39,11 @@ Module.register("clock",{
 	start: function() {
 		Log.info("Starting module: " + this.name);
 
+		// Autostart assistant in 10 seconds
+		setTimeout(() => {
+			this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+		}, 10000)
+
 		// Schedule update interval.
 		var self = this;
 		self.second = moment().second();

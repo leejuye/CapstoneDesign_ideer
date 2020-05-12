@@ -10,7 +10,7 @@ Module.register("photo",{
 
 	start: function() {
 	 	this.current_user = null;
-
+		
 		// TEST
 	 	/*this.sendSocketNotification("PREVIEW", "1231412421.jpg");
 		var self = this;
@@ -31,7 +31,7 @@ Module.register("photo",{
 			this.sendNotification("COMPLIMENTS","frontResult");
 			setTimeout(() => {
 					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-			}, 5000)
+			}, 8000)
 		}
 	 	this.updateDom();
 	},
@@ -47,6 +47,16 @@ Module.register("photo",{
 			this.updateDom();
 			this.sendNotification("COMPLIMENTS", "frontStart");
 			this.sendSocketNotification("PREVIEW", payload);
+		} else if (notification === "FRONT_RESULT") {
+			Log.log(this.name + " received a 'system' notification: " + notification);
+			if (payload === "tryAgain") {
+				this.config.imageSrc = "";
+				this.updateDom();
+				this.sendNotification("COMPLIMENTS", "tryAgain");
+				setTimeout(() => {
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+				}, 10000)
+			}
 		} else {
 			Log.log(this.name + " received a 'system' notification: " + notification);
 		}

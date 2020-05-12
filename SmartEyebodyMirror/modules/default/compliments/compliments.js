@@ -35,7 +35,8 @@ Module.register("compliments", {
 		afternoonStartTime: 12,
 		afternoonEndTime: 17,
 		random: false,
-		noSayCnt: 0
+		noSayCnt: 0,
+		badFrontCnt: 0
 	},
 	lastIndexUsed:-1,
 	// Set currentweather from module
@@ -116,6 +117,9 @@ Module.register("compliments", {
 				);
 				if (payload === "frontResult") {
 					this.config.text = "frontResult";
+				} else if (payload == "tryAgain") {
+					// Say what you want to do
+					this.sendNotification("COMPLIMENTS", "sayFunction");
 				}
 				break
 			case "SHUTDOWN_REQUEST":
@@ -144,7 +148,15 @@ Module.register("compliments", {
 					case "shutdown":
 						break
 					case "frontResult":
-						this.sendNotification("TAKE_PIC", "test.jpg")
+						this.config.badFrontCnt++;
+						if (this.config.badFrontCnt === 3) {
+							this.sendNotification("FRONT_RESULT", "tryAgain");
+							// this.descCommand = "tryAgain";
+							// this.updateDom(5000);
+							this.config.badFrontCnt = 0;
+						} else {
+							this.sendNotification("TAKE_PIC", "test.jpg");
+						}
 						break
 				}
 				this.config.text = ""
@@ -212,6 +224,10 @@ Module.register("compliments", {
 			compliments = this.config.compliments.frontStart.slice(0);
 		} else if (this.descCommand == "frontResult") {
 			compliments = this.config.compliments.frontResult.slice(0);
+		} else if (this.descCommand == "tryAgain") {
+			compliments = this.config.compliments.tryAgain.slice(0);
+		} else if (this.descCommand == "sayFunction") {
+			compliments = this.config.compliments.sayFunction.slice(0);
 		} else if (hour >= this.config.morningStartTime && hour < this.config.morningEndTime && this.config.compliments.hasOwnProperty("morning")) {
 			compliments = this.config.compliments.morning.slice(0);
 		} else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {
