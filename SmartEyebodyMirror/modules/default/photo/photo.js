@@ -10,7 +10,7 @@ Module.register("photo",{
 	fileName: null,
 	start: function() {
 	 	this.current_user = null;
-		
+
 		// TEST
 	 	/*this.sendSocketNotification("PREVIEW", "1231412421.jpg");
 		var self = this;
@@ -69,6 +69,7 @@ Module.register("photo",{
 		} else if (notification === "FRONT_RESULT") {
 			Log.log(this.name + " received a 'system' notification: " + notification);
 			if (payload === "tryAgain") {
+				this.sendSocketNotification("REMOVE_PIC", this.fileName + '_front.jpg');
 				this.config.imageSrc = "";
 				this.updateDom();
 				this.sendNotification("COMPLIMENTS", "tryAgain");
