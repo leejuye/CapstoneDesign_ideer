@@ -182,10 +182,16 @@ Module.register("compliments", {
 						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 					}, 3000);
 				} else {  // You say nothing
-					this.sendNotification("VOICE_ERROR", "noResponse");
-					setTimeout(() => {
-						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-					}, 3000);
+					this.config.noSayCnt++;
+					if (this.config.noSayCnt === 3) {
+						// shutdown now
+						this.config.noSayCnt = 0;
+					} else { 
+						this.sendNotification("VOICE_ERROR", "noResponse");
+						setTimeout(() => {
+							this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+						}, 3000);
+					}
 				}
 				this.config.assistState = "";
 				this.config.sayTF = false;
