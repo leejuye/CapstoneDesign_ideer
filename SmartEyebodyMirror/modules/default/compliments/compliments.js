@@ -78,6 +78,8 @@ Module.register("compliments", {
 			break;
 		case "frontStart":
 		case "frontResult":
+		case "sideStart":
+		case "sideResult":
 			ret = "bottom_right";
 			break;
 		default:
@@ -123,6 +125,9 @@ Module.register("compliments", {
 			case "frontResult" :
 				this.config.text = "frontResult";
 				break;
+			case "sideResult" :
+				this.config.text = "sideResult";
+				break;
 			case "tryAgain":
 				this.sendNotification("COMPLIMENTS", "sayFunction");
 				break;
@@ -141,7 +146,8 @@ Module.register("compliments", {
 					this.sendNotification("HIDE_ALL_MODULES");
 					break;
 				case "frontResult":
-					//sideStart
+					//side start
+					this.sendNotification("TAKE_PIC_SIDE");
 					break;
 				}
 				this.config.text = "";
@@ -153,7 +159,7 @@ Module.register("compliments", {
 				case "frontResult":
 					this.config.badFrontCnt++;
 					if (this.config.badFrontCnt === 3) {
-						this.sendNotification("FRONT_RESULT", "tryAgain");
+						this.sendNotification("PHOTO", "tryAgain");
 						// this.descCommand = "tryAgain";
 						// this.updateDom(5000);
 						this.config.badFrontCnt = 0;
@@ -234,6 +240,10 @@ Module.register("compliments", {
 			compliments = this.config.compliments.frontResult.slice(0);
 		} else if (this.descCommand == "checkBody") {
 			compliments = this.config.compliments.checkBody.slice(0);
+		} else if (this.descCommand == "sideStart") {
+			compliments = this.config.compliments.sideStart.slice(0);
+		} else if (this.descCommand == "sideResult") {
+			compliments = this.config.compliments.sideResult.slice(0);
 		} else if (this.descCommand == "tryAgain") {
 			compliments = this.config.compliments.tryAgain.slice(0);
 		} else if (this.descCommand == "sayFunction") {
