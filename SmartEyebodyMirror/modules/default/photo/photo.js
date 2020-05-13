@@ -5,7 +5,7 @@
 
 Module.register("photo",{
 	defaults: {
-		text: "photo module test"
+		text: "photo module test",
 		imageSrc: ""
 	},
 	fileName: null,
@@ -46,7 +46,7 @@ Module.register("photo",{
 	initImage: function() {
 		this.config.imageSrc = "";
 		this.updateDom();
-	}
+	},
 
 	socketNotificationReceived: function(notification, payload){
 		if(notification === "PREVIEW_DONE") {

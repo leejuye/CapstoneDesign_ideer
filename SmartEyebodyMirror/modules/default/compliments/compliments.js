@@ -27,7 +27,7 @@ Module.register("compliments", {
 				"원하는 기능을 \n말해주세요."
 			]
 		},
-		updateInterval: 500,
+		updateInterval: 2500,
 		remoteFile: "description.json",
 		fadeSpeed: 2000,
 		morningStartTime: 5,
@@ -36,7 +36,10 @@ Module.register("compliments", {
 		afternoonEndTime: 17,
 		random: false,
 		noSayCnt: 0,
-		badFrontCnt: 0
+		badFrontCnt: 0,
+		state: "",
+		sayTF: false,
+		assistState: ""
 	},
 	lastIndexUsed:-1,
 	// Set currentweather from module
@@ -73,9 +76,6 @@ Module.register("compliments", {
 	getLocation: function() {
 		var ret;
 		switch (this.descCommand) {
-		case "noKeyword":
-			ret = "top_right";
-			break;
 		case "frontStart":
 		case "frontResult":
 		case "sideStart":
@@ -123,13 +123,10 @@ Module.register("compliments", {
 				this.setCurrentWeatherType(payload.data);
 				break;
 			case "frontResult" :
-				this.config.text = "frontResult";
+				this.config.state = "frontResult";
 				break;
 			case "sideResult" :
 				this.config.text = "sideResult";
-				break;
-			case "tryAgain":
-				this.sendNotification("COMPLIMENTS", "sayFunction");
 				break;
 			case "shutdownRequest":
 				this.config.text = payload;
@@ -141,7 +138,7 @@ Module.register("compliments", {
 				this.config.text = payload;
 				break;
 			case "sayYes":
-				switch(this.config.text){
+				switch(this.config.state){
 				case "shutdownRequest":
 					this.sendNotification("HIDE_ALL_MODULES");
 					break;
@@ -153,43 +150,48 @@ Module.register("compliments", {
 				this.config.text = "";
 			case "sayNo":
 				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
-				switch(this.config.text){
+				switch(this.config.state){
 				case "shutdownRequest":
 					break;
 				case "frontResult":
 					this.config.badFrontCnt++;
 					if (this.config.badFrontCnt === 3) {
 						this.sendNotification("PHOTO", "tryAgain");
-						// this.descCommand = "tryAgain";
-						// this.updateDom(5000);
 						this.config.badFrontCnt = 0;
 					} else {
 						this.sendNotification("TAKE_PIC", "test.jpg");
 					}
 					break;
 				}
-				this.config.text = "";
+				this.config.state = "";
 			}
 		}
-		if(notification==="ASSISTANT_ERROR") {
+		if (notification === "ASSISTANT_LISTEN") {  // Assistant is listening
 			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
-			switch(this.config.text){
-			case "shutdown":
-				break;
-			case "frontResult":
-				this.config.noSayCnt++;
-				if (this.config.noSayCnt === 2) {
-					this.sendNotification("ASSISTANT_COMMAND", {
-						command: "SHUTDOWN_FORCE"
-					});
-					this.config.noSayCnt = 0;
-					break;
+			this.config.assistState = "listen";
+			this.config.sayTF = false;
+		} else if (notification === "ASSISTANT_CONFIRMATION") {  // You say something
+			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
+			this.config.sayTF = true;
+		} else if (notification === "ASSISTANT_ERROR") {
+			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
+			if (this.config.assistState === "listen") {
+				if (this.config.sayTF === true) {  // You say non-keyword
+					this.sendNotification("VOICE_ERROR", "noKeyword");
+					setTimeout(() => {
+						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+					}, 3000);
+				} else {  // You say nothing
+					this.sendNotification("VOICE_ERROR", "noResponse");
+					setTimeout(() => {
+						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+					}, 3000);
 				}
-				setTimeout(() => {
-					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-				}, 3000);
+				this.config.assistState = "";
+				this.config.sayTF = false;
 			}
 		}
+		
 	},
 	/* randomIndex(compliments)
 	 * Generate a random index for a list of compliments.
@@ -246,8 +248,6 @@ Module.register("compliments", {
 			compliments = this.config.compliments.sideResult.slice(0);
 		} else if (this.descCommand == "tryAgain") {
 			compliments = this.config.compliments.tryAgain.slice(0);
-		} else if (this.descCommand == "sayFunction") {
-			compliments = this.config.compliments.sayFunction.slice(0);
 		} else if (hour >= this.config.morningStartTime && hour < this.config.morningEndTime && this.config.compliments.hasOwnProperty("morning")) {
 			compliments = this.config.compliments.morning.slice(0);
 		} else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {
