@@ -68,6 +68,13 @@ Module.register("compliments", {
 		this.compInterval = setInterval(function() {
 			self.updateDom(self.config.fadeSpeed);
 		}, this.config.updateInterval);
+
+		//TEST
+		var self = this;
+		setTimeout(function() {
+			self.sendNotification("PHOTO", "SHOW_RESULT");
+			Log.log("@@@@@@@");
+		}, 5000);
 	},
 	// Module location
 	getLocation: function() {
@@ -80,6 +87,7 @@ Module.register("compliments", {
 		case "frontResult":
 		case "sideStart":
 		case "sideResult":
+		case "savePictureOrNot":
 			ret = "bottom_right";
 			break;
 		default:
@@ -92,7 +100,7 @@ Module.register("compliments", {
 	notificationReceived: function(notification, payload, sender) {
 
 		if (notification === "COMPLIMENTS") {
-			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload);
+			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload + ", from: " + sender);
 
 			clearInterval(this.compInterval);
 
@@ -228,11 +236,11 @@ Module.register("compliments", {
 		var compliments;
 
 		// description setting
-		if(this.descCommand == "noKeyword") {
+		if (this.descCommand == "noKeyword") {
 			compliments = this.config.compliments.noKeyword.slice(0);
-		} else if(this.descCommand == "shutdownRequest") {
+		} else if (this.descCommand == "shutdownRequest") {
 			compliments = this.config.compliments.shutdownRequest.slice(0);
-		} else if(this.descCommand == "shutdownNow") {
+		} else if (this.descCommand == "shutdownNow") {
 			compliments = this.config.compliments.shutdownNow.slice(0);
 		} else if (this.descCommand == "frontStart") {
 			compliments = this.config.compliments.frontStart.slice(0);
@@ -246,6 +254,8 @@ Module.register("compliments", {
 			compliments = this.config.compliments.tryAgain.slice(0);
 		} else if (this.descCommand == "sayFunction") {
 			compliments = this.config.compliments.sayFunction.slice(0);
+		} else if (this.descCommand == "savePictureOrNot") {
+			compliments = this.config.compliments.savePictureOrNot.slice(0);
 		} else if (hour >= this.config.morningStartTime && hour < this.config.morningEndTime && this.config.compliments.hasOwnProperty("morning")) {
 			compliments = this.config.compliments.morning.slice(0);
 		} else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {

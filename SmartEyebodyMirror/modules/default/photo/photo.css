@@ -1,5 +1,10 @@
 .photo {
-	height: 640;
+	height: auto;
 	width: auto;
 	margin-top: 40px;
+}
+
+img {
+	width: 320px;
+	height: auto;
 }
