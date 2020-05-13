@@ -4,15 +4,19 @@ Module.register("hideshow",{
 	// 	text: "Hello World!"
 	// },
 
-	// start: function() {
-	// 	const self = this;
-	// 	setTimeout(function() {
-	// 		self.sendNotification("COMPLIMENTS", "shutdownRequest");
-	// 	}, 2000);
-	// 	setTimeout(function() {
-	// 		self.sendNotification("COMPLIMENTS", "sayYes");
-	// 	}, 7000);
-	// },
+	start: function() {
+		const self = this;
+		setTimeout(function() {
+			self.sendNotification("ASSISTANT_COMMAND", {
+				command: "SHUTDOWN_REQUEST"
+			 });
+		}, 2000);
+		setTimeout(function() {
+			self.sendNotification("ASSISTANT_COMMAND", {
+				command: "NO"
+			 });
+		}, 7000);
+	},
 
 	notificationReceived: function (notification, payload, sender) {
 		if (notification === "HIDE_ALL_MODULES") {
@@ -46,15 +50,11 @@ Module.register("hideshow",{
 				modules = {
 					"compliments":{
 						visible: "true",
-						position: "lower_third",
+						position: "center",
 					},
 					"MMM-AssistantMk2":{
 						visible: "true",
 						position: "top_left",
-					},
-					"photo":{
-						visible: "true",
-						position: "middle_center",
 					},
 					"clock":{
 						visible: "true",
