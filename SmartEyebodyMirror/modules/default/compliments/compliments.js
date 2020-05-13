@@ -153,7 +153,7 @@ Module.register("compliments", {
 				case "frontResult":
 					this.config.badFrontCnt++;
 					if (this.config.badFrontCnt === 3) {
-						this.sendNotification("FRONT_RESULT", "tryAgain");
+						this.sendNotification("PHOTO", "tryAgain");
 						// this.descCommand = "tryAgain";
 						// this.updateDom(5000);
 						this.config.badFrontCnt = 0;
