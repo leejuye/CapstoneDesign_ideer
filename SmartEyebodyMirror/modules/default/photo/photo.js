@@ -78,7 +78,6 @@ Module.register("photo",{
 				this.sendSocketNotification("PREVIEW", this.fileName + this.fileNameSuffix);
 				break;
 			case "tryAgain":
-				this.sendSocketNotification("REMOVE_PIC", this.fileName + '_front.jpg');
 				this.sendNotification("COMPLIMENTS", "tryAgain");
 				setTimeout(() => {
 					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
@@ -92,6 +91,16 @@ Module.register("photo",{
 				break;
 			case "VOICE_ERROR":
 				this.sendNotification("COMPLIMENTS", "noKeyword");
+				break;
+			case "RE_TAKE_PIC":
+				if(this.fileNameSuffix === '_front.jpg'){
+					this.initFileName();
+					this.sendNotification("COMPLIMENTS", "frontStart");
+				} else {
+					this.sendNotification("COMPLIMENTS", "sideStart");
+				}
+				this.sendSocketNotification("REMOVE_PIC", this.fileName + this.fileNameSuffix);
+				this.sendSocketNotification("PREVIEW", this,fileName + this.fileNameSuffix);
 				break;
 			}
 		}
