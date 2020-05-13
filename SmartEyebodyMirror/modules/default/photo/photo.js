@@ -5,11 +5,12 @@
 
 Module.register("photo",{
 	defaults: {
-		text: "photo module test"
+		text: "photo module test",
 		imageSrc: ""
 	},
 	fileName: null,
 	fileNameSuffix: null,
+	isTwoImage: false,
 	start: function() {
 	 	this.current_user = null;
 
@@ -21,6 +22,7 @@ Module.register("photo",{
 		}, 3000);*/
 		// TEST END
 
+		this.fileName = "1234";
 	 	Log.info("Starting module: " + this.name);
 	},
 
@@ -45,8 +47,9 @@ Module.register("photo",{
 
 	initImage: function() {
 		this.config.imageSrc = "";
+		this.isTwoImage = false;
 		this.updateDom();
-	}
+	},
 
 	socketNotificationReceived: function(notification, payload){
 		if(notification === "PREVIEW_DONE") {
@@ -64,7 +67,7 @@ Module.register("photo",{
 	 	this.updateDom();
 	},
 
-	notificationReceived: function (notification, payload, sender) {
+	notificationReceived: function(notification, payload, sender) {
 		if(notification === "PHOTO") {
 			Log.log(this.name + "received a notification: " + notification + ", payload : " + payload);
 		 	this.initImage();
@@ -100,22 +103,35 @@ Module.register("photo",{
 					this.sendNotification("COMPLIMENTS", "sideStart");
 				}
 				this.sendSocketNotification("REMOVE_PIC", this.fileName + this.fileNameSuffix);
-				this.sendSocketNotification("PREVIEW", this,fileName + this.fileNameSuffix);
+				this.sendSocketNotification("PREVIEW", this.fileName + this.fileNameSuffix);
+				break;
+			case "SHOW_RESULT":
+				this.isTwoImage = true;
+				this.updateDom();
+				this.sendNotification("COMPLIMENTS", "savePictureOrNot");
 				break;
 			}
 		}
 	},
 
 	getDom: function() {
-		// var wrapper = document.createElement("div");
-		// wrapper.innerHTML = this.config.text;
-		var wrapper = document.createElement("img");
-		wrapper.src = this.config.imageSrc;
-		wrapper.className = "frontImg";
+		var wrapper = document.createElement("div");
+		var img1 = document.createElement("img");
+		img1.src = this.config.imageSrc;
+		wrapper.appendChild(img1);
 
-		/*var wrapper2 = document.createElement("img");
-		wrapper2.src = this.config.imageSrc2;
-		wrapper2.className = "sideImg";*/
+		if (this.isTwoImage) {
+			wrapper.lastElementChild.remove();
+			img1.src = "/modules/default/photo/image/" + this.fileName + "_front.jpg";
+			img1.style.margin = "10px";
+
+			var img2 = document.createElement("img");
+			img2.src = "/modules/default/photo/image/" + this.fileName + "_side.jpg";
+			img2.style.margin = "10px"
+
+			wrapper.appendChild(img1);
+			wrapper.appendChild(img2);
+		}
 
 		return wrapper;
 	},
