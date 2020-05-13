@@ -232,6 +232,8 @@ Module.register("compliments", {
 			compliments = this.config.compliments.frontStart.slice(0);
 		} else if (this.descCommand == "frontResult") {
 			compliments = this.config.compliments.frontResult.slice(0);
+		} else if (this.descCommand == "checkBody") {
+			compliments = this.config.compliments.checkBody.slice(0);
 		} else if (this.descCommand == "tryAgain") {
 			compliments = this.config.compliments.tryAgain.slice(0);
 		} else if (this.descCommand == "sayFunction") {
