@@ -1,5 +1,6 @@
 {
-  "NO_RESPONSE" : "Sorry, I don't understand.",
+  "NO_RESPONSE" : "잘못 들었습니다. 다시 말씀해주세요.",  // "Sorry, I don't understand."
+  "NO_KEYWORD" : "처음 듣는 말이에요. 다시 말씀해주세요.",
   "NO_AUDIO_RESPONSE" : " ",
   "TOO_SHORT" : "Sorry, I don't understand.",
   "CONVERSATION_ERROR" : "Conversation error. (misconfigured microphone)",

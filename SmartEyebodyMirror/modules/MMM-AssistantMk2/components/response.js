@@ -201,17 +201,23 @@ class AssistantResponseClass {
     }
 
     var normalResponse = (response) => {
-      this.showing = true
-      this.callbacks.A2D(response)
-      this.status("reply")
-      var so = this.showScreenOutput(response)
-      var ao = this.playAudioOutput(response)
-      if (ao) {
-        log("Wait audio to finish")
-      } else {
-        log("No response")
-        this.end()
-      }
+      this.showing = false
+	this.status("error")
+	this.showError(this.callbacks.translate("NO_KEYWORD"))
+	this.end()
+	return
+
+	/*this.showing = true
+	this.callbacks.A2D(response)
+	this.status("reply")
+	var so = this.showScreenOutput(response)
+	var ao = this.playAudioOutput(response)
+	if (ao) {
+	log("Wait audio to finish")
+	} else {
+	log("No response")
+	this.end()
+	}*/
     }
     this.postProcess(
       response,
