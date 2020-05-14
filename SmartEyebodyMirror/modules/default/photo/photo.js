@@ -10,7 +10,7 @@ Module.register("photo",{
 	},
 	fileName: null,
 	fileNameSuffix: null,
-	isTwoImage: false,
+	whatPage: null,
 	start: function() {
 	 	this.current_user = null;
 
@@ -47,7 +47,7 @@ Module.register("photo",{
 
 	initImage: function() {
 		this.config.imageSrc = "";
-		this.isTwoImage = false;
+		this.whatPage = null;
 		this.updateDom();
 	},
 
@@ -106,7 +106,7 @@ Module.register("photo",{
 				this.sendSocketNotification("PREVIEW", this.fileName + this.fileNameSuffix);
 				break;
 			case "SHOW_RESULT":
-				this.isTwoImage = true;
+				this.whatPage = "resultPage";
 				this.updateDom();
 				this.sendNotification("COMPLIMENTS", "savePictureOrNot");
 				break;
@@ -114,27 +114,70 @@ Module.register("photo",{
 				this.sendSocketNotification("REMOVE_PIC", this.fileName + "_front.jpg");
 				this.sendSocketNotification("REMOVE_PIC", this.fileName + "_side.jpg");
 				break;
+			case "SHOW_COMPARE":
+				this.whatPage = "comparePage";
+				this.updateDom();
+				break;
 			}
 		}
 	},
 
-	getDom: function() {
+	drawResultPage: function() {
 		var wrapper = document.createElement("div");
 		var img1 = document.createElement("img");
-		img1.src = this.config.imageSrc;
-		wrapper.appendChild(img1);
+                img1.src = "/modules/default/photo/image/" + this.fileName + "_front.jpg";
 
-		if (this.isTwoImage) {
-			wrapper.lastElementChild.remove();
-			img1.src = "/modules/default/photo/image/" + this.fileName + "_front.jpg";
-			img1.style.margin = "10px";
+                var img2 = document.createElement("img");
+                img2.src = "/modules/default/photo/image/" + this.fileName + "_side.jpg";
 
-			var img2 = document.createElement("img");
-			img2.src = "/modules/default/photo/image/" + this.fileName + "_side.jpg";
-			img2.style.margin = "10px"
+                wrapper.appendChild(img1);
+                wrapper.appendChild(img2);
 
-			wrapper.appendChild(img1);
-			wrapper.appendChild(img2);
+		return wrapper;
+	},
+
+	drawComparePage: function() {
+		var wrapper = document.createElement("div");
+		wrapper
+
+		// origin image
+		var img1 = document.createElement("img");
+                img1.src = "/modules/default/photo/image/" + this.fileName + "_front.jpg";
+
+		var info1 = document.createElement("div");
+		info1.className = "info_item";
+
+		// current image
+                var img2 = document.createElement("img");
+                img2.src = "/modules/default/photo/image/" + this.fileName + "_side.jpg";
+
+		var info2 = document.createElement("div");
+		info2.className = "info_item";
+
+                wrapper.appendChild(img1);
+		wrapper.appendChild(info1);
+                wrapper.appendChild(img2);
+		wrapper.appendChild(info2);
+
+                return wrapper;
+	},
+
+	drawDefaultPage: function() {
+		var wrapper = document.createElement("img");
+                wrapper.src = this.config.imageSrc;
+		return wrapper;
+	},
+
+	getDom: function() {
+		switch(this.whatPage) {
+		case "resultPage":
+			wrapper = this.drawResultPage();
+			break;
+		case "comparePage":
+			wrapper = this.drawComparePage();
+			break;
+		default:
+			wrapper = this.drawDefaultPage();
 		}
 
 		return wrapper;

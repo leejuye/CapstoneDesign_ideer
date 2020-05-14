@@ -1,10 +1,19 @@
 .photo {
-	height: auto;
+	height: 500px;
 	width: auto;
 	margin-top: 40px;
 }
 
+.info_item {
+	width: 240px;
+	height: 440px;
+	border: 2px solid white;
+	float: left;
+}
+
 img {
-	width: 320px;
+	width: 260px;
 	height: auto;
+	margin: 10px;
+	float: left;
 }
