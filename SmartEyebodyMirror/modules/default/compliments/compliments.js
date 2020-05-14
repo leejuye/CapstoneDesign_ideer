@@ -122,6 +122,12 @@ Module.register("compliments", {
 			case "CURRENTWEATHER_DATA":
 				this.setCurrentWeatherType(payload.data);
 				break;
+			case "dressCheck":
+				this.config.state = "dressCheck";
+				setTimeout(() => {
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+				}, 5000);
+				break;
 			case "frontResult" :
 				this.config.state = "frontResult";
 				break;
@@ -132,26 +138,29 @@ Module.register("compliments", {
 				this.config.text = payload;
 				setTimeout(() => {
 					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-				}, 500);
+				}, 3000);
 				break;
 			case "shutdownNow":
 				this.config.text = payload;
 				break;
 			case "sayYes":
 				switch(this.config.state){
-				case "shutdownRequest":
-					this.sendNotification("HIDE_ALL_MODULES");
+				case "dressCheck":
+					this.sendNotification("PHOTO", "TAKE_PIC");
 					break;
 				case "frontResult":
 					//side start
-					this.sendNotification("TAKE_PIC_SIDE");
+					this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
+					break;
+				case "shutdownRequest":
+					this.sendNotification("HIDE_ALL_MODULES");
 					break;
 				}
-				this.config.text = "";
+				this.config.state = "";
 			case "sayNo":
-				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 				switch(this.config.state){
-				case "shutdownRequest":
+				case "dressCheck":
+					this.sendNotification("PHOTO", "dressWait");
 					break;
 				case "frontResult":
 					this.config.badFrontCnt++;
@@ -159,8 +168,10 @@ Module.register("compliments", {
 						this.sendNotification("PHOTO", "tryAgain");
 						this.config.badFrontCnt = 0;
 					} else {
-						this.sendNotification("TAKE_PIC", "test.jpg");
+						this.sendNotification("PHOTO", "TAKE_PIC");
 					}
+					break;
+				case "shutdownRequest":
 					break;
 				}
 				this.config.state = "";
@@ -177,7 +188,7 @@ Module.register("compliments", {
 			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 			if (this.config.assistState === "listen") {
 				if (this.config.sayTF === true) {  // You say non-keyword
-					this.sendNotification("VOICE_ERROR", "noKeyword");
+					this.sendNotification("PHOTO", "noKeyword");
 					setTimeout(() => {
 						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 					}, 3000);
@@ -187,7 +198,7 @@ Module.register("compliments", {
 						// shutdown now
 						this.config.noSayCnt = 0;
 					} else { 
-						this.sendNotification("VOICE_ERROR", "noResponse");
+						this.sendNotification("PHOTO", "noResponse");
 						setTimeout(() => {
 							this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 						}, 3000);
@@ -246,8 +257,10 @@ Module.register("compliments", {
 			compliments = this.config.compliments.frontStart.slice(0);
 		} else if (this.descCommand == "frontResult") {
 			compliments = this.config.compliments.frontResult.slice(0);
-		} else if (this.descCommand == "checkBody") {
-			compliments = this.config.compliments.checkBody.slice(0);
+		} else if (this.descCommand == "dressCheck") {
+			compliments = this.config.compliments.dressCheck.slice(0);
+		} else if (this.descCommand == "dressWait") {
+			compliments = this.config.compliments.dressWait.slice(0);
 		} else if (this.descCommand == "sideStart") {
 			compliments = this.config.compliments.sideStart.slice(0);
 		} else if (this.descCommand == "sideResult") {

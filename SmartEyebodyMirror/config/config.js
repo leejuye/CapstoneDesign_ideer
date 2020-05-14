@@ -126,8 +126,8 @@ var config = {
 							chime: "open"
 						},
 						notificationExec: {
-							notification: "TAKE_PIC",
-							payload: "test.jpg"
+							notification: "COMPLIMENTS",
+							payload: "dressCheck"
 						}
 					},
 					"SHUTDOWN_REQUEST": {
