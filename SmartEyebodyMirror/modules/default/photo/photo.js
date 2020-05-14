@@ -90,12 +90,6 @@ Module.register("photo",{
 				this.sendNotification("COMPLIMENTS", "sideStart");
 				this.sendSocketNotification("PREVIEW", this.fileName + this.fileNameSuffix);
 				break;
-			case "noKeyword":
-				this.sendNotification("COMPLIMENTS", "noKeyword");
-				break;
-			case "noResponse":
-				this.sendNotification("COMPLIMENTS", "noResponse");
-				break;
 			case "dressCheck":
 				this.sendNotification("COMPLIMENTS", "dressCheck");
 				break;

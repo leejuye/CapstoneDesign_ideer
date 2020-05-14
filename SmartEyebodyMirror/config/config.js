@@ -102,13 +102,13 @@ var config = {
 						pattern: "(촬영|찍어)",  // No spaces
 						command: "CAMERA_START"
 					},
-					"SHUTDOWN": {
-						pattern: "(종료|꺼 줘)",  // No spaces but ok in this case
-						command: "SHUTDOWN_REQUEST"
+					"IM_HERE": {
+						pattern: "나 왔어",  // No spaces but ok in this case
+						command: "IM_HERE"
 					},
-					"SHUTDOWN_FORCE": {
-						pattern: "shutdown",
-						command: "SHUTDOWN_FORCE"
+					"SHUTDOWN": {
+						pattern: "(종료|꺼 줘)",
+						command: "SHUTDOWN_REQUEST"
 					},
 					"YES": {
 						pattern: "응",
@@ -121,6 +121,15 @@ var config = {
 				},
 				actions: {},
 				commands: {
+					"IM_HERE": {
+						soundExec: {
+							chime: "open"
+						},
+						notificationExec: {
+							notification: "COMPLIMENTS",
+							payload: "imHere"
+						}
+					},
 					"CAMERA_START": {
 						soundExec: {
 							chime: "open"

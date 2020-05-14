@@ -47,6 +47,7 @@ Module.register("compliments", {
 
 	compInterval: null,
 	descCommand: null,
+	waitInterval: null,
 
 	// Define required scripts.
 	getScripts: function() {
@@ -126,7 +127,21 @@ Module.register("compliments", {
 				this.config.state = "dressCheck";
 				setTimeout(() => {
 					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-				}, 5000);
+				}, 7000);
+				break;
+			case "dressWait":
+				this.config.state = "dressWait";
+				this.waitInterval = setInterval(function() {
+					// shutdown now
+				}, 600000);  // wait 10 minutes = 600000
+				break;
+			case "imHere":
+				if (this.config.state === "dressWait") {
+					this.sendNotification("PHOTO", "TAKE_PIC");
+					this.config.state = "";
+				} else {
+					this.sendNotification("ASSISTANT_ERROR");
+				}
 				break;
 			case "frontResult" :
 				this.config.state = "frontResult";
@@ -174,13 +189,18 @@ Module.register("compliments", {
 				case "shutdownRequest":
 					break;
 				}
-				this.config.state = "";
+				if (this.config.state !== "dressWait") {
+					this.config.state = "";
+				}
 			}
 		}
 		if (notification === "ASSISTANT_LISTEN") {  // Assistant is listening
 			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 			this.config.assistState = "listen";
 			this.config.sayTF = false;
+			if (this.config.state === "dressWait") {
+				clearInterval(this.waitInterval);
+			}
 		} else if (notification === "ASSISTANT_CONFIRMATION") {  // You say something
 			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 			this.config.sayTF = true;
@@ -188,7 +208,6 @@ Module.register("compliments", {
 			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 			if (this.config.assistState === "listen") {
 				if (this.config.sayTF === true) {  // You say non-keyword
-					this.sendNotification("PHOTO", "noKeyword");
 					setTimeout(() => {
 						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 					}, 3000);
@@ -198,7 +217,6 @@ Module.register("compliments", {
 						// shutdown now
 						this.config.noSayCnt = 0;
 					} else { 
-						this.sendNotification("PHOTO", "noResponse");
 						setTimeout(() => {
 							this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 						}, 3000);
