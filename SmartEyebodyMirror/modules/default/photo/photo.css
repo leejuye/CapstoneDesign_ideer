@@ -1,5 +1,21 @@
 .photo {
-	height: 640;
+	height: 500px;
 	width: auto;
 	margin-top: 40px;
+}
+
+.info_item {
+	width: 240px;
+	height: 440px;
+	border: 2px solid white;
+	float: left;
+	color: white;
+	padding: 10px;
+}
+
+img {
+	width: 260px;
+	height: auto;
+	margin: 10px;
+	float: left;
 }

@@ -4,16 +4,28 @@ import cv2
 import sys
 import json
 import os
-from picamera import PiCamera
+import pygame #sound
 import time
+from picamera import PiCamera
 from PIL import Image
 from picamera.array import PiRGBArray
 
+#path
 curPath = os.path.dirname(os.path.abspath(__file__))
 
-overlay = None
-
+def playSound(sfx, check = False):
+    if check == False:
+        if sfx == "sfx1":
+            sfx1.play()
+            time.sleep(0.1)
+        else:
+            sfx2.play()
+            time.sleep(1)
+            return 0
+    return True
+            
 # overlay
+overlay = None
 if sys.argv[1][len(sys.argv[1])-5] == 't':
     overlay = cv2.imread(curPath + '/overlay_front.png')
 else:
@@ -38,6 +50,12 @@ color = (255, 255, 255)
 font = cv2.FONT_HERSHEY_SIMPLEX
 fontSize = 5
 thickness = 2
+
+# sound setting
+pygame.mixer.init()
+sfx1 = pygame.mixer.Sound(curPath + "/sound/bleeper.wav")
+sfx2 = pygame.mixer.Sound(curPath + "/sound/shutter.wav")
+check = [False, False, False]
 
 # allow the camera to warmup
 time.sleep(0.1)
@@ -69,10 +87,13 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     cnt = time.time()-start
     if cnt >= 9:
         cv2.putText(addedImage, "1", location, font, fontSize, color, thickness, cv2.LINE_AA)
+        check[0] = playSound("sfx1", check[0])
     elif cnt >= 8:
         cv2.putText(addedImage, "2", location, font, fontSize, color, thickness, cv2.LINE_AA)
+        check[1] = playSound("sfx1", check[1])
     elif cnt >= 7:
         cv2.putText(addedImage, "3", location, font, fontSize, color, thickness, cv2.LINE_AA)
+        check[2] = playSound("sfx1", check[2])
     
     # show the frame
     cv2.namedWindow(winName)
@@ -85,6 +106,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     
     # if the `q` key was pressed, break from the loop
     if key == ord("q") or time.time()-start >= 10:
+        playSound("sfx2")
         camera.capture(curPath + "/image/" + sys.argv[1])
         break
 
@@ -101,5 +123,7 @@ dst = cv2.remap(img,mapx,mapy,cv2.INTER_LINEAR)
 # crop the image
 x,y,w,h = roi
 dst = dst[y:y+h, x:x+w]
+
+dst = np.fliplr(dst)
 cv2.imwrite(curPath + "/image/" + sys.argv[1],dst)
 #cv2.imwrite(curPath + "/image/calibresult.png",dst)
