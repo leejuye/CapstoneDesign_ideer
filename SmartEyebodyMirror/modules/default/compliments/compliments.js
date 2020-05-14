@@ -63,18 +63,18 @@ Module.register("compliments", {
 				//self.updateDom();
 			});
 		}
-
+		
 		// Schedule update timer.
 		this.compInterval = setInterval(function() {
 			self.updateDom(self.config.fadeSpeed);
 		}, this.config.updateInterval);
 
 		//TEST
-		var self = this;
+		/*var self = this;
 		setTimeout(function() {
 			self.sendNotification("PHOTO", "SHOW_RESULT");
 			Log.log("@@@@@@@");
-		}, 5000);
+		}, 5000);*/
 	},
 	// Module location
 	getLocation: function() {
@@ -108,7 +108,13 @@ Module.register("compliments", {
 			this.lastIndexUsed = 123;
 			var self = this;
 			self.updateDom();
-
+			
+			//savePicture
+			if(payload.number) {
+				this.filenumber = payload.number;
+				payload = payload.payload;
+			}
+			
 			this.descCommand = payload;
 			console.log(payload);
 			this.lastIndexUsed = -1;
@@ -125,7 +131,7 @@ Module.register("compliments", {
 					}
 				}
 			);
-
+			
 			switch(payload){
 			case "CURRENTWEATHER_DATA":
 				this.setCurrentWeatherType(payload.data);
@@ -135,6 +141,9 @@ Module.register("compliments", {
 				break;
 			case "sideResult" :
 				this.config.text = "sideResult";
+				break;
+			case "savePicture" :
+				this.config.text = "savePicture";
 				break;
 			case "tryAgain":
 				this.sendNotification("COMPLIMENTS", "sayFunction");
@@ -250,6 +259,8 @@ Module.register("compliments", {
 			compliments = this.config.compliments.sideStart.slice(0);
 		} else if (this.descCommand == "sideResult") {
 			compliments = this.config.compliments.sideResult.slice(0);
+		} else if (this.descCommand == "savePicture") {
+			compliments = this.config.compliments.savePicture.slice(0);
 		} else if (this.descCommand == "tryAgain") {
 			compliments = this.config.compliments.tryAgain.slice(0);
 		} else if (this.descCommand == "sayFunction") {
@@ -327,6 +338,9 @@ Module.register("compliments", {
 		wrapper.className = this.config.classes ? this.config.classes : "thin large bright pre-line";
 		// get the compliment text
 		var complimentText = this.randomCompliment();
+		if( this.descCommand === "savePicture") {
+			complimentText = [complimentText.slice(0,13), this.filenumber, complimentText.slice(13)].join('');
+		}
 		// split it into parts on newline text
 		var parts= complimentText.split("\n");
 		// create a span to hold it all

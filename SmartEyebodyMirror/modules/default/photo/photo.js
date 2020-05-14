@@ -22,7 +22,7 @@ Module.register("photo",{
 		}, 3000);*/
 		// TEST END
 
-		this.fileName = "1234";
+		//this.fileName = "1234";
 	 	Log.info("Starting module: " + this.name);
 	},
 
@@ -63,6 +63,8 @@ Module.register("photo",{
 			setTimeout(() => {
 					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 			}, 8000)
+		} else if(notification === "FILE_NUMBER") {
+			this.sendNotification("COMPLIMENTS", {"payload": "savePicture", "number": payload});
 		}
 	 	this.updateDom();
 	},
@@ -75,8 +77,7 @@ Module.register("photo",{
 			switch(payload) {
 			case "TAKE_PIC":
 				this.initFileName();
-				this.fileNameSuffix = '_front.jpg'
-
+				this.fileNameSuffix = '_front.jpg';
 				this.sendNotification("COMPLIMENTS", "frontStart");
 				this.sendSocketNotification("PREVIEW", this.fileName + this.fileNameSuffix);
 				break;
@@ -117,6 +118,9 @@ Module.register("photo",{
 			case "SHOW_COMPARE":
 				this.whatPage = "comparePage";
 				this.updateDom();
+				break;
+			case "COUNT_FILE":
+				this.sendSocketNotification("FILE_NUM", payload);
 				break;
 			}
 		}
