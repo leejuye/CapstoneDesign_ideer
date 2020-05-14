@@ -110,6 +110,10 @@ Module.register("photo",{
 				this.updateDom();
 				this.sendNotification("COMPLIMENTS", "savePictureOrNot");
 				break;
+			case "REMOVE_RESULT":
+				this.sendSocketNotification("REMOVE_PIC", this.fileName + "_front.jpg");
+				this.sendSocketNotification("REMOVE_PIC", this.fileName + "_side.jpg");
+				break;
 			}
 		}
 	},
