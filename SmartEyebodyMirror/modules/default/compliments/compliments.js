@@ -63,7 +63,7 @@ Module.register("compliments", {
 				//self.updateDom();
 			});
 		}
-		
+
 		// Schedule update timer.
 		this.compInterval = setInterval(function() {
 			self.updateDom(self.config.fadeSpeed);
@@ -108,13 +108,13 @@ Module.register("compliments", {
 			this.lastIndexUsed = 123;
 			var self = this;
 			self.updateDom();
-			
+
 			//savePicture
 			if(payload.number) {
 				this.filenumber = payload.number;
 				payload = payload.payload;
 			}
-			
+
 			this.descCommand = payload;
 			console.log(payload);
 			this.lastIndexUsed = -1;
@@ -131,7 +131,7 @@ Module.register("compliments", {
 					}
 				}
 			);
-			
+
 			switch(payload){
 			case "CURRENTWEATHER_DATA":
 				this.setCurrentWeatherType(payload.data);
@@ -245,38 +245,21 @@ Module.register("compliments", {
 		var compliments;
 
 		// description setting
-		if (this.descCommand == "noKeyword") {
-			compliments = this.config.compliments.noKeyword.slice(0);
-		} else if (this.descCommand == "shutdownRequest") {
-			compliments = this.config.compliments.shutdownRequest.slice(0);
-		} else if (this.descCommand == "shutdownNow") {
-			compliments = this.config.compliments.shutdownNow.slice(0);
-		} else if (this.descCommand == "frontStart") {
-			compliments = this.config.compliments.frontStart.slice(0);
-		} else if (this.descCommand == "frontResult") {
-			compliments = this.config.compliments.frontResult.slice(0);
-		} else if (this.descCommand == "sideStart") {
-			compliments = this.config.compliments.sideStart.slice(0);
-		} else if (this.descCommand == "sideResult") {
-			compliments = this.config.compliments.sideResult.slice(0);
-		} else if (this.descCommand == "savePicture") {
-			compliments = this.config.compliments.savePicture.slice(0);
-		} else if (this.descCommand == "tryAgain") {
-			compliments = this.config.compliments.tryAgain.slice(0);
-		} else if (this.descCommand == "sayFunction") {
-			compliments = this.config.compliments.sayFunction.slice(0);
-		} else if (this.descCommand == "savePictureOrNot") {
-			compliments = this.config.compliments.savePictureOrNot.slice(0);
+		if(this.descCommand != null) {
+			if(this.config.compliments.hasOwnProperty(this.descCommand)) {
+				compliments = this.config.compliments[this.descCommand];
+			}
 		} else if (hour >= this.config.morningStartTime && hour < this.config.morningEndTime && this.config.compliments.hasOwnProperty("morning")) {
-			compliments = this.config.compliments.morning.slice(0);
-		} else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {
-			compliments = this.config.compliments.afternoon.slice(0);
-		} else if(this.config.compliments.hasOwnProperty("evening")) {
-			compliments = this.config.compliments.evening.slice(0);
-		}
+                        compliments = this.config.compliments.morning.slice(0);
+                } else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {
+                        compliments = this.config.compliments.afternoon.slice(0);
+                } else if(this.config.compliments.hasOwnProperty("evening")) {
+                        compliments = this.config.compliments.evening.slice(0);
+                }
 
 		if (typeof compliments === "undefined") {
 			compliments = new Array();
+			Log.log("@@@@@@");
 		}
 
 		if (this.currentWeatherType in this.config.compliments) {

@@ -117,6 +117,7 @@ Module.register("photo",{
 				break;
 			case "SHOW_COMPARE":
 				this.whatPage = "comparePage";
+				this.sendNotification("COMPLIMENTS", "noDescription");
 				this.updateDom();
 				break;
 			case "COUNT_FILE":
@@ -140,9 +141,27 @@ Module.register("photo",{
 		return wrapper;
 	},
 
+	getPictureInfo: function(fileName, isFront) {
+		// TODO: Get info from DB
+		// test
+		var ret = new Object();
+		ret.bee = 12;
+		ret.hip = 24;
+
+		return ret;
+	},
+
+	fillBox: function(box, fileName, isFront) {
+		info = this.getPictureInfo(fileName, isFront);
+		for(key in info) {
+			box.appendChild(document.createTextNode(key + ": " + info[key] + "cm"));
+			box.appendChild(document.createElement("BR"));
+		}
+		box.lastElementChild.remove();
+	},
+
 	drawComparePage: function() {
 		var wrapper = document.createElement("div");
-		wrapper
 
 		// origin image
 		var img1 = document.createElement("img");
@@ -150,6 +169,7 @@ Module.register("photo",{
 
 		var info1 = document.createElement("div");
 		info1.className = "info_item";
+		this.fillBox(info1, this.fileName, true);
 
 		// current image
                 var img2 = document.createElement("img");
