@@ -14,15 +14,11 @@ Module.register("photo",{
 	start: function() {
 	 	this.current_user = null;
 
-		// TEST
-	 	/*this.sendSocketNotification("PREVIEW", "1231412421.jpg");
-		var self = this;
-		setTimeout(function() {
-			self.sendNotification("COMPLIMENTS", "frontStart");
-		}, 3000);*/
-		// TEST END
-
+		//TEST
+		this.sendSocketNotification("TEST", null);
 		//this.fileName = "1234";
+		//TEST END
+
 	 	Log.info("Starting module: " + this.name);
 	},
 
