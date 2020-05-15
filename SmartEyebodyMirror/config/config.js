@@ -122,6 +122,10 @@ var config = {
 						pattern: "아니",
 						command: "NO"
 					},
+					"NOT_NOW": {
+						pattern: "!",
+						command: "NOT_NOW"
+					},
 				},
 				actions: {},
 				commands: {

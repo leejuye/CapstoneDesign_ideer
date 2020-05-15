@@ -39,7 +39,8 @@ Module.register("compliments", {
 		badFrontCnt: 0,
 		state: "",
 		sayTF: false,
-		assistState: ""
+		assistState: "",
+		pass: false
 	},
 	lastIndexUsed:-1,
 	// Set currentweather from module
@@ -103,113 +104,134 @@ Module.register("compliments", {
 		if (notification === "COMPLIMENTS") {
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload + ", from: " + sender);
 
-			clearInterval(this.compInterval);
-
-			// Remove last compliment
-			this.lastIndexUsed = 123;
-			var self = this;
-			self.updateDom();
-
-			//savePicture
-			if(payload.number) {
-				this.filenumber = payload.number;
-				payload = payload.payload;
-			}
-
-			this.descCommand = payload;
-			console.log(payload);
-			this.lastIndexUsed = -1;
-
-			this.compInterval = setInterval(function() {
-				self.updateDom(self.config.fadeSpeed);
-			}, this.config.updateInterval);
-
-			this.sendNotification("CHANGE_POSITIONS",
-				modules = {
-					"compliments":{
-						visible: "true",
-						position: this.getLocation(),
-					}
-				}
-			);
-
-			switch(payload){
-			case "CURRENTWEATHER_DATA":
-				this.setCurrentWeatherType(payload.data);
-				break;
+			switch(payload) {
 			case "dressCheck":
-				this.config.state = "dressCheck";
-				setTimeout(() => {
-					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-				}, 7000);
-				break;
-			case "dressWait":
-				this.config.state = "dressWait";
-				this.waitInterval = setInterval(function() {
-					// shutdown now
-				}, 600000);  // wait 10 minutes = 600000
-				break;
-			case "imHere":
-				if (this.config.state === "dressWait") {
-					this.sendNotification("PHOTO", "TAKE_PIC");
-					this.config.state = "";
-				} else {
-					this.sendNotification("ASSISTANT_ERROR");
+				if (this.config.state === "dressCheck") {
+					this.config.pass = true;
+					setTimeout(() => {
+						this.sendNotification("ASSISTANT_ACTIVATE", {
+							type: "TEXT",
+							key: "촬영",
+							text: "NOT_NOW",
+							chime: false
+						})
+					}, 1000);
 				}
 				break;
-			case "frontResult" :
-				this.config.state = "frontResult";
-				break;
-			case "sideResult" :
-				this.config.state = "sideResult";
-				break;
-			case "savePicture" :
-				this.config.state = "savePicture";
-				break;
-			case "shutdownRequest":
-				this.config.text = payload;
-				setTimeout(() => {
-					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-				}, 3000);
-				break;
-			case "shutdownNow":
-				this.config.text = payload;
-				break;
-			case "sayYes":
-				switch(this.config.state){
-				case "dressCheck":
-					this.sendNotification("PHOTO", "TAKE_PIC");
-					break;
-				case "frontResult":
-					//side start
-					this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
-					break;
-				case "shutdownRequest":
-					this.sendNotification("HIDE_ALL_MODULES");
-					break;
+			}
+
+			if (this.config.pass === false) {
+				clearInterval(this.compInterval);
+
+				// Remove last compliment
+				this.lastIndexUsed = 123;
+				var self = this;
+				self.updateDom();
+
+				//savePicture
+				if(payload.number) {
+					this.filenumber = payload.number;
+					payload = payload.payload;
 				}
-				this.config.state = "";
-			case "sayNo":
-				switch(this.config.state){
-				case "dressCheck":
-					this.sendNotification("PHOTO", "dressWait");
+
+				this.descCommand = payload;
+				console.log(payload);
+				this.lastIndexUsed = -1;
+
+				
+
+				this.compInterval = setInterval(function() {
+					self.updateDom(self.config.fadeSpeed);
+				}, this.config.updateInterval);
+
+				this.sendNotification("CHANGE_POSITIONS",
+					modules = {
+						"compliments":{
+							visible: "true",
+							position: this.getLocation(),
+						}
+					}
+				);
+
+				switch(payload){
+				case "CURRENTWEATHER_DATA":
+					this.setCurrentWeatherType(payload.data);
 					break;
-				case "frontResult":
-					this.config.badFrontCnt++;
-					if (this.config.badFrontCnt === 3) {
-						this.sendNotification("PHOTO", "tryAgain");
-						this.config.badFrontCnt = 0;
-					} else {
+				case "dressCheck":
+					this.config.state = "dressCheck";
+					setTimeout(() => {
+						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+					}, 7000);
+					break;
+				case "dressWait":
+					this.config.state = "dressWait";
+					this.waitInterval = setInterval(function() {
+						// shutdown now
+					}, 600000);  // wait 10 minutes = 600000
+					break;
+				case "imHere":
+					if (this.config.state === "dressWait") {
 						this.sendNotification("PHOTO", "TAKE_PIC");
+						this.config.state = "";
+					} else {
+						this.sendNotification("ASSISTANT_ERROR");
 					}
 					break;
-				case "shutdownRequest":
+				case "frontResult" :
+					this.config.state = "frontResult";
 					break;
-				}
-				if (this.config.state !== "dressWait") {
+				case "sideResult" :
+					this.config.state = "sideResult";
+					break;
+				case "savePicture" :
+					this.config.state = "savePicture";
+					break;
+				case "shutdownRequest":
+					this.config.text = payload;
+					setTimeout(() => {
+						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+					}, 3000);
+					break;
+				case "shutdownNow":
+					this.config.text = payload;
+					break;
+				case "sayYes":
+					switch(this.config.state){
+					case "dressCheck":
+						this.sendNotification("PHOTO", "TAKE_PIC");
+						break;
+					case "frontResult":
+						//side start
+						this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
+						break;
+					case "shutdownRequest":
+						this.sendNotification("HIDE_ALL_MODULES");
+						break;
+					}
 					this.config.state = "";
+				case "sayNo":
+					switch(this.config.state){
+					case "dressCheck":
+						this.sendNotification("PHOTO", "dressWait");
+						break;
+					case "frontResult":
+						this.config.badFrontCnt++;
+						if (this.config.badFrontCnt === 3) {
+							this.sendNotification("PHOTO", "tryAgain");
+							this.config.badFrontCnt = 0;
+						} else {
+							this.sendNotification("PHOTO", "TAKE_PIC");
+						}
+						break;
+					case "shutdownRequest":
+						break;
+					}
+					if (this.config.state !== "dressWait") {
+						this.config.state = "";
+					}
 				}
 			}
+			this.config.pass = false;
 		}
 		if (notification === "ASSISTANT_LISTEN") {  // Assistant is listening
 			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
@@ -243,7 +265,6 @@ Module.register("compliments", {
 				this.config.sayTF = false;
 			}
 		}
-		
 	},
 	/* randomIndex(compliments)
 	 * Generate a random index for a list of compliments.
@@ -288,12 +309,12 @@ Module.register("compliments", {
 				compliments = this.config.compliments[this.descCommand];
 			}
 		} else if (hour >= this.config.morningStartTime && hour < this.config.morningEndTime && this.config.compliments.hasOwnProperty("morning")) {
-    	compliments = this.config.compliments.morning.slice(0);
-    } else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {
-    	compliments = this.config.compliments.afternoon.slice(0);
-    } else if(this.config.compliments.hasOwnProperty("evening")) {
-    	compliments = this.config.compliments.evening.slice(0);
-    }
+		    	compliments = this.config.compliments.morning.slice(0);
+		} else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {
+		    	compliments = this.config.compliments.afternoon.slice(0);
+		} else if(this.config.compliments.hasOwnProperty("evening")) {
+		    	compliments = this.config.compliments.evening.slice(0);
+		}
 
 		if (typeof compliments === "undefined") {
 			compliments = new Array();
