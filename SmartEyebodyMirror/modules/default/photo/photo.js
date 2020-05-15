@@ -10,6 +10,7 @@ Module.register("photo",{
 	},
 	fileName: null,
 	fileNameSuffix: null,
+	whatPage: null,
 	start: function() {
 	 	this.current_user = null;
 
@@ -21,6 +22,7 @@ Module.register("photo",{
 		}, 3000);*/
 		// TEST END
 
+		//this.fileName = "1234";
 	 	Log.info("Starting module: " + this.name);
 	},
 
@@ -45,6 +47,7 @@ Module.register("photo",{
 
 	initImage: function() {
 		this.config.imageSrc = "";
+		this.whatPage = null;
 		this.updateDom();
 	},
 
@@ -60,11 +63,13 @@ Module.register("photo",{
 			setTimeout(() => {
 				this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 			}, 8000)
+		} else if(notification === "FILE_NUMBER") {
+			this.sendNotification("COMPLIMENTS", {"payload": "savePicture", "number": payload});
 		}
 	 	this.updateDom();
 	},
 
-	notificationReceived: function (notification, payload, sender) {
+	notificationReceived: function(notification, payload, sender) {
 		if(notification === "PHOTO") {
 			Log.log(this.name + "received a notification: " + notification + ", payload : " + payload);
 		 	this.initImage();
@@ -72,13 +77,11 @@ Module.register("photo",{
 			switch(payload) {
 			case "TAKE_PIC":
 				this.initFileName();
-				this.fileNameSuffix = '_front.jpg'
-
+				this.fileNameSuffix = '_front.jpg';
 				this.sendNotification("COMPLIMENTS", "frontStart");
 				this.sendSocketNotification("PREVIEW", this.fileName + this.fileNameSuffix);
 				break;
 			case "tryAgain":
-				this.sendSocketNotification("REMOVE_PIC", this.fileName + '_front.jpg');
 				this.sendNotification("COMPLIMENTS", "tryAgain");
 				setTimeout(() => {
 					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
@@ -96,20 +99,113 @@ Module.register("photo",{
 			case "dressWait":
 				this.sendNotification("COMPLIMENTS", "dressWait");
 				break;
+			case "RE_TAKE_PIC":
+				if(this.fileNameSuffix === '_front.jpg'){
+					this.initFileName();
+					this.sendNotification("COMPLIMENTS", "frontStart");
+				} else {
+					this.sendNotification("COMPLIMENTS", "sideStart");
+				}
+				this.sendSocketNotification("REMOVE_PIC", this.fileName + this.fileNameSuffix);
+				this.sendSocketNotification("PREVIEW", this.fileName + this.fileNameSuffix);
+				break;
+			case "SHOW_RESULT":
+				this.whatPage = "resultPage";
+				this.updateDom();
+				this.sendNotification("COMPLIMENTS", "savePictureOrNot");
+				break;
+			case "REMOVE_RESULT":
+				this.sendSocketNotification("REMOVE_PIC", this.fileName + "_front.jpg");
+				this.sendSocketNotification("REMOVE_PIC", this.fileName + "_side.jpg");
+				break;
+			case "SHOW_COMPARE":
+				this.whatPage = "comparePage";
+				this.sendNotification("COMPLIMENTS", "noDescription");
+				this.updateDom();
+				break;
+			case "COUNT_FILE":
+				this.sendSocketNotification("FILE_NUM", payload);
+				break;
 			}
 		}
 	},
 
-	getDom: function() {
-		// var wrapper = document.createElement("div");
-		// wrapper.innerHTML = this.config.text;
-		var wrapper = document.createElement("img");
-		wrapper.src = this.config.imageSrc;
-		wrapper.className = "frontImg";
+	drawResultPage: function() {
+		var wrapper = document.createElement("div");
+		var img1 = document.createElement("img");
+                img1.src = "/modules/default/photo/image/" + this.fileName + "_front.jpg";
 
-		/*var wrapper2 = document.createElement("img");
-		wrapper2.src = this.config.imageSrc2;
-		wrapper2.className = "sideImg";*/
+                var img2 = document.createElement("img");
+                img2.src = "/modules/default/photo/image/" + this.fileName + "_side.jpg";
+
+                wrapper.appendChild(img1);
+                wrapper.appendChild(img2);
+
+		return wrapper;
+	},
+
+	getPictureInfo: function(fileName, isFront) {
+		// TODO: Get info from DB
+		// test
+		var ret = new Object();
+		ret.bee = 12;
+		ret.hip = 24;
+
+		return ret;
+	},
+
+	fillBox: function(box, fileName, isFront) {
+		info = this.getPictureInfo(fileName, isFront);
+		for(key in info) {
+			box.appendChild(document.createTextNode(key + ": " + info[key] + "cm"));
+			box.appendChild(document.createElement("BR"));
+		}
+		box.lastElementChild.remove();
+	},
+
+	drawComparePage: function() {
+		var wrapper = document.createElement("div");
+
+		// origin image
+		var img1 = document.createElement("img");
+                img1.src = "/modules/default/photo/image/" + this.fileName + "_front.jpg";
+
+		var info1 = document.createElement("div");
+		info1.className = "info_item";
+		this.fillBox(info1, this.fileName, true);
+
+		// current image
+                var img2 = document.createElement("img");
+                img2.src = "/modules/default/photo/image/" + this.fileName + "_side.jpg";
+
+		var info2 = document.createElement("div");
+		info2.className = "info_item";
+
+                wrapper.appendChild(img1);
+		wrapper.appendChild(info1);
+                wrapper.appendChild(img2);
+		wrapper.appendChild(info2);
+
+                return wrapper;
+	},
+
+	drawDefaultPage: function() {
+		var wrapper = document.createElement("img");
+                wrapper.src = this.config.imageSrc;
+		return wrapper;
+	},
+
+	getDom: function() {
+		switch(this.whatPage) {
+		case "resultPage":
+			wrapper = this.drawResultPage();
+			break;
+		case "comparePage":
+			wrapper = this.drawComparePage();
+			break;
+		default:
+			wrapper = this.drawDefaultPage();
+		}
 
 		return wrapper;
 	},

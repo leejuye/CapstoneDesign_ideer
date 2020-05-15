@@ -72,6 +72,13 @@ Module.register("compliments", {
 		this.compInterval = setInterval(function() {
 			self.updateDom(self.config.fadeSpeed);
 		}, this.config.updateInterval);
+
+		//TEST
+		/*var self = this;
+		setTimeout(function() {
+			self.sendNotification("PHOTO", "SHOW_RESULT");
+			Log.log("@@@@@@@");
+		}, 5000);*/
 	},
 	// Module location
 	getLocation: function() {
@@ -81,6 +88,7 @@ Module.register("compliments", {
 		case "frontResult":
 		case "sideStart":
 		case "sideResult":
+		case "savePictureOrNot":
 			ret = "bottom_right";
 			break;
 		default:
@@ -93,7 +101,7 @@ Module.register("compliments", {
 	notificationReceived: function(notification, payload, sender) {
 
 		if (notification === "COMPLIMENTS") {
-			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload);
+			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload + ", from: " + sender);
 
 			clearInterval(this.compInterval);
 
@@ -101,6 +109,12 @@ Module.register("compliments", {
 			this.lastIndexUsed = 123;
 			var self = this;
 			self.updateDom();
+
+			//savePicture
+			if(payload.number) {
+				this.filenumber = payload.number;
+				payload = payload.payload;
+			}
 
 			this.descCommand = payload;
 			console.log(payload);
@@ -147,7 +161,10 @@ Module.register("compliments", {
 				this.config.state = "frontResult";
 				break;
 			case "sideResult" :
-				this.config.text = "sideResult";
+				this.config.state = "sideResult";
+				break;
+			case "savePicture" :
+				this.config.state = "savePicture";
 				break;
 			case "shutdownRequest":
 				this.config.text = payload;
@@ -201,17 +218,17 @@ Module.register("compliments", {
 			if (this.config.state === "dressWait") {
 				clearInterval(this.waitInterval);
 			}
-		} else if (notification === "ASSISTANT_CONFIRMATION") {  // You say something
+		} else if (notification === "ASSISTANT_CONFIRMATION") {  // You said something
 			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 			this.config.sayTF = true;
 		} else if (notification === "ASSISTANT_ERROR") {
 			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 			if (this.config.assistState === "listen") {
-				if (this.config.sayTF === true) {  // You say non-keyword
+				if (this.config.sayTF === true) {  // You said non-keyword
 					setTimeout(() => {
 						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 					}, 3000);
-				} else {  // You say nothing
+				} else {  // You said nothing
 					this.config.noSayCnt++;
 					if (this.config.noSayCnt === 3) {
 						// shutdown now
@@ -265,36 +282,22 @@ Module.register("compliments", {
 		var compliments;
 
 		// description setting
-		if(this.descCommand == "noKeyword") {
-			compliments = this.config.compliments.noKeyword.slice(0);
-		} else if(this.descCommand == "shutdownRequest") {
-			compliments = this.config.compliments.shutdownRequest.slice(0);
-		} else if(this.descCommand == "shutdownNow") {
-			compliments = this.config.compliments.shutdownNow.slice(0);
-		} else if (this.descCommand == "frontStart") {
-			compliments = this.config.compliments.frontStart.slice(0);
-		} else if (this.descCommand == "frontResult") {
-			compliments = this.config.compliments.frontResult.slice(0);
-		} else if (this.descCommand == "dressCheck") {
-			compliments = this.config.compliments.dressCheck.slice(0);
-		} else if (this.descCommand == "dressWait") {
-			compliments = this.config.compliments.dressWait.slice(0);
-		} else if (this.descCommand == "sideStart") {
-			compliments = this.config.compliments.sideStart.slice(0);
-		} else if (this.descCommand == "sideResult") {
-			compliments = this.config.compliments.sideResult.slice(0);
-		} else if (this.descCommand == "tryAgain") {
-			compliments = this.config.compliments.tryAgain.slice(0);
+
+		if(this.descCommand != null) {
+			if(this.config.compliments.hasOwnProperty(this.descCommand)) {
+				compliments = this.config.compliments[this.descCommand];
+			}
 		} else if (hour >= this.config.morningStartTime && hour < this.config.morningEndTime && this.config.compliments.hasOwnProperty("morning")) {
-			compliments = this.config.compliments.morning.slice(0);
-		} else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {
-			compliments = this.config.compliments.afternoon.slice(0);
-		} else if(this.config.compliments.hasOwnProperty("evening")) {
-			compliments = this.config.compliments.evening.slice(0);
-		}
+    	compliments = this.config.compliments.morning.slice(0);
+    } else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {
+    	compliments = this.config.compliments.afternoon.slice(0);
+    } else if(this.config.compliments.hasOwnProperty("evening")) {
+    	compliments = this.config.compliments.evening.slice(0);
+    }
 
 		if (typeof compliments === "undefined") {
 			compliments = new Array();
+			Log.log("@@@@@@");
 		}
 
 		if (this.currentWeatherType in this.config.compliments) {
@@ -356,6 +359,9 @@ Module.register("compliments", {
 		wrapper.className = this.config.classes ? this.config.classes : "thin large bright pre-line";
 		// get the compliment text
 		var complimentText = this.randomCompliment();
+		if( this.descCommand === "savePicture") {
+			complimentText = [complimentText.slice(0,13), this.filenumber, complimentText.slice(13)].join('');
+		}
 		// split it into parts on newline text
 		var parts= complimentText.split("\n");
 		// create a span to hold it all

@@ -35,6 +35,10 @@ var config = {
 		    module: "MMM-Dynamic-Modules"
 		},
 		/*{
+			module: "helloworld",
+			position: "bottom_bar"
+		},
+		{
 		    module: "hideshow"
 		},*/
 		{
@@ -47,7 +51,7 @@ var config = {
 		},
 		{
 			module: "photo",
-			position: "middle_center"
+			position: "top_left"
 		},
 		{
 			module: "MMM-AssistantMk2",

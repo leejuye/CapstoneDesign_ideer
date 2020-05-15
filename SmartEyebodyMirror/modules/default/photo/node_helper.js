@@ -6,7 +6,17 @@ const fs = require('fs');
 var pythonStarted = false;
 
 module.exports = NodeHelper.create({
-
+	numberOfFiles : function() {
+		const execSync = require('child_process').execSync;
+		const path = "/home/pi/CapstoneDesign_ideer/SmartEyebodyMirror/modules/default/photo/image/";
+		const cmd = 'find ' + path + ' -type f -name "*_front.jpg" | wc -l';
+		
+		this.filenum = execSync(cmd);
+		this.filenum = parseInt(this.filenum);
+		console.log("filenumber: " + this.filenum);
+		console.log("type: " + typeof(this.filenum));
+	},
+	
 	socketNotificationReceived: function(notification, payload) {
 		if(notification === "PREVIEW") {
 			var self = this;
@@ -17,8 +27,10 @@ module.exports = NodeHelper.create({
 			});
 		} else if(notification === "REMOVE_PIC") {
 			fs.unlinkSync("modules/default/photo/image/" + payload);
+		} else if(notification === "FILE_NUM") {
+			this.numberOfFiles();
+			this.sendSocketNotification("FILE_NUMBER", this.filenum);
 		}
 	}
 
 });
-
