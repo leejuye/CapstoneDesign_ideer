@@ -57,11 +57,11 @@ Module.register("photo",{
 			if(payload.indexOf("front") != -1) {
 				Log.log("front result");
 				this.sendNotification("COMPLIMENTS","frontResult");
-			}else {
+			} else {
 				this.sendNotification("COMPLIMENTS","sideResult");
 			}
 			setTimeout(() => {
-					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+				this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 			}, 8000)
 		} else if(notification === "FILE_NUMBER") {
 			this.sendNotification("COMPLIMENTS", {"payload": "savePicture", "number": payload});
@@ -93,8 +93,11 @@ Module.register("photo",{
 				this.sendNotification("COMPLIMENTS", "sideStart");
 				this.sendSocketNotification("PREVIEW", this.fileName + this.fileNameSuffix);
 				break;
-			case "VOICE_ERROR":
-				this.sendNotification("COMPLIMENTS", "noKeyword");
+			case "dressCheck":
+				this.sendNotification("COMPLIMENTS", "dressCheck");
+				break;
+			case "dressWait":
+				this.sendNotification("COMPLIMENTS", "dressWait");
 				break;
 			case "RE_TAKE_PIC":
 				if(this.fileNameSuffix === '_front.jpg'){

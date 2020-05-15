@@ -27,7 +27,7 @@ Module.register("compliments", {
 				"원하는 기능을 \n말해주세요."
 			]
 		},
-		updateInterval: 500,
+		updateInterval: 2500,
 		remoteFile: "description.json",
 		fadeSpeed: 2000,
 		morningStartTime: 5,
@@ -36,7 +36,10 @@ Module.register("compliments", {
 		afternoonEndTime: 17,
 		random: false,
 		noSayCnt: 0,
-		badFrontCnt: 0
+		badFrontCnt: 0,
+		state: "",
+		sayTF: false,
+		assistState: ""
 	},
 	lastIndexUsed:-1,
 	// Set currentweather from module
@@ -44,6 +47,7 @@ Module.register("compliments", {
 
 	compInterval: null,
 	descCommand: null,
+	waitInterval: null,
 
 	// Define required scripts.
 	getScripts: function() {
@@ -80,9 +84,6 @@ Module.register("compliments", {
 	getLocation: function() {
 		var ret;
 		switch (this.descCommand) {
-		case "noKeyword":
-			ret = "top_right";
-			break;
 		case "frontStart":
 		case "frontResult":
 		case "sideStart":
@@ -136,77 +137,113 @@ Module.register("compliments", {
 			case "CURRENTWEATHER_DATA":
 				this.setCurrentWeatherType(payload.data);
 				break;
+			case "dressCheck":
+				this.config.state = "dressCheck";
+				setTimeout(() => {
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+				}, 7000);
+				break;
+			case "dressWait":
+				this.config.state = "dressWait";
+				this.waitInterval = setInterval(function() {
+					// shutdown now
+				}, 600000);  // wait 10 minutes = 600000
+				break;
+			case "imHere":
+				if (this.config.state === "dressWait") {
+					this.sendNotification("PHOTO", "TAKE_PIC");
+					this.config.state = "";
+				} else {
+					this.sendNotification("ASSISTANT_ERROR");
+				}
+				break;
 			case "frontResult" :
-				this.config.text = "frontResult";
+				this.config.state = "frontResult";
 				break;
 			case "sideResult" :
-				this.config.text = "sideResult";
+				this.config.state = "sideResult";
 				break;
 			case "savePicture" :
-				this.config.text = "savePicture";
-				break;
-			case "tryAgain":
-				this.sendNotification("COMPLIMENTS", "sayFunction");
+				this.config.state = "savePicture";
 				break;
 			case "shutdownRequest":
 				this.config.text = payload;
 				setTimeout(() => {
 					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-				}, 500);
+				}, 3000);
 				break;
 			case "shutdownNow":
 				this.config.text = payload;
 				break;
 			case "sayYes":
-				switch(this.config.text){
-				case "shutdownRequest":
-					this.sendNotification("HIDE_ALL_MODULES");
+				switch(this.config.state){
+				case "dressCheck":
+					this.sendNotification("PHOTO", "TAKE_PIC");
 					break;
 				case "frontResult":
 					//side start
-					this.sendNotification("TAKE_PIC_SIDE");
+					this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
+					break;
+				case "shutdownRequest":
+					this.sendNotification("HIDE_ALL_MODULES");
 					break;
 				}
-				this.config.text = "";
+				this.config.state = "";
 			case "sayNo":
-				Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
-				switch(this.config.text){
-				case "shutdownRequest":
+				switch(this.config.state){
+				case "dressCheck":
+					this.sendNotification("PHOTO", "dressWait");
 					break;
 				case "frontResult":
 					this.config.badFrontCnt++;
 					if (this.config.badFrontCnt === 3) {
 						this.sendNotification("PHOTO", "tryAgain");
-						// this.descCommand = "tryAgain";
-						// this.updateDom(5000);
 						this.config.badFrontCnt = 0;
 					} else {
-						this.sendNotification("TAKE_PIC", "test.jpg");
+						this.sendNotification("PHOTO", "TAKE_PIC");
 					}
 					break;
-				}
-				this.config.text = "";
-			}
-		}
-		if(notification==="ASSISTANT_ERROR") {
-			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
-			switch(this.config.text){
-			case "shutdown":
-				break;
-			case "frontResult":
-				this.config.noSayCnt++;
-				if (this.config.noSayCnt === 2) {
-					this.sendNotification("ASSISTANT_COMMAND", {
-						command: "SHUTDOWN_FORCE"
-					});
-					this.config.noSayCnt = 0;
+				case "shutdownRequest":
 					break;
 				}
-				setTimeout(() => {
-					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-				}, 3000);
+				if (this.config.state !== "dressWait") {
+					this.config.state = "";
+				}
 			}
 		}
+		if (notification === "ASSISTANT_LISTEN") {  // Assistant is listening
+			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
+			this.config.assistState = "listen";
+			this.config.sayTF = false;
+			if (this.config.state === "dressWait") {
+				clearInterval(this.waitInterval);
+			}
+		} else if (notification === "ASSISTANT_CONFIRMATION") {  // You said something
+			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
+			this.config.sayTF = true;
+		} else if (notification === "ASSISTANT_ERROR") {
+			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
+			if (this.config.assistState === "listen") {
+				if (this.config.sayTF === true) {  // You said non-keyword
+					setTimeout(() => {
+						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+					}, 3000);
+				} else {  // You said nothing
+					this.config.noSayCnt++;
+					if (this.config.noSayCnt === 3) {
+						// shutdown now
+						this.config.noSayCnt = 0;
+					} else { 
+						setTimeout(() => {
+							this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+						}, 3000);
+					}
+				}
+				this.config.assistState = "";
+				this.config.sayTF = false;
+			}
+		}
+		
 	},
 	/* randomIndex(compliments)
 	 * Generate a random index for a list of compliments.
@@ -245,17 +282,18 @@ Module.register("compliments", {
 		var compliments;
 
 		// description setting
+
 		if(this.descCommand != null) {
 			if(this.config.compliments.hasOwnProperty(this.descCommand)) {
 				compliments = this.config.compliments[this.descCommand];
 			}
 		} else if (hour >= this.config.morningStartTime && hour < this.config.morningEndTime && this.config.compliments.hasOwnProperty("morning")) {
-                        compliments = this.config.compliments.morning.slice(0);
-                } else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {
-                        compliments = this.config.compliments.afternoon.slice(0);
-                } else if(this.config.compliments.hasOwnProperty("evening")) {
-                        compliments = this.config.compliments.evening.slice(0);
-                }
+    	compliments = this.config.compliments.morning.slice(0);
+    } else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {
+    	compliments = this.config.compliments.afternoon.slice(0);
+    } else if(this.config.compliments.hasOwnProperty("evening")) {
+    	compliments = this.config.compliments.evening.slice(0);
+    }
 
 		if (typeof compliments === "undefined") {
 			compliments = new Array();

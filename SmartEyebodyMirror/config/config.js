@@ -57,6 +57,8 @@ var config = {
 			module: "MMM-AssistantMk2",
 			position: "top_left",  // fullscreen_above, top_left
 			config: {
+				debug: false,
+				useA2D: true,
 				ui: "Simple",	// Fullscreen, Classic, Classic2, Simple
 				assistantConfig: {
 					latitude: 51.508530,
@@ -65,9 +67,9 @@ var config = {
 				responseConfig: {
 					useHTML5: true,
 					useScreenOutput: true,
-					useAudioOutput: true,
+					useAudioOutput: false,
 					useChime: true,
-					timer: 0,
+					timer: 3000,
 					myMagicWord: true,
 					delay: 0.5,
 					//Your prefer sound play program. By example, if you are running this on OSX, `afplay` could be available.
@@ -104,13 +106,13 @@ var config = {
 						pattern: "(촬영|찍어)",  // No spaces
 						command: "CAMERA_START"
 					},
-					"SHUTDOWN": {
-						pattern: "(종료|꺼 줘)",  // No spaces but ok in this case
-						command: "SHUTDOWN_REQUEST"
+					"IM_HERE": {
+						pattern: "나 왔어",  // No spaces but ok in this case
+						command: "IM_HERE"
 					},
-					"SHUTDOWN_FORCE": {
-						pattern: "shutdown",
-						command: "SHUTDOWN_FORCE"
+					"SHUTDOWN": {
+						pattern: "(종료|꺼 줘)",
+						command: "SHUTDOWN_REQUEST"
 					},
 					"YES": {
 						pattern: "응",
@@ -120,20 +122,25 @@ var config = {
 						pattern: "아니",
 						command: "NO"
 					},
-					"TEST": {
-						pattern: "테스트",
-						command: "TEST"
-					},
 				},
 				actions: {},
 				commands: {
+					"IM_HERE": {
+						soundExec: {
+							chime: "open"
+						},
+						notificationExec: {
+							notification: "COMPLIMENTS",
+							payload: "imHere"
+						}
+					},
 					"CAMERA_START": {
 						soundExec: {
 							chime: "open"
 						},
 						notificationExec: {
-							notification: "TAKE_PIC",
-							payload: "test.jpg"
+							notification: "COMPLIMENTS",
+							payload: "dressCheck"
 						}
 					},
 					"SHUTDOWN_REQUEST": {
@@ -163,34 +170,24 @@ var config = {
 							payload: "sayNo"
 						}
 					},
-					"TEST": {
-						moduleExec: {
-							module: ["MMM-AssistantMk2"],
-							exec: (module, params, key) => {
-							  	setTimeout(()=>{
-									module.sendNotification("SHOW_ALERT", {
-										message:"it's works !",
-										timer:2000
-									});
-								}, 100);
-							}
-						},
-						soundExec: {
-							chime: "open",
-							say: "it's really works !" // message should be set to your language !
-						},
-						notificationExec: {
-							notification: "SHOW_ALERT",
-							payload: {
-								title:"TEST",
-							  	message:"This is a test."
-							}
-						}
-					},
 				},
-				plugins: {},
+				plugins: {
+					onReady: [],
+					onBeforeAudioResponse: [],
+					onAfterAudioResponse: [],
+					onBeforeScreenResponse: [],
+					onAfterScreenResponse: [],
+					onBeforeInactivated: [],
+					onAfterInactivated: [],
+					onBeforeActivated: [],
+					onAfterActivated: [],
+					onError: [],
+					onBeforeNotificationReceived: [],
+					onAfterNotificationReceived: [],
+					onBeforeSocketNotificationReceived: [],
+					onAfterSocketNotificationReceived: [],
+				},
 				responseHooks: {},
-				useA2D: true,
 			},
 		},
 		{

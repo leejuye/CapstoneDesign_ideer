@@ -65,6 +65,7 @@ Temporary Items
 !/modules/README.md**
 !/modules/MMM-AssistantMk2/components/response.js
 !/modules/MMM-AssistantMk2/translations/en.json
+!/modules/MMM-AssistantMk2/ui/Simple/Simple.css
 
 # Ignore changes to the custom css files.
 /css/custom.css
