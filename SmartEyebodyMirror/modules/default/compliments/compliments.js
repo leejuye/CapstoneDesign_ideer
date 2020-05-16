@@ -244,7 +244,6 @@ Module.register("compliments", {
 					break;
 				case "imHere":
 					this.sendNotification("PHOTO", "TAKE_PIC");
-					this.config.state = "";
 					break;
 				case "frontResult":
 					this.config.state = "frontResult";
@@ -256,6 +255,7 @@ Module.register("compliments", {
 					this.config.state = "savePicture";
 					break;
 				case "shutdownRequest":
+					this.config.state = "shutdownRequest";
 					this.config.text = payload;
 					setTimeout(() => {
 						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
@@ -270,14 +270,14 @@ Module.register("compliments", {
 						this.sendNotification("PHOTO", "TAKE_PIC");
 						break;
 					case "frontResult":
-						//side start
+						// side start
 						this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
 						break;
 					case "shutdownRequest":
 						this.sendNotification("HIDE_ALL_MODULES");
 						break;
 					}
-					this.config.state = "";
+					this.config.state = "initial";
 				case "sayNo":
 					switch(this.config.state){
 					case "dressCheck":
@@ -287,16 +287,27 @@ Module.register("compliments", {
 						this.config.badFrontCnt++;
 						if (this.config.badFrontCnt === 3) {
 							this.sendNotification("PHOTO", "tryAgain");
+							this.config.state = "initial";
 							this.config.badFrontCnt = 0;
 						} else {
 							this.sendNotification("PHOTO", "TAKE_PIC");
+						}
+						break;
+					case "sideResult":
+						this.config.badFrontCnt++;
+						if (this.config.badFrontCnt === 3) {
+							this.sendNotification("PHOTO", "tryAgain");
+							this.config.state = "initial";
+							this.config.badFrontCnt = 0;
+						} else {
+							this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
 						}
 						break;
 					case "shutdownRequest":
 						break;
 					}
 					if (this.config.state !== "dressWait") {
-						this.config.state = "";
+						this.config.state = "initial";
 					}
 				}
 			}
