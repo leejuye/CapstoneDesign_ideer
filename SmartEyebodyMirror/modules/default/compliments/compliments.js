@@ -37,7 +37,7 @@ Module.register("compliments", {
 		random: false,
 		noSayCnt: 0,
 		badFrontCnt: 0,
-		state: "",
+		state: "initial",
 		sayTF: false,
 		assistState: "",
 		pass: false
@@ -98,28 +98,103 @@ Module.register("compliments", {
 		return ret;
 	},
 
+	// Make NOT_NOW error
+	makeNotNow: function(key) {
+		setTimeout(() => {
+			this.sendNotification("ASSISTANT_ACTIVATE", {
+				type: "TEXT",
+				key: key,
+				text: "NOT_NOW",
+				chime: false
+			})
+		}, 100);
+	},
+
 	// Override notification handler.
 	notificationReceived: function(notification, payload, sender) {
 
 		if (notification === "COMPLIMENTS") {
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload + ", from: " + sender);
+			
+			// Set what commands to receive
+			switch (this.config.state) {  
 
-			switch(payload) {
-			case "dressCheck":
-				if (this.config.state === "dressCheck") {
+			// only take_pic, lookup, shutdown
+			case "initial":
+				switch (payload) {
+				case "dressCheck":
+				case "shutdownRequest":
+					this.config.pass = false;
+					break;
+				case "imHere":
 					this.config.pass = true;
-					setTimeout(() => {
-						this.sendNotification("ASSISTANT_ACTIVATE", {
-							type: "TEXT",
-							key: "촬영",
-							text: "NOT_NOW",
-							chime: false
-						})
-					}, 1000);
+					this.makeNotNow("나 왔어");
+					break;
+				case "sayYes":
+					this.config.pass = true;
+					this.makeNotNow("응");
+					break;
+				case "sayNo":
+					this.config.pass = true;
+					this.makeNotNow("아니");
+					break;
 				}
 				break;
+
+			// only yes or no
+			case "dressCheck":
+			case "frontResult":
+			case "sideResult":
+			case "savePicture":
+			case "shutdownRequest":
+				switch (payload) {
+				case "sayYes":
+				case "sayNo":
+					this.config.pass = false;
+					break;
+				case "dressCheck":
+					this.config.pass = true;
+					this.makeNotNow("촬영");
+					break;
+				case "imHere":
+					this.config.pass = true;
+					this.makeNotNow("나 왔어");
+					break;
+				case "shutdownRequest":
+					this.config.pass = true;
+					this.makeNotNow("종료");
+					break;
+				}
+				break;
+
+			// only I'm here
+			case "dressWait":
+				switch (payload) {
+				case "imHere":
+					this.config.pass = false;
+					break;
+				case "dressCheck":
+					this.config.pass = true;
+					this.makeNotNow("촬영");
+					break;
+				case "shutdownRequest":
+					this.config.pass = true;
+					this.makeNotNow("종료");
+					break;
+				case "sayYes":
+					this.config.pass = true;
+					this.makeNotNow("응");
+					break;
+				case "sayNo":
+					this.config.pass = true;
+					this.makeNotNow("아니");
+					break;
+				}
+				break;
+
 			}
 
+			// Execute commands
 			if (this.config.pass === false) {
 				clearInterval(this.compInterval);
 
@@ -138,8 +213,6 @@ Module.register("compliments", {
 				console.log(payload);
 				this.lastIndexUsed = -1;
 
-				
-
 				this.compInterval = setInterval(function() {
 					self.updateDom(self.config.fadeSpeed);
 				}, this.config.updateInterval);
@@ -153,7 +226,7 @@ Module.register("compliments", {
 					}
 				);
 
-				switch(payload){
+				switch (payload) {
 				case "CURRENTWEATHER_DATA":
 					this.setCurrentWeatherType(payload.data);
 					break;
@@ -170,20 +243,16 @@ Module.register("compliments", {
 					}, 600000);  // wait 10 minutes = 600000
 					break;
 				case "imHere":
-					if (this.config.state === "dressWait") {
-						this.sendNotification("PHOTO", "TAKE_PIC");
-						this.config.state = "";
-					} else {
-						this.sendNotification("ASSISTANT_ERROR");
-					}
+					this.sendNotification("PHOTO", "TAKE_PIC");
+					this.config.state = "";
 					break;
-				case "frontResult" :
+				case "frontResult":
 					this.config.state = "frontResult";
 					break;
-				case "sideResult" :
+				case "sideResult":
 					this.config.state = "sideResult";
 					break;
-				case "savePicture" :
+				case "savePicture":
 					this.config.state = "savePicture";
 					break;
 				case "shutdownRequest":
@@ -233,6 +302,7 @@ Module.register("compliments", {
 			}
 			this.config.pass = false;
 		}
+
 		if (notification === "ASSISTANT_LISTEN") {  // Assistant is listening
 			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 			this.config.assistState = "listen";
@@ -266,6 +336,7 @@ Module.register("compliments", {
 			}
 		}
 	},
+
 	/* randomIndex(compliments)
 	 * Generate a random index for a list of compliments.
 	 *
