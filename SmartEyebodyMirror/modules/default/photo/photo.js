@@ -11,18 +11,15 @@ Module.register("photo",{
 	fileName: null,
 	fileNameSuffix: null,
 	whatPage: null,
+	comparePageData: null,
 	start: function() {
 	 	this.current_user = null;
 
-		// TEST
-	 	/*this.sendSocketNotification("PREVIEW", "1231412421.jpg");
-		var self = this;
-		setTimeout(function() {
-			self.sendNotification("COMPLIMENTS", "frontStart");
-		}, 3000);*/
-		// TEST END
+		//TEST
+		//this.sendSocketNotification("TEST", null);
+		this.fileName = "1234";
+		//TEST END
 
-		//this.fileName = "1234";
 	 	Log.info("Starting module: " + this.name);
 	},
 
@@ -65,6 +62,9 @@ Module.register("photo",{
 			}, 8000)
 		} else if(notification === "FILE_NUMBER") {
 			this.sendNotification("COMPLIMENTS", {"payload": "savePicture", "number": payload});
+		} else if(notification === "HERE_INFO") {
+			this.whatPage = "comparePage";
+			this.comparePageData = payload;
 		}
 	 	this.updateDom();
 	},
@@ -119,9 +119,12 @@ Module.register("photo",{
 				this.sendSocketNotification("REMOVE_PIC", this.fileName + "_side.jpg");
 				break;
 			case "SHOW_COMPARE":
-				this.whatPage = "comparePage";
 				this.sendNotification("COMPLIMENTS", "noDescription");
-				this.updateDom();
+				this.sendSocketNotification("GET_INFO", {
+					"beforeFileName": "1234",
+					"afterFileName": "1235",
+					"isFront": true
+				});
 				break;
 			case "COUNT_FILE":
 				this.sendSocketNotification("FILE_NUM", payload);
@@ -144,42 +147,35 @@ Module.register("photo",{
 		return wrapper;
 	},
 
-	getPictureInfo: function(fileName, isFront) {
-		// TODO: Get info from DB
-		// test
-		var ret = new Object();
-		ret.bee = 12;
-		ret.hip = 24;
-
-		return ret;
-	},
-
-	fillBox: function(box, fileName, isFront) {
-		info = this.getPictureInfo(fileName, isFront);
-		for(key in info) {
-			box.appendChild(document.createTextNode(key + ": " + info[key] + "cm"));
+	fillBox: function(box, data) {
+		for(key in data) {
+			box.appendChild(document.createTextNode(key + ": " + data[key] + "cm"));
 			box.appendChild(document.createElement("BR"));
 		}
 		box.lastElementChild.remove();
+
+		this.queryData = null;
 	},
 
 	drawComparePage: function() {
 		var wrapper = document.createElement("div");
+		var data = this.comparePageData;
 
-		// origin image
+		// Draw before info
 		var img1 = document.createElement("img");
-                img1.src = "/modules/default/photo/image/" + this.fileName + "_front.jpg";
+                img1.src = "/modules/default/photo/image/" + data.beforeFileName + (data.isFront ? "_front" : "_side") + ".jpg";
 
 		var info1 = document.createElement("div");
 		info1.className = "info_item";
-		this.fillBox(info1, this.fileName, true);
+		this.fillBox(info1, data.beforeData);
 
-		// current image
+		// Draw after info
                 var img2 = document.createElement("img");
-                img2.src = "/modules/default/photo/image/" + this.fileName + "_side.jpg";
+                img2.src = "/modules/default/photo/image/" + data.afterFileName + (data.isFront ? "_front" : "_side") + ".jpg";
 
 		var info2 = document.createElement("div");
 		info2.className = "info_item";
+		this.fillBox(info2, data.afterData);
 
                 wrapper.appendChild(img1);
 		wrapper.appendChild(info1);
