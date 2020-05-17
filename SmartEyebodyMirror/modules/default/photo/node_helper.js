@@ -14,8 +14,6 @@ module.exports = NodeHelper.create({
 
 		this.filenum = execSync(cmd);
 		this.filenum = parseInt(this.filenum);
-		console.log("filenumber: " + this.filenum);
-		console.log("type: " + typeof(this.filenum));
 	},
 
 	dbConn: async function(qry, params) {
@@ -49,7 +47,18 @@ module.exports = NodeHelper.create({
 		});
 
 	},
-
+	dbGetBeforeFileName: async fuction() {
+		var qry = "SELECT base_file from users WHERE id = ?";
+		var beforeFileName = await this.dbConn(qry, payload]);
+		this.sendSocketNotification("HERE_BEFORE_FILENAME", beforeFilName);
+	},
+	dbGetAfterFileName: async function() {
+		var qry = "SELECT DATE_FORMAT(date, '%Y%m%d%H%i%S'), is_front FROM size_info "
+			+ "WHERE id = ? ORDER BY ABS(DATEDIFF(DATE_ADD(now(), INTERVAL ? DAY), date)";
+		var afterfileName = await this.dbConn(qry, [payload.id, payload.term]);
+		this.sendSocketNotification("HERE_AFTER_FILENAME", afterFilName);
+	},
+	
 	socketNotificationReceived: function(notification, payload) {
 		if(notification === "PREVIEW") {
 			var self = this;
@@ -62,11 +71,19 @@ module.exports = NodeHelper.create({
 			fs.unlinkSync("modules/default/photo/image/" + payload);
 		} else if(notification === "FILE_NUM") {
 			this.numberOfFiles();
-			this.sendSocketNotification("FILE_NUMBER", this.filenum);
+			if(payload === "recall") {
+				this.sendSocketNotification("FILE_NUMBER_CALL", this.filenum);
+			} else if(payload === "save") {
+				this.sendSocketNotification("FILE_NUMBER_SAVE", this.filenum);
+			}
 		} else if(notification === "GET_INFO") {
 			this.getSizeInfo(payload);
 		} else if(notification === "TEST") {
-			this.dbConn("select * from size_info");
+			this.dbConn("select * from size_info");	
+		} else if(notification === "GET_BEFORE_FILENAME") {
+			this.dbGetBeforeFileName(payload);
+		} else if(notification === "GET_AFTER_FILENAME") {
+			this.dbGetAfterFileName(payload);
 		}
 	}
 

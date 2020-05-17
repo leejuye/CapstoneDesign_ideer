@@ -37,6 +37,7 @@ Module.register("compliments", {
 		random: false,
 		noSayCnt: 0,
 		badFrontCnt: 0,
+		badSideCnt: 0,
 		state: "",
 		sayTF: false,
 		assistState: ""
@@ -163,9 +164,19 @@ Module.register("compliments", {
 			case "sideResult" :
 				this.config.state = "sideResult";
 				break;
+			case "savePictureOrNot" :
+				this.config.state = "savePictureOrNot";
+				break;
 			case "savePicture" :
 				this.config.state = "savePicture";
+				this.sendNotification("PHOTO", "SHOW_COMPARE");
+				break;	
+			case "deletePicture" :
+				this.config.state = "deletePicture";
+				this.sendNotification("PHOTO", "SHOW_COMPARE");
 				break;
+			case "photoNotExist" :
+				this.config.state = "photoNotExist";
 			case "shutdownRequest":
 				this.config.text = payload;
 				setTimeout(() => {
@@ -183,6 +194,12 @@ Module.register("compliments", {
 				case "frontResult":
 					//side start
 					this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
+					break;
+				case "sideResult":
+					this.sendNotification("PHOTO", "SHOW_RESULT");
+					break;
+				case "savePictureOrNot":
+					this.sendNotification("PHOTO", "COUNT_FILE");
 					break;
 				case "shutdownRequest":
 					this.sendNotification("HIDE_ALL_MODULES");
@@ -202,6 +219,18 @@ Module.register("compliments", {
 					} else {
 						this.sendNotification("PHOTO", "TAKE_PIC");
 					}
+					break;
+				case "sideResult":
+					this.config.badSideCnt++;
+					if (this.config.badSideCnt === 3) {
+						this.sendNotification("PHOTO", "tryAgain");
+						this.config.badSideCnt = 0;
+					} else {
+						this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
+					}
+					break;	
+				case "savePictureOrNot":
+					this.sendNotification("PHOTO", "REMOVE_RESULT");
 					break;
 				case "shutdownRequest":
 					break;
