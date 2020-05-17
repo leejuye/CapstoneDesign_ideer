@@ -47,16 +47,17 @@ module.exports = NodeHelper.create({
 		});
 
 	},
-	dbGetBeforeFileName: async fuction() {
+	dbGetBeforeFileName: async function(payload) {
 		var qry = "SELECT base_file from users WHERE id = ?";
-		var beforeFileName = await this.dbConn(qry, payload]);
-		this.sendSocketNotification("HERE_BEFORE_FILENAME", beforeFilName);
+		var beforeFileName = await this.dbConn(qry, payload);
+		console.log('@@@@@@@@@@@@@@@@@@beforeFileName: ' + beforeFileName);
+		this.sendSocketNotification("HERE_BEFORE_FILENAME", beforeFileName);
 	},
-	dbGetAfterFileName: async function() {
-		var qry = "SELECT DATE_FORMAT(date, '%Y%m%d%H%i%S'), is_front FROM size_info "
-			+ "WHERE id = ? ORDER BY ABS(DATEDIFF(DATE_ADD(now(), INTERVAL ? DAY), date)";
-		var afterfileName = await this.dbConn(qry, [payload.id, payload.term]);
-		this.sendSocketNotification("HERE_AFTER_FILENAME", afterFilName);
+	dbGetAfterFileName: async function(payload) {
+		//var qry = "SELECT DATE_FORMAT(file_name, '%Y%m%d%H%i%S') FROM size_info WHERE id = 1 ORDER BY ABS(TIMESTAMPDIFF(SECOND, DATE_ADD(now(), INTERVAL ? DAY), file_name)) LIMIT 1";
+		var qry = "SELECT DATE_FORMAT(date, '%Y%m%d%H%i%S') FROM size_info WHERE id = 1 ORDER BY ABS(TIMESTAMPDIFF(SECOND, DATE_ADD(now(), INTERVAL ? DAY), date)) LIMIT 1";
+		var afterFileName = await this.dbConn(qry, [payload.id, payload.term]);
+		this.sendSocketNotification("HERE_AFTER_FILENAME", afterFileName);
 	},
 	
 	socketNotificationReceived: function(notification, payload) {
