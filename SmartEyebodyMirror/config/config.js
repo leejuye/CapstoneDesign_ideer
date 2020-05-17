@@ -114,6 +114,10 @@ var config = {
 						pattern: "(종료|꺼 줘)",
 						command: "SHUTDOWN_REQUEST"
 					},
+					"SIGN_UP": {
+						pattern: "(신규 등록|회원 가입)",
+						command: "SIGN_UP_REQUEST"
+					},
 					"YES": {
 						pattern: "응",
 						command: "YES"
@@ -150,6 +154,15 @@ var config = {
 						notificationExec: {
 							notification: "COMPLIMENTS",
 							payload: "shutdownRequest"
+						},
+					},
+					"SIGN_UP_REQUEST": {
+						soundExec: {
+							chime: "open"
+						},
+						notificationExec: {
+							notification: "COMPLIMENTS",
+							payload: "signUpRequest"
 						},
 					},
 					"YES": {

@@ -175,6 +175,13 @@ Module.register("compliments", {
 			case "shutdownNow":
 				this.config.text = payload;
 				break;
+			case "signUpRequest":
+				this.config.text = payload;
+				// this.config.state = "singInRequest";
+				setTimeout(() => {
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+				}, 3000);
+				break;
 			case "sayYes":
 				switch(this.config.state){
 				case "dressCheck":
@@ -233,7 +240,7 @@ Module.register("compliments", {
 					if (this.config.noSayCnt === 3) {
 						// shutdown now
 						this.config.noSayCnt = 0;
-					} else { 
+					} else {
 						setTimeout(() => {
 							this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 						}, 3000);
@@ -243,7 +250,7 @@ Module.register("compliments", {
 				this.config.sayTF = false;
 			}
 		}
-		
+
 	},
 	/* randomIndex(compliments)
 	 * Generate a random index for a list of compliments.
@@ -289,11 +296,11 @@ Module.register("compliments", {
 			}
 		} else if (hour >= this.config.morningStartTime && hour < this.config.morningEndTime && this.config.compliments.hasOwnProperty("morning")) {
     	compliments = this.config.compliments.morning.slice(0);
-    } else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {
+		} else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {
     	compliments = this.config.compliments.afternoon.slice(0);
-    } else if(this.config.compliments.hasOwnProperty("evening")) {
+		} else if(this.config.compliments.hasOwnProperty("evening")) {
     	compliments = this.config.compliments.evening.slice(0);
-    }
+		}
 
 		if (typeof compliments === "undefined") {
 			compliments = new Array();
@@ -360,7 +367,7 @@ Module.register("compliments", {
 		// get the compliment text
 		var complimentText = this.randomCompliment();
 		if( this.descCommand === "savePicture") {
-			complimentText = [complimentText.slice(0,13), this.filenumber, complimentText.slice(13)].join('');
+			complimentText = [complimentText.slice(0,13), this.filenumber, complimentText.slice(13)].join("");
 		}
 		// split it into parts on newline text
 		var parts= complimentText.split("\n");

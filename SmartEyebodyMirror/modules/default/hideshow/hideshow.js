@@ -4,19 +4,19 @@ Module.register("hideshow",{
 	// 	text: "Hello World!"
 	// },
 
-	start: function() {
-		const self = this;
-		setTimeout(function() {
-			self.sendNotification("ASSISTANT_COMMAND", {
-				command: "SHUTDOWN_REQUEST"
-			 });
-		}, 2000);
-		setTimeout(function() {
-			self.sendNotification("ASSISTANT_COMMAND", {
-				command: "NO"
-			 });
-		}, 7000);
-	},
+	// start: function() {
+	// 	const self = this;
+	// 	setTimeout(function() {
+	// 		self.sendNotification("ASSISTANT_COMMAND", {
+	// 			command: "SHUTDOWN_REQUEST"
+	// 		 });
+	// 	}, 2000);
+	// 	setTimeout(function() {
+	// 		self.sendNotification("ASSISTANT_COMMAND", {
+	// 			command: "NO"
+	// 		 });
+	// 	}, 7000);
+	// },
 
 	notificationReceived: function (notification, payload, sender) {
 		if (notification === "HIDE_ALL_MODULES") {
@@ -45,23 +45,24 @@ Module.register("hideshow",{
 					}
 				);
 			}, 5000);
-		} else if (notification === "ASSISTANT_ACTIVATE") {
-			this.sendNotification("CHANGE_POSITIONS",
-				modules = {
-					"compliments":{
-						visible: "true",
-						position: "center",
-					},
-					"MMM-AssistantMk2":{
-						visible: "true",
-						position: "top_left",
-					},
-					"clock":{
-						visible: "true",
-						position: "top_center",
-					},
-				}
-			);
 		}
+		// else if (notification === "ASSISTANT_ACTIVATE") {
+		// 	this.sendNotification("CHANGE_POSITIONS",
+		// 		modules = {
+		// 			"compliments":{
+		// 				visible: "true",
+		// 				position: "center",
+		// 			},
+		// 			"MMM-AssistantMk2":{
+		// 				visible: "true",
+		// 				position: "top_left",
+		// 			},
+		// 			"clock":{
+		// 				visible: "true",
+		// 				position: "top_center",
+		// 			},
+		// 		}
+		// 	);
+		// }
 	},
 });
