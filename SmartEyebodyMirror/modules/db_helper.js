@@ -8,14 +8,19 @@ const pool = mariadb.createPool({
 });
 
 function dbHelper() {
-	this.getConnection = function(callback) {
-		pool.getConnection()
-			.then(conn => {
-				callback(conn);
-			}).catch(err => {
-			console.log("db connection fail");
-		});
-	};
+	this.getConnection = async function() {
+        	let conn;
+	        try {
+        	        conn = await pool.getConnection();
+	        } catch(err) {
+	                console.log("db connection fail");
+	                throw err;
+	        } finally {
+	                return new Promise(function (resolve, reject) {
+	                        resolve(conn);
+			});
+	        }
+        };
 }
 
 module.exports = new dbHelper();

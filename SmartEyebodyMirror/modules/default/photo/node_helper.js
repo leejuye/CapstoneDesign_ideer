@@ -18,21 +18,36 @@ module.exports = NodeHelper.create({
 		console.log("type: " + typeof(this.filenum));
 	},
 
-	dbTest: function() {
-		dbHelper.getConnection(function(conn) {
-			conn.query('select * from users')
-				.then((results) => {
-					console.log('@@@@result: ' + JSON.stringify(results));
-				})
-				.then((res) => {
-					console.log('@@@@res = ' + JSON.stringify(res));
-					conn.end();
-				})
-				.catch(err => {
-					console.log('@@@@ERROR: ' + err);
-					conn.end();
-				})
+	dbConn: async function(qry, params) {
+		var conn, results;
+		try{
+			conn = await dbHelper.getConnection();
+			results = await conn.query(qry, params);
+			console.log('@@@@RESULT: ' + JSON.stringify(results[0]));
+		} catch(err) {
+			console.log('@@@@ERROR: ' + err);
+			throw err;
+		} finally {
+			if(conn) conn.end();
+			return new Promise(function(resolve, reject){
+				resolve(results[0]);
+			});
+		}
+	},
+
+	getSizeInfo: async function(payload) {
+		var qry = "SELECT shoulder,chest,waist,hip,thigh,calf,weight,bmi "
+			+ "FROM size_info WHERE is_front = ? and file_name = ?";
+		var beforeData = await this.dbConn(qry, [payload.isFront, payload.beforeFileName]);
+		var afterData = await this.dbConn(qry, [payload.isFront, payload.afterFileName]);
+		this.sendSocketNotification("HERE_INFO", {
+			"beforeFileName": payload.beforeFileName,
+			"beforeData": beforeData,
+			"afterFileName": payload.afterFileName,
+			"afterData": afterData,
+			"isFront": payload.isFront
 		});
+
 	},
 
 	socketNotificationReceived: function(notification, payload) {
@@ -48,8 +63,10 @@ module.exports = NodeHelper.create({
 		} else if(notification === "FILE_NUM") {
 			this.numberOfFiles();
 			this.sendSocketNotification("FILE_NUMBER", this.filenum);
+		} else if(notification === "GET_INFO") {
+			this.getSizeInfo(payload);
 		} else if(notification === "TEST") {
-			this.dbTest();
+			this.dbConn("select * from size_info");
 		}
 	}
 
