@@ -15,6 +15,7 @@ var log = function() {
 
 Module.register("MMM-AssistantMk2", {
   defaults: {
+    isName: false,
     debug:false,
     useA2D: false,
     A2DStopCommand: "stop",
@@ -285,6 +286,8 @@ Module.register("MMM-AssistantMk2", {
         break
       case "ASSISTANT_ACTIVATE":
         var session = Date.now()
+	if(payload.isName) this.config.isName = true;
+	Log.log(this.config.isName);
         payload.secretMode = (payload.secretMode) ? payload.secretMode : false
         payload.sayMode = (payload.sayMode) ? payload.sayMode : false
         this.assistantResponse.setSecret(payload.secretMode)
@@ -348,6 +351,12 @@ Module.register("MMM-AssistantMk2", {
         this.doPlugin("onReady")
         break
       case "ASSISTANT_RESULT":
+//	if (this.config.isName === 1) this.config.isName = 2;
+//	else if (this.config.isName === 2) {
+//	   Log.log(payload.transcription.transcription);
+//	   this.config.isName = 0
+//	}
+	if (this.config.isName) { this.config.isName }
         if (payload.session && this.session.hasOwnProperty(payload.session)) {
           var session = this.session[payload.session]
           if (typeof session.callback == "function") {
@@ -441,7 +450,8 @@ Module.register("MMM-AssistantMk2", {
       useHTML5: this.config.responseConfig.useHTML5,
       session: session,
       status: this.myStatus.old,
-      chime: true
+      chime: true,
+      isName: payload.isName
     }
     var options = Object.assign({}, options, payload)
     if (payload.hasOwnProperty("profile") && typeof this.config.profiles[payload.profile] !== "undefined") {

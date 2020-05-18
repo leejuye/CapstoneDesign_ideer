@@ -179,7 +179,7 @@ Module.register("compliments", {
 				this.config.text = payload;
 				// this.config.state = "singInRequest";
 				setTimeout(() => {
-					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
 				}, 3000);
 				break;
 			case "sayYes":

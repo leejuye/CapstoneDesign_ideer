@@ -201,7 +201,6 @@ class AssistantResponseClass {
 		}
 
 		var normalResponse = (response) => {
-			console.log(response);
 			this.showing = false;
 			this.status("error");
 			this.showError(this.callbacks.translate("NO_KEYWORD"));
