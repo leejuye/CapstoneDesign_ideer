@@ -79,7 +79,7 @@ Module.register("compliments", {
 		//TEST
 		var self = this;
 		setTimeout(function() {
-			self.sendNotification("PHOTO", "TAKE_PIC");
+			self.sendNotification("PHOTO", "SHOW_COMPARE");
 			Log.log("@@@@@@@");
 		}, 5000);
 	},
@@ -352,6 +352,7 @@ Module.register("compliments", {
 						this.sendNotification("PHOTO", "RE_TAKE_PIC_SIDE");
 					}
 					break;
+				}
 				if (this.config.state !== "dressWait") {
 					this.config.state = "";
 				}
