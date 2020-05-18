@@ -200,8 +200,19 @@ class AssistantResponseClass {
       return
     }
 
+    //Log.log(response);
+    //Log.log(this);
+
+    if(response.lastQuery.text === "NOT_NOW") {
+	this.showing = false
+	this.status("error")
+	this.showError(this.callbacks.translate("NOT_NOW"))
+	this.end()
+	return
+    }
+
     var normalResponse = (response) => {
-      this.showing = false
+	this.showing = false
 	this.status("error")
 	this.showError(this.callbacks.translate("NO_KEYWORD"))
 	this.end()

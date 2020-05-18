@@ -125,15 +125,6 @@ var config = {
 				},
 				actions: {},
 				commands: {
-					"IM_HERE": {
-						soundExec: {
-							chime: "open"
-						},
-						notificationExec: {
-							notification: "COMPLIMENTS",
-							payload: "imHere"
-						}
-					},
 					"CAMERA_START": {
 						soundExec: {
 							chime: "open"
@@ -141,6 +132,15 @@ var config = {
 						notificationExec: {
 							notification: "COMPLIMENTS",
 							payload: "dressCheck"
+						}
+					},
+					"IM_HERE": {
+						soundExec: {
+							chime: "open"
+						},
+						notificationExec: {
+							notification: "COMPLIMENTS",
+							payload: "imHere"
 						}
 					},
 					"SHUTDOWN_REQUEST": {
