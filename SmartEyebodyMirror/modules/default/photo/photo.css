@@ -5,12 +5,25 @@
 }
 
 .info_item {
-	width: 240px;
+	width: 200px;
 	height: 440px;
 	border: 2px solid white;
 	float: left;
 	color: white;
 	padding: 10px;
+}
+
+.dif_item {
+	float: left;
+	padding: 5px;
+}
+
+.red_font {
+	color: red;
+}
+
+.green_font {
+	color: green;
 }
 
 img {
