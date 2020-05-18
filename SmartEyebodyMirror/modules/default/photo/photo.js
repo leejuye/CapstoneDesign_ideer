@@ -16,9 +16,13 @@ Module.register("photo",{
 	start: function() {
 	 	this.current_user = null;
 		this.term = 0;
+		this.fileNumber = 0;
 		//TEST
 		//this.sendSocketNotification("TEST", null);
-		this.fileName = "20200518121212";
+		//this.fileName = "1234";
+		this.id = 1;
+		//this.term = -7;
+		//this.sendSocketNotification("GET_AFTER_FILENAME", {"id": this.id, "term": this.term});
 		//TEST END
 		
 	 	Log.info("Starting module: " + this.name);
@@ -49,6 +53,29 @@ Module.register("photo",{
 		this.updateDom();
 	},
 
+	compare: function() {
+		if(this.fileNumber === 0) {
+			this.sendNotification("COMPLIMENTS", "photoNotExist");
+			Log.log('@@@@@@filenum0:' + this.fileNumber);
+		} else if(this.fileNumber === 1) {
+			this.whatPage = "comparePhotos";
+			Log.log('@@@@@@filenum1:' + this.fileNumber);
+			this.sendSocketNotification("GET_BEFORE_FILENAME", this.id);
+		} else if(this.fileNumber >= 2) {
+			this.whatPage = "comparePhotos";
+			Log.log('@@@@@@filenum2:' + this.fileNumber);
+			this.sendSocketNotification("GET_BEFORE_FILENAME", this.id);
+			this.sendSocketNotification("GET_AFTER_FILENAME", {"id": this.id, "term": this.term});
+		}
+		this.sendNotification("COMPLIMENTS", "noDescription");
+		//if fileNumber === 1?
+		this.sendSocketNotification("GET_INFO", {
+			"beforeFileName": "1234",
+			"afterFileName": "1235",
+			"isFront": true
+		});
+	},
+	
 	socketNotificationReceived: function(notification, payload){
 		if(notification === "PREVIEW_DONE") {
 			this.config.imageSrc = "/modules/default/photo/image/" + payload;
@@ -63,6 +90,7 @@ Module.register("photo",{
 			}, 8000)
 		} else if(notification === "FILE_NUMBER_CALL") {
 			this.fileNumber = payload;
+			this.compare();
 		} else if(notification === "FILE_NUMBER_SAVE") {
 			this.fileNumber = payload;
 			this.sendNotification("COMPLIMENTS", {"payload": "savePicture", "number": payload});
@@ -134,27 +162,7 @@ Module.register("photo",{
 				this.sendNotification("COMPLIMENTS", "deletePicture");
 				break;
 			case "SHOW_COMPARE":
-				/*this.sendSocketNotification("FILE_NUM", "recall");
-
-				if(this.fileNumber === 0) {
-					this.sendNotification("COMPLIMENTS", "photoNotExist");
-					break;
-				} else if(this.fileNumber === 1) {
-					this.whatPage = "onlyRecentPhoto";
-					this.sendSocketNotification("GET_BEFORE_FILENAME", this.id);
-				} else if(this.fileNumber >= 2) {
-					this.whatPage = "comparePhotos";
-					this.sendSocketNotification("GET_BEFORE_FILENAME", this.id);
-					this.sendSocketNotification("GET_AFTER_FILENAME", {"id": this.id, "term": this.term});
-				}*/
-				this.whatPage = "comparePage";
-				this.sendNotification("COMPLIMENTS", "noDescription");
-				//if fileNumber === 1?
-				this.sendSocketNotification("GET_INFO", {
-					"beforeFileName": "20200518121212",
-					"afterFileName": "20200519121212",
-					"isFront": true
-				});
+				this.sendSocketNotification("FILE_NUM", "recall");
 				break;
 			case "COUNT_FILE":
 				this.sendSocketNotification("FILE_NUM", "save");
