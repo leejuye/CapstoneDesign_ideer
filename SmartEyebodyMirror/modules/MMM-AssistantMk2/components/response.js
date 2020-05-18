@@ -202,6 +202,14 @@ class AssistantResponseClass {
 			return;
 		}
 
+		if(response.lastQuery.text === "NOT_NOW") {
+			this.showing = false;
+			this.status("error");
+			this.showError(this.callbacks.translate("NOT_NOW"));
+			this.end();
+			return;
+		}
+
 		var normalResponse = (response) => {
 			if(!this.isName) {
 				this.showing = false;
@@ -230,8 +238,7 @@ class AssistantResponseClass {
 			}, // postProcess done
 			()=>{ normalResponse(response); } // postProcess none
 		);
-	}
-
+	};
 	stopResponse (callback = ()=>{}) {
 		this.showing = false;
 		var winh = document.getElementById("AMK2_HELPER");
