@@ -317,9 +317,7 @@ Module.register("compliments", {
 				}
 			}
 			this.config.pass = false;
-		}
-
-		if (notification === "ASSISTANT_LISTEN") {  // Assistant is listening
+		} else if (notification === "ASSISTANT_LISTEN") {  // Assistant is listening
 			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 			this.config.assistState = "listen";
 			this.config.sayTF = false;

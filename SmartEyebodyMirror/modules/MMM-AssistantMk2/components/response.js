@@ -159,6 +159,16 @@ class AssistantResponseClass {
     }
   }
 
+  checkBeforeRequest (string, text) {
+	string = string.split(text);
+	string = parseInt(string[0]);
+	if (!isNaN(string)) {  // false = number
+		return true;
+	} else {
+		return false;
+	}
+  }
+
   start (response) {
     this.hookChimed = false
     this.response = response
@@ -203,7 +213,41 @@ class AssistantResponseClass {
     //Log.log(response);
     //Log.log(this);
 
-    if(response.lastQuery.text === "NOT_NOW") {
+    command = response.transcription.transcription;
+
+    if (command.indexOf("전 사진 보여 줘") >= 0) {
+	var string;
+	string = command.split(' 전');
+	string = string[0];
+	if (string.indexOf('일') >= 0) {
+		if(this.checkBeforeRequest(string, '일')){
+			this.showing = false;
+			this.end();
+			return;
+		}
+	} else if (string.indexOf('주') >= 0) {
+		if(this.checkBeforeRequest(string, '주')){
+			this.showing = false;
+			this.end();
+			return;
+		}
+	} else if (string.indexOf('개월') >= 0) {
+		if(this.checkBeforeRequest(string, '개월')){
+			this.showing = false;
+			this.end();
+			return;
+		}
+	} else if (string.indexOf('년') >= 0) {
+		if(this.checkBeforeRequest(string, '년')){
+			this.showing = false;
+			this.end();
+			return;
+		}
+	}
+	
+    }
+
+    if (response.lastQuery.text === "NOT_NOW") {
 	this.showing = false
 	this.status("error")
 	this.showError(this.callbacks.translate("NOT_NOW"))
