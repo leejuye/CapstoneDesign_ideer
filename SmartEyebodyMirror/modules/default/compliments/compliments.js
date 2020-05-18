@@ -37,6 +37,7 @@ Module.register("compliments", {
 		random: false,
 		noSayCnt: 0,
 		badFrontCnt: 0,
+		badSideCnt: 0,
 		state: "initial",
 		sayTF: false,
 		assistState: "",
@@ -91,6 +92,9 @@ Module.register("compliments", {
 		case "sideResult":
 		case "savePictureOrNot":
 			ret = "bottom_right";
+			break;
+		case "requestGuide":
+			ret = "fullscreen_above";
 			break;
 		default:
 			ret = "middle_center";
@@ -168,7 +172,7 @@ Module.register("compliments", {
 				break;
 
 			// only I'm here
-			case "dressWait":
+			case "dressWait":				
 				switch (payload) {
 				case "imHere":
 					this.config.pass = false;
@@ -238,6 +242,7 @@ Module.register("compliments", {
 					break;
 				case "dressWait":
 					this.config.state = "dressWait";
+					this.sendNotification("SNOWBOY", "dressWait");  // no requestGuide in dressWait
 					this.waitInterval = setInterval(function() {
 						// shutdown now
 					}, 600000);  // wait 10 minutes = 600000
@@ -294,11 +299,11 @@ Module.register("compliments", {
 						}
 						break;
 					case "sideResult":
-						this.config.badFrontCnt++;
-						if (this.config.badFrontCnt === 3) {
+						this.config.badSideCnt++;
+						if (this.config.badSideCnt === 3) {
 							this.sendNotification("PHOTO", "tryAgain");
 							this.config.state = "initial";
-							this.config.badFrontCnt = 0;
+							this.config.badSideCnt = 0;
 						} else {
 							this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
 						}
