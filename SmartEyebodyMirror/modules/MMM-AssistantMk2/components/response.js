@@ -3,7 +3,6 @@
 class AssistantResponseClass {
 	constructor (responseConfig, callbacks, isName) {
 		this.isName = isName;
-		console.log(isName);
 		this.config = responseConfig;
 		this.callbacks = callbacks;
 		this.showing = false;
@@ -206,6 +205,12 @@ class AssistantResponseClass {
 			this.showing = false;
 			this.status("error");
 			this.showError(this.callbacks.translate("NOT_NOW"));
+			this.end();
+			return;
+		}
+
+		if(response.lastQuery.isName) {
+			this.showing = false;
 			this.end();
 			return;
 		}

@@ -41,11 +41,8 @@ Module.register("compliments", {
 		state: "initial",
 		sayTF: false,
 		assistState: "",
-<<<<<<< HEAD
 		userName: "",
-=======
 		pass: false
->>>>>>> a666849e99db019e29bc778e8e2e14b61b794920
 	},
 	lastIndexUsed:-1,
 	// Set currentweather from module
@@ -114,8 +111,86 @@ Module.register("compliments", {
 				key: key,
 				text: "NOT_NOW",
 				chime: false
-			})
+			});
 		}, 100);
+	},
+
+	checkPossibleCommand: function(state, payload) {
+	// Set what commands to receive
+		switch (state) {
+		// only take_pic, lookup, shutdown
+		case "initial":
+			switch (payload) {
+			case "dressCheck":
+			case "shutdownRequest":
+				this.config.pass = false;
+				break;
+			case "imHere":
+				this.config.pass = true;
+				this.makeNotNow("나 왔어");
+				break;
+			case "sayYes":
+				this.config.pass = true;
+				this.makeNotNow("응");
+				break;
+			case "sayNo":
+				this.config.pass = true;
+				this.makeNotNow("아니");
+				break;
+			}
+			break;
+
+		// only yes or no
+		case "dressCheck":
+		case "frontResult":
+		case "sideResult":
+		case "savePicture":
+		case "shutdownRequest":
+			switch (payload) {
+			case "sayYes":
+			case "sayNo":
+				this.config.pass = false;
+				break;
+			case "dressCheck":
+				this.config.pass = true;
+				this.makeNotNow("촬영");
+				break;
+			case "imHere":
+				this.config.pass = true;
+				this.makeNotNow("나 왔어");
+				break;
+			case "shutdownRequest":
+				this.config.pass = true;
+				this.makeNotNow("종료");
+				break;
+			}
+			break;
+
+		// only I'm here
+		case "dressWait":
+			switch (payload) {
+			case "imHere":
+				this.config.pass = false;
+				break;
+			case "dressCheck":
+				this.config.pass = true;
+				this.makeNotNow("촬영");
+				break;
+			case "shutdownRequest":
+				this.config.pass = true;
+				this.makeNotNow("종료");
+				break;
+			case "sayYes":
+				this.config.pass = true;
+				this.makeNotNow("응");
+				break;
+			case "sayNo":
+				this.config.pass = true;
+				this.makeNotNow("아니");
+				break;
+			}
+			break;
+		}
 	},
 
 	// Override notification handler.
@@ -123,92 +198,11 @@ Module.register("compliments", {
 
 		if (notification === "COMPLIMENTS") {
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload + ", from: " + sender);
-			
-			// Set what commands to receive
-			switch (this.config.state) {  
 
-			// only take_pic, lookup, shutdown
-			case "initial":
-				switch (payload) {
-				case "dressCheck":
-				case "shutdownRequest":
-					this.config.pass = false;
-					break;
-				case "imHere":
-					this.config.pass = true;
-					this.makeNotNow("나 왔어");
-					break;
-				case "sayYes":
-					this.config.pass = true;
-					this.makeNotNow("응");
-					break;
-				case "sayNo":
-					this.config.pass = true;
-					this.makeNotNow("아니");
-					break;
-				}
-				break;
-
-			// only yes or no
-			case "dressCheck":
-			case "frontResult":
-			case "sideResult":
-			case "savePicture":
-			case "shutdownRequest":
-				switch (payload) {
-				case "sayYes":
-				case "sayNo":
-					this.config.pass = false;
-					break;
-				case "dressCheck":
-					this.config.pass = true;
-					this.makeNotNow("촬영");
-					break;
-				case "imHere":
-					this.config.pass = true;
-					this.makeNotNow("나 왔어");
-					break;
-				case "shutdownRequest":
-					this.config.pass = true;
-					this.makeNotNow("종료");
-					break;
-				}
-				break;
-
-			// only I'm here
-			case "dressWait":				
-				switch (payload) {
-				case "imHere":
-					this.config.pass = false;
-					break;
-				case "dressCheck":
-					this.config.pass = true;
-					this.makeNotNow("촬영");
-					break;
-				case "shutdownRequest":
-					this.config.pass = true;
-					this.makeNotNow("종료");
-					break;
-				case "sayYes":
-					this.config.pass = true;
-					this.makeNotNow("응");
-					break;
-				case "sayNo":
-					this.config.pass = true;
-					this.makeNotNow("아니");
-					break;
-				}
-				break;
-
-			}
-			//checkUserName
-			if(payload.userName) {
-				this.config.userName = payload.userName;
-				payload = payload.payload;
-			}
+			this.checkPossibleCommand(this.config.state, payload);
 
 			// Execute commands
-			if (this.config.pass === false) {
+			if (!this.config.pass) {
 				clearInterval(this.compInterval);
 
 				// Remove last compliment
@@ -221,83 +215,58 @@ Module.register("compliments", {
 					this.filenumber = payload.number;
 					payload = payload.payload;
 				}
-
-			switch(payload){
-			case "CURRENTWEATHER_DATA":
-				this.setCurrentWeatherType(payload.data);
-				break;
-			case "dressCheck":
-				this.config.state = "dressCheck";
-				setTimeout(() => {
-					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-				}, 7000);
-				break;
-			case "dressWait":
-				this.config.state = "dressWait";
-				this.waitInterval = setInterval(function() {
-					// shutdown now
-				}, 600000);  // wait 10 minutes = 600000
-				break;
-			case "imHere":
-				if (this.config.state === "dressWait") {
-					this.sendNotification("PHOTO", "TAKE_PIC");
-					this.config.state = "";
-				} else {
-					this.sendNotification("ASSISTANT_ERROR");
+				//checkUserName
+				if(payload.userName) {
+					this.config.userName = payload.userName;
+					payload = payload.payload;
 				}
-				break;
-			case "shutdownRequest":
-				this.config.state = payload;
-				setTimeout(() => {
-					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-				}, 3000);
-				break;
-			case "shutdownNow":
-				this.config.state = payload;
-				break;
-			case "signUpRequest":
-				this.config.state = payload;
-				// this.config.state = "singInRequest";
-				setTimeout(() => {
-					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
-				}, 3000);
-				break;
-			case "sayYes":
-				switch(this.config.state){
+
+				this.descCommand = payload;
+				console.log(payload);
+				this.lastIndexUsed = -1;
+				this.compInterval = setInterval(function() {
+					self.updateDom(self.config.fadeSpeed);
+				}, this.config.updateInterval);
+
+				this.sendNotification("CHANGE_POSITIONS",
+					modules = {
+						"compliments":{
+							visible: "true",
+							position: this.getLocation(),
+						}
+					}
+				);
+
+				switch(payload){
+				case "CURRENTWEATHER_DATA":
+					this.setCurrentWeatherType(payload.data);
+					break;
 				case "dressCheck":
-					this.config.state = "dressCheck";
+					this.config.state = payload;
 					setTimeout(() => {
 						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 					}, 7000);
 					break;
 				case "dressWait":
-					this.config.state = "dressWait";
-					this.sendNotification("SNOWBOY", "dressWait");  // no requestGuide in dressWait
+					this.config.state = payload;
 					this.waitInterval = setInterval(function() {
-						// shutdown now
+					// shutdown now
 					}, 600000);  // wait 10 minutes = 600000
 					break;
 				case "imHere":
 					this.sendNotification("PHOTO", "TAKE_PIC");
 					break;
-				case "frontResult":
-					this.config.state = "frontResult";
-					break;
-				case "sideResult":
-					this.config.state = "sideResult";
-					break;
-				case "savePicture":
-					this.config.state = "savePicture";
-					break;
 				case "shutdownRequest":
-					this.config.state = "shutdownRequest";
-					this.config.text = payload;
+					this.config.state = payload;
 					setTimeout(() => {
 						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 					}, 3000);
 					break;
-				case "shutdownNow":
-					this.config.text = payload;
+				case "signUpRequest":
+					this.config.state = payload;
+					setTimeout(() => {
+						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
+					}, 3000);
 					break;
 				case "sayYes":
 					switch(this.config.state){
@@ -305,7 +274,7 @@ Module.register("compliments", {
 						this.sendNotification("PHOTO", "TAKE_PIC");
 						break;
 					case "frontResult":
-						// side start
+					// side start
 						this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
 						break;
 					case "shutdownRequest":
@@ -340,14 +309,14 @@ Module.register("compliments", {
 						break;
 					case "shutdownRequest":
 						break;
+					default:
+						this.config.state = payload;
+						break;
 					}
 					if (this.config.state !== "dressWait") {
 						this.config.state = "initial";
 					}
 				}
-			default:
-				this.config.state = payload;
-				break;
 			}
 			this.config.pass = false;
 		} else if (notification === "ASSISTANT_LISTEN") {  // Assistant is listening
@@ -382,9 +351,7 @@ Module.register("compliments", {
 				this.config.sayTF = false;
 			}
 		}
-	}
 	},
-
 
 	/* randomIndex(compliments)
 	 * Generate a random index for a list of compliments.
