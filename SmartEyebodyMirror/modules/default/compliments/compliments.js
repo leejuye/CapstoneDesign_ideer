@@ -77,11 +77,11 @@ Module.register("compliments", {
 		}, this.config.updateInterval);
 
 		//TEST
-		/*var self = this;
+		var self = this;
 		setTimeout(function() {
-			self.sendNotification("PHOTO", "SHOW_RESULT");
+			self.sendNotification("PHOTO", "TAKE_PIC");
 			Log.log("@@@@@@@");
-		}, 5000);*/
+		}, 5000);
 	},
 	// Module location
 	getLocation: function() {
@@ -175,7 +175,19 @@ Module.register("compliments", {
 			case "dressCheck":
 				this.config.pass = true;
 				this.makeNotNow("촬영");
+			case "savePictureOrNot" :
+				this.config.state = "savePictureOrNot";
 				break;
+			case "savePicture" :
+				this.config.state = "savePicture";
+				this.sendNotification("PHOTO", "SHOW_COMPARE");
+				break;	
+			case "deletePicture" :
+				this.config.state = "deletePicture";
+				this.sendNotification("PHOTO", "SHOW_COMPARE");
+				break;
+			case "photoNotExist" :
+				this.config.state = "photoNotExist";
 			case "shutdownRequest":
 				this.config.pass = true;
 				this.makeNotNow("종료");
@@ -256,6 +268,12 @@ Module.register("compliments", {
 				case "imHere":
 					this.sendNotification("PHOTO", "TAKE_PIC");
 					break;
+				case "sideResult":
+					this.sendNotification("PHOTO", "SHOW_RESULT");
+					break;
+				case "savePictureOrNot":
+					this.sendNotification("PHOTO", "COUNT_FILE");
+					break;
 				case "shutdownRequest":
 					this.config.state = payload;
 					setTimeout(() => {
@@ -316,6 +334,26 @@ Module.register("compliments", {
 					if (this.config.state !== "dressWait") {
 						this.config.state = "initial";
 					}
+				case "frontResult":
+					this.config.badFrontCnt++;
+					if (this.config.badFrontCnt === 3) {
+						this.sendNotification("PHOTO", "tryAgain");
+						this.config.badFrontCnt = 0;
+					} else {
+						this.sendNotification("PHOTO", "RE_TAKE_PIC");
+					}
+					break;
+				case "sideResult":
+					this.config.badSideCnt++;
+					if (this.config.badSideCnt === 3) {
+						this.sendNotification("PHOTO", "tryAgain");
+						this.config.badSideCnt = 0;
+					} else {
+						this.sendNotification("PHOTO", "RE_TAKE_PIC_SIDE");
+					}
+					break;
+				if (this.config.state !== "dressWait") {
+					this.config.state = "";
 				}
 			}
 			this.config.pass = false;

@@ -5,25 +5,33 @@ const dbHelper = require('../../db_helper');
 const fs = require('fs');
 
 var pythonStarted = false;
+const parts = ["id", "shoulder", "chest", "waist", "hip", "thigh", "calf",
+	"weight", "bmi", "is_front", "file_name"]
 
 module.exports = NodeHelper.create({
-	numberOfFiles: function() {
-		const execSync = require('child_process').execSync;
-		const path = "/home/pi/CapstoneDesign_ideer/SmartEyebodyMirror/modules/default/photo/image/";
-		const cmd = 'find ' + path + ' -type f -name "*_front.jpg" | wc -l';
+	numberOfFiles: async function(payload) {
+		console.log('@@@@numberOfFiles@@@@@');
+			const execSync = require('child_process').execSync;
+			const path = "/home/pi/CapstoneDesign_ideer/SmartEyebodyMirror/modules/default/photo/image/";
+			const cmd = 'find ' + path + ' -type f -name "*_front.jpg" | wc -l';
 
-		this.filenum = execSync(cmd);
-		this.filenum = parseInt(this.filenum);
-		console.log("filenumber: " + this.filenum);
-		console.log("type: " + typeof(this.filenum));
+			this.filenum = await execSync(cmd);
+			this.filenum = await parseInt(this.filenum);
+			console.log(this.filenum);
+			
+			if(payload === "recall") {
+				this.sendSocketNotification("FILE_NUMBER_CALL", this.filenum);
+			} else if(payload === "save") {
+				this.sendSocketNotification("FILE_NUMBER_SAVE", this.filenum);
+			}
 	},
-
+	
 	dbConn: async function(qry, params) {
 		var conn, results;
 		try{
 			conn = await dbHelper.getConnection();
 			results = await conn.query(qry, params);
-			console.log('@@@@RESULT: ' + JSON.stringify(results[0]));
+			console.log('@@@@RESULT: ' + JSON.stringify(results));
 		} catch(err) {
 			console.log('@@@@ERROR: ' + err);
 			throw err;
@@ -50,23 +58,63 @@ module.exports = NodeHelper.create({
 
 	},
 
+	dbGetBeforeFileName: async function(payload) {
+		var qry = "SELECT base_file FROM users WHERE id = ?";
+		var beforeFileName = await this.dbConn(qry, payload);
+		this.sendSocketNotification("HERE_BEFORE_FILENAME", beforeFileName);
+	},
+
+	dbGetAfterFileName: async function(payload) {
+		var qry = "SELECT DATE_FORMAT(file_name, '%Y%m%d%H%i%S') FROM size_info WHERE id = 1 ORDER BY ABS(TIMESTAMPDIFF(SECOND, DATE_ADD(now(), INTERVAL ? DAY), file_name)) LIMIT 1";
+		//var qry = "SELECT DATE_FORMAT(date, '%Y%m%d%H%i%S') FROM size_info WHERE id = 1 ORDER BY ABS(TIMESTAMPDIFF(SECOND, DATE_ADD(now(), INTERVAL ? DAY), date)) LIMIT 1";
+		var afterFileName = await this.dbConn(qry, [payload.id, payload.term]);
+		this.sendSocketNotification("HERE_AFTER_FILENAME", afterFileName);
+	},
+
+	setSizeInfo: async function(data) {
+		var qry = "INSERT INTO size_info VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+
+		const arr = [];
+		data = JSON.parse(data);
+
+		for (var i in parts) {
+			arr.push(data[parts[i]]);
+		}
+		this.dbConn(qry, arr);
+	},
+
+	deleteSizeInfo: function(data) {
+		var qry = "DELETE FROM size_info WHERE file_name = ? and is_front = ?";
+		var isFront = data.substring(15, data.length - 4) == "front" ? true : false;
+		console.log("filename: " + data.substring(0, 14)+" annd :" + isFront);
+
+		this.dbConn(qry, [data.substring(0, 14), isFront]);
+	},
+
 	socketNotificationReceived: function(notification, payload) {
+		console.log("!!!!! noti: " + notification + " pay: " + payload);
 		if(notification === "PREVIEW") {
 			var self = this;
 			PythonShell.run("modules/default/photo/preview.py", {args: [payload]},
 			function (err, result) {
+				console.log('########################' + result);
 				if (err) throw err;
+				self.setSizeInfo(result);
 				self.sendSocketNotification("PREVIEW_DONE",payload);
 			});
 		} else if(notification === "REMOVE_PIC") {
 			fs.unlinkSync("modules/default/photo/image/" + payload);
+			this.deleteSizeInfo(payload);
 		} else if(notification === "FILE_NUM") {
-			this.numberOfFiles();
-			this.sendSocketNotification("FILE_NUMBER", this.filenum);
+			this.numberOfFiles(payload);
 		} else if(notification === "GET_INFO") {
 			this.getSizeInfo(payload);
 		} else if(notification === "TEST") {
 			this.dbConn("select * from size_info");
+		} else if(notification === "GET_BEFORE_FILENAME") {
+			this.dbGetBeforeFileName(payload);
+		} else if(notification === "GET_AFTER_FILENAME") {
+			this.dbGetAfterFileName(payload);
 		}
 	}
 
