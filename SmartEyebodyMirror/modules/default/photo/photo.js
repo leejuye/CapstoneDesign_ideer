@@ -24,7 +24,7 @@ Module.register("photo",{
 		//this.term = -7;
 		//this.sendSocketNotification("GET_AFTER_FILENAME", {"id": this.id, "term": this.term});
 		//TEST END
-		
+
 	 	Log.info("Starting module: " + this.name);
 	},
 
@@ -109,13 +109,13 @@ Module.register("photo",{
 		if(notification === "PHOTO") {
 			Log.log(this.name + "received a notification: " + notification + ", payload : " + payload);
 		 	this.initImage();
-		 	
+
 		 	//SHOW_COMPARE
 			if(payload.term) {
 				this.term = payload.term;
 				payload = payload.payload;
 			}
-			
+
 			switch(payload) {
 			case "TAKE_PIC":
 				this.initFileName();
@@ -142,13 +142,13 @@ Module.register("photo",{
 				this.sendNotification("COMPLIMENTS", "dressWait");
 				break;
 			case "RE_TAKE_PIC":
+				this.sendSocketNotification("REMOVE_PIC", this.fileName + this.fileNameSuffix);
 				if(this.fileNameSuffix === '_front.jpg'){
 					this.initFileName();
 					this.sendNotification("COMPLIMENTS", "frontStart");
 				} else {
 					this.sendNotification("COMPLIMENTS", "sideStart");
 				}
-				this.sendSocketNotification("REMOVE_PIC", this.fileName + this.fileNameSuffix);
 				this.sendSocketNotification("PREVIEW", this.fileName + this.fileNameSuffix);
 				break;
 			case "SHOW_RESULT":

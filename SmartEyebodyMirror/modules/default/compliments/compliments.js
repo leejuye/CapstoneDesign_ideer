@@ -75,11 +75,11 @@ Module.register("compliments", {
 		}, this.config.updateInterval);
 
 		//TEST
-		/*var self = this;
+		var self = this;
 		setTimeout(function() {
-			self.sendNotification("PHOTO", "SHOW_RESULT");
+			self.sendNotification("PHOTO", "TAKE_PIC");
 			Log.log("@@@@@@@");
-		}, 5000);*/
+		}, 5000);
 	},
 	// Module location
 	getLocation: function() {
@@ -217,7 +217,7 @@ Module.register("compliments", {
 						this.sendNotification("PHOTO", "tryAgain");
 						this.config.badFrontCnt = 0;
 					} else {
-						this.sendNotification("PHOTO", "TAKE_PIC");
+						this.sendNotification("PHOTO", "RE_TAKE_PIC");
 					}
 					break;
 				case "sideResult":
@@ -226,9 +226,9 @@ Module.register("compliments", {
 						this.sendNotification("PHOTO", "tryAgain");
 						this.config.badSideCnt = 0;
 					} else {
-						this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
+						this.sendNotification("PHOTO", "RE_TAKE_PIC_SIDE");
 					}
-					break;	
+					break;
 				case "savePictureOrNot":
 					this.sendNotification("PHOTO", "REMOVE_RESULT");
 					break;

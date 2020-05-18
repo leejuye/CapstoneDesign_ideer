@@ -28,7 +28,7 @@ def playSound(sfx, check = False):
 
 def toInfo(sizeInfo):
     try:
-        print(sizeInfo)
+        print(json.dumps(sizeInfo))
     except Exception:
         pass
     sys.stdout.flush()
@@ -86,12 +86,13 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     # crop the image
     x,y,w,h = roi
     dst = dst[y:y+h, x:x+w]
-    
+
     image = dst
-    addedImage = cv2.add(image,overlay)
-    addedImage = np.fliplr(addedImage)
-    addedImage = np.array(addedImage)
-    
+    addedImage = image
+    #addedImage = cv2.add(image,overlay)
+    #addedImage = np.fliplr(addedImage)
+    #addedImage = np.array(addedImage)
+
     #count down text
     cnt = time.time()-start
     if cnt >= 9:
@@ -137,5 +138,7 @@ dst = np.fliplr(dst)
 cv2.imwrite(curPath + "/image/" + sys.argv[1],dst)
 #cv2.imwrite(curPath + "/image/calibresult.png",dst)
 
-sizeInfo = [1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 12, True, 20200518074355]
+sizeInfo = { "id":141,"shoulder":1.1, "chest":2.2, "waist": 3.3, "hip":4.4,
+	"thigh":5.5, "calf":6.6, "weight":7.7, "bmi":12,
+	"is_front":(sys.argv[1][len(sys.argv[1])-5] == 't'), "file_name":sys.argv[1][0:14] }
 toInfo(sizeInfo)
