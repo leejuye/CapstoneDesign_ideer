@@ -1,7 +1,9 @@
 /* Common AMk2 Class */
 
 class AssistantResponseClass {
-	constructor (responseConfig, callbacks) {
+	constructor (responseConfig, callbacks, isName) {
+		this.isName = isName;
+		console.log(isName);
 		this.config = responseConfig;
 		this.callbacks = callbacks;
 		this.showing = false;
@@ -201,24 +203,24 @@ class AssistantResponseClass {
 		}
 
 		var normalResponse = (response) => {
-			this.showing = false;
-			this.status("error");
-			this.showError(this.callbacks.translate("NO_KEYWORD"));
-			this.end();
-			return;
-			/*
-			this.showing = true;
-			this.callbacks.A2D(response);
-			this.status("reply");
-			var so = this.showScreenOutput(response);
-			var ao = this.playAudioOutput(response);
-			if (ao) {
-				log("Wait audio to finish");
-			} else {
-				log("No response");
+			if(!this.isName) {
+				this.showing = false;
+				this.status("error");
+				this.showError(this.callbacks.translate("NO_KEYWORD"));
 				this.end();
-      }
-      */
+				return;
+			}
+			// this.showing = true;
+			// this.callbacks.A2D(response);
+			// this.status("reply");
+			// var so = this.showScreenOutput(response);
+			// var ao = this.playAudioOutput(response);
+			// if (ao) {
+			// 	log("Wait audio to finish");
+			// } else {
+			// 	log("No response");
+			// 	this.end();
+			// }
 		};
 		this.postProcess(
 			response,

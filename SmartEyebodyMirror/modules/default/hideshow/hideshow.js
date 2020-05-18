@@ -19,7 +19,8 @@ Module.register("hideshow",{
 	// },
 
 	notificationReceived: function (notification, payload, sender) {
-		if (notification === "HIDE_ALL_MODULES") {
+		switch(notification) {
+		case "HIDE_ALL_MODULES":
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload);
 			this.sendNotification("COMPLIMENTS", "shutdownNow");
 			const self = this;
@@ -45,6 +46,9 @@ Module.register("hideshow",{
 					}
 				);
 			}, 5000);
+			break;
+		default:
+			break;
 		}
 		// else if (notification === "ASSISTANT_ACTIVATE") {
 		// 	this.sendNotification("CHANGE_POSITIONS",

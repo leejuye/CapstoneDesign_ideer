@@ -39,7 +39,8 @@ Module.register("compliments", {
 		badFrontCnt: 0,
 		state: "",
 		sayTF: false,
-		assistState: ""
+		assistState: "",
+		userName: "",
 	},
 	lastIndexUsed:-1,
 	// Set currentweather from module
@@ -115,6 +116,11 @@ Module.register("compliments", {
 				this.filenumber = payload.number;
 				payload = payload.payload;
 			}
+			//checkUserName
+			if(payload.userName) {
+				this.config.userName = payload.userName;
+				payload = payload.payload;
+			}
 
 			this.descCommand = payload;
 			console.log(payload);
@@ -157,26 +163,17 @@ Module.register("compliments", {
 					this.sendNotification("ASSISTANT_ERROR");
 				}
 				break;
-			case "frontResult" :
-				this.config.state = "frontResult";
-				break;
-			case "sideResult" :
-				this.config.state = "sideResult";
-				break;
-			case "savePicture" :
-				this.config.state = "savePicture";
-				break;
 			case "shutdownRequest":
-				this.config.text = payload;
+				this.config.state = payload;
 				setTimeout(() => {
 					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 				}, 3000);
 				break;
 			case "shutdownNow":
-				this.config.text = payload;
+				this.config.state = payload;
 				break;
 			case "signUpRequest":
-				this.config.text = payload;
+				this.config.state = payload;
 				// this.config.state = "singInRequest";
 				setTimeout(() => {
 					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
@@ -216,9 +213,11 @@ Module.register("compliments", {
 				if (this.config.state !== "dressWait") {
 					this.config.state = "";
 				}
+			default:
+				this.config.state = payload;
+				break;
 			}
-		}
-		if (notification === "ASSISTANT_LISTEN") {  // Assistant is listening
+		}else if (notification === "ASSISTANT_LISTEN") {  // Assistant is listening
 			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 			this.config.assistState = "listen";
 			this.config.sayTF = false;
@@ -228,28 +227,29 @@ Module.register("compliments", {
 		} else if (notification === "ASSISTANT_CONFIRMATION") {  // You said something
 			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 			this.config.sayTF = true;
-		} else if (notification === "ASSISTANT_ERROR") {
-			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
-			if (this.config.assistState === "listen") {
-				if (this.config.sayTF === true) {  // You said non-keyword
-					setTimeout(() => {
-						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-					}, 3000);
-				} else {  // You said nothing
-					this.config.noSayCnt++;
-					if (this.config.noSayCnt === 3) {
-						// shutdown now
-						this.config.noSayCnt = 0;
-					} else {
-						setTimeout(() => {
-							this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-						}, 3000);
-					}
-				}
-				this.config.assistState = "";
-				this.config.sayTF = false;
-			}
 		}
+		// else if (notification === "ASSISTANT_ERROR") {
+		// 	Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
+		// 	if (this.config.assistState === "listen") {
+		// 		if (this.config.sayTF === true) {  // You said non-keyword
+		// 			setTimeout(() => {
+		// 				this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+		// 			}, 3000);
+		// 		} else {  // You said nothing
+		// 			this.config.noSayCnt++;
+		// 			if (this.config.noSayCnt === 3) {
+		// 				// shutdown now
+		// 				this.config.noSayCnt = 0;
+		// 			} else {
+		// 				setTimeout(() => {
+		// 					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+		// 				}, 3000);
+		// 			}
+		// 		}
+		// 		this.config.assistState = "";
+		// 		this.config.sayTF = false;
+		// 	}
+		// }
 
 	},
 	/* randomIndex(compliments)
@@ -366,8 +366,12 @@ Module.register("compliments", {
 		wrapper.className = this.config.classes ? this.config.classes : "thin large bright pre-line";
 		// get the compliment text
 		var complimentText = this.randomCompliment();
-		if( this.descCommand === "savePicture") {
+		if(this.descCommand === "savePicture") {
 			complimentText = [complimentText.slice(0,13), this.filenumber, complimentText.slice(13)].join("");
+		}
+		if(this.descCommand === "checkUserName") {
+			complimentText = `${this.config.userName}${complimentText}`;
+			this.config.userName = "";
 		}
 		// split it into parts on newline text
 		var parts= complimentText.split("\n");
@@ -377,7 +381,7 @@ Module.register("compliments", {
 		for (part of parts){
 			// create a text element for each part
 			compliment.appendChild(document.createTextNode(part));
-			// add a break `
+			// add a break
 			compliment.appendChild(document.createElement("BR"));
 		}
 		// remove the last break
