@@ -61,6 +61,7 @@
   "dependencies": {
     "colors": "^1.1.2",
     "console-stamp": "^0.2.9",
+    "cookie-parser": "^1.4.5",
     "express": "^4.16.2",
     "express-ipfilter": "^1.0.1",
     "express-session": "^1.17.1",

@@ -56,178 +56,178 @@ var config = {
 			module: "photo",
 			position: "top_left"
 		},
-		{
-			module: "MMM-AssistantMk2",
-			position: "top_left",  // fullscreen_above, top_left
-			config: {
-				debug: false,
-				useA2D: true,
-				ui: "Simple",	// Fullscreen, Classic, Classic2, Simple
-				assistantConfig: {
-					latitude: 51.508530,
-					longitude: -0.076132,
-			  	},
-				responseConfig: {
-					useHTML5: true,
-					useScreenOutput: true,
-					useAudioOutput: false,
-					useChime: true,
-					timer: 3000,
-					myMagicWord: true,
-					delay: 0.5,
-					//Your prefer sound play program. By example, if you are running this on OSX, `afplay` could be available.
-					//needed if you don't use HTML5
-					playProgram: "mpg321",
-					chime: {
-					  beep: "beep.mp3",
-					  error: "error.mp3",
-					  continue: "continue.mp3",
-					  open: "Google_beep_open.mp3",
-					  close: "Google_beep_close.mp3",
-					},
-					// false - animated icons, 'standby' - static icons only for standby state, true - all static icons
-					useStaticIcons: false,
-				},
-				micConfig: {
-					recorder: "arecord",
-					device: "plughw:1",  // You should use yours
-				},
-				defaultProfile: "default",
-				profiles: {
-  					"default": {
-    					profileFile: "default.json",
-    					lang: "ko-KR"  // ko-KR, en-US
-  					}
-				},
-				/*recipes: [
-					"test_with_soundExec.js",
-					"Reboot-Restart-Shutdown.js",
-					"actions.js"
-				],*/
-				transcriptionHooks: {	// Recognize all words that contain patterns.
-					"CAMERA": {
-						pattern: "(촬영|찍어)",  // No spaces
-						command: "CAMERA_START"
-					},
-					"IM_HERE": {
-						pattern: "나 왔어",  // No spaces but ok in this case
-						command: "IM_HERE"
-					},
-					"SHUTDOWN": {
-						pattern: "(종료|꺼 줘)",
-						command: "SHUTDOWN_REQUEST"
-					},
-					"SIGN_UP": {
-						pattern: "(신규 등록|회원 가입)",
-						command: "SIGN_UP_REQUEST"
-					},
-					"YES": {
-						pattern: "응",
-						command: "YES"
-					},
-					"NO": {
-						pattern: "아니",
-						command: "NO"
-					},
-				},
-				actions: {},
-				commands: {
-					"CAMERA_START": {
-						soundExec: {
-							chime: "open"
-						},
-						notificationExec: {
-							notification: "COMPLIMENTS",
-							payload: "dressCheck"
-						}
-					},
-					"IM_HERE": {
-						soundExec: {
-							chime: "open"
-						},
-						notificationExec: {
-							notification: "COMPLIMENTS",
-							payload: "imHere"
-						}
-					},
-					"SHUTDOWN_REQUEST": {
-						soundExec: {
-							chime: "open"
-						},
-						notificationExec: {
-							notification: "COMPLIMENTS",
-							payload: "shutdownRequest"
-						},
-					},
-					"SIGN_UP_REQUEST": {
-						soundExec: {
-							chime: "open"
-						},
-						notificationExec: {
-							notification: "COMPLIMENTS",
-							payload: "signUpRequest"
-						},
-					},
-					"YES": {
-						soundExec: {
-							chime: "open"
-						},
-						notificationExec: {
-							notification: "COMPLIMENTS",
-							payload: "sayYes"
-						}
-					},
-					"NO": {
-						soundExec: {
-							chime: "close"
-						},
-						notificationExec: {
-							notification: "COMPLIMENTS",
-							payload: "sayNo"
-						}
-					},
-				},
-				plugins: {
-					onReady: [],
-					onBeforeAudioResponse: [],
-					onAfterAudioResponse: [],
-					onBeforeScreenResponse: [],
-					onAfterScreenResponse: [],
-					onBeforeInactivated: [],
-					onAfterInactivated: [],
-					onBeforeActivated: [],
-					onAfterActivated: [],
-					onError: [],
-					onBeforeNotificationReceived: [],
-					onAfterNotificationReceived: [],
-					onBeforeSocketNotificationReceived: [],
-					onAfterSocketNotificationReceived: [],
-				},
-				responseHooks: {},
-			},
-		},
-		{
-			module: "MMM-Snowboy",
-			config: {
-			  debug: false,
-			  AudioGain: 2.0,
-			  Frontend: true,
-			  Model: "jarvis",
-			  Sensitivity: 1.0,
-			  micConfig: {
-					recorder: "arecord",
-					device: "plughw:1"  // You should use yours
-			  },
-			  onDetected: {
-					notification: "ASSISTANT_ACTIVATE",
-					parameters: {
-				  type: "MIC",
-				  profile: "default",
-				  chime: true
-				 }
-			  }
-			}
-		},
+		// {
+		// 	module: "MMM-AssistantMk2",
+		// 	position: "top_left",  // fullscreen_above, top_left
+		// 	config: {
+		// 		debug: false,
+		// 		useA2D: true,
+		// 		ui: "Simple",	// Fullscreen, Classic, Classic2, Simple
+		// 		assistantConfig: {
+		// 			latitude: 51.508530,
+		// 			longitude: -0.076132,
+		// 	  	},
+		// 		responseConfig: {
+		// 			useHTML5: true,
+		// 			useScreenOutput: true,
+		// 			useAudioOutput: false,
+		// 			useChime: true,
+		// 			timer: 3000,
+		// 			myMagicWord: true,
+		// 			delay: 0.5,
+		// 			//Your prefer sound play program. By example, if you are running this on OSX, `afplay` could be available.
+		// 			//needed if you don't use HTML5
+		// 			playProgram: "mpg321",
+		// 			chime: {
+		// 			  beep: "beep.mp3",
+		// 			  error: "error.mp3",
+		// 			  continue: "continue.mp3",
+		// 			  open: "Google_beep_open.mp3",
+		// 			  close: "Google_beep_close.mp3",
+		// 			},
+		// 			// false - animated icons, 'standby' - static icons only for standby state, true - all static icons
+		// 			useStaticIcons: false,
+		// 		},
+		// 		micConfig: {
+		// 			recorder: "arecord",
+		// 			device: "plughw:1",  // You should use yours
+		// 		},
+		// 		defaultProfile: "default",
+		// 		profiles: {
+  		// 			"default": {
+    	// 				profileFile: "default.json",
+    	// 				lang: "ko-KR"  // ko-KR, en-US
+  		// 			}
+		// 		},
+		// 		/*recipes: [
+		// 			"test_with_soundExec.js",
+		// 			"Reboot-Restart-Shutdown.js",
+		// 			"actions.js"
+		// 		],*/
+		// 		transcriptionHooks: {	// Recognize all words that contain patterns.
+		// 			"CAMERA": {
+		// 				pattern: "(촬영|찍어)",  // No spaces
+		// 				command: "CAMERA_START"
+		// 			},
+		// 			"IM_HERE": {
+		// 				pattern: "나 왔어",  // No spaces but ok in this case
+		// 				command: "IM_HERE"
+		// 			},
+		// 			"SHUTDOWN": {
+		// 				pattern: "(종료|꺼 줘)",
+		// 				command: "SHUTDOWN_REQUEST"
+		// 			},
+		// 			"SIGN_UP": {
+		// 				pattern: "(신규 등록|회원 가입)",
+		// 				command: "SIGN_UP_REQUEST"
+		// 			},
+		// 			"YES": {
+		// 				pattern: "응",
+		// 				command: "YES"
+		// 			},
+		// 			"NO": {
+		// 				pattern: "아니",
+		// 				command: "NO"
+		// 			},
+		// 		},
+		// 		actions: {},
+		// 		commands: {
+		// 			"CAMERA_START": {
+		// 				soundExec: {
+		// 					chime: "open"
+		// 				},
+		// 				notificationExec: {
+		// 					notification: "COMPLIMENTS",
+		// 					payload: "dressCheck"
+		// 				}
+		// 			},
+		// 			"IM_HERE": {
+		// 				soundExec: {
+		// 					chime: "open"
+		// 				},
+		// 				notificationExec: {
+		// 					notification: "COMPLIMENTS",
+		// 					payload: "imHere"
+		// 				}
+		// 			},
+		// 			"SHUTDOWN_REQUEST": {
+		// 				soundExec: {
+		// 					chime: "open"
+		// 				},
+		// 				notificationExec: {
+		// 					notification: "COMPLIMENTS",
+		// 					payload: "shutdownRequest"
+		// 				},
+		// 			},
+		// 			"SIGN_UP_REQUEST": {
+		// 				soundExec: {
+		// 					chime: "open"
+		// 				},
+		// 				notificationExec: {
+		// 					notification: "COMPLIMENTS",
+		// 					payload: "signUpRequest"
+		// 				},
+		// 			},
+		// 			"YES": {
+		// 				soundExec: {
+		// 					chime: "open"
+		// 				},
+		// 				notificationExec: {
+		// 					notification: "COMPLIMENTS",
+		// 					payload: "sayYes"
+		// 				}
+		// 			},
+		// 			"NO": {
+		// 				soundExec: {
+		// 					chime: "close"
+		// 				},
+		// 				notificationExec: {
+		// 					notification: "COMPLIMENTS",
+		// 					payload: "sayNo"
+		// 				}
+		// 			},
+		// 		},
+		// 		plugins: {
+		// 			onReady: [],
+		// 			onBeforeAudioResponse: [],
+		// 			onAfterAudioResponse: [],
+		// 			onBeforeScreenResponse: [],
+		// 			onAfterScreenResponse: [],
+		// 			onBeforeInactivated: [],
+		// 			onAfterInactivated: [],
+		// 			onBeforeActivated: [],
+		// 			onAfterActivated: [],
+		// 			onError: [],
+		// 			onBeforeNotificationReceived: [],
+		// 			onAfterNotificationReceived: [],
+		// 			onBeforeSocketNotificationReceived: [],
+		// 			onAfterSocketNotificationReceived: [],
+		// 		},
+		// 		responseHooks: {},
+		// 	},
+		// },
+		// {
+		// 	module: "MMM-Snowboy",
+		// 	config: {
+		// 	  debug: false,
+		// 	  AudioGain: 2.0,
+		// 	  Frontend: true,
+		// 	  Model: "jarvis",
+		// 	  Sensitivity: 1.0,
+		// 	  micConfig: {
+		// 			recorder: "arecord",
+		// 			device: "plughw:1"  // You should use yours
+		// 	  },
+		// 	  onDetected: {
+		// 			notification: "ASSISTANT_ACTIVATE",
+		// 			parameters: {
+		// 		  type: "MIC",
+		// 		  profile: "default",
+		// 		  chime: true
+		// 		 }
+		// 	  }
+		// 	}
+		// },
 		/*{
 			module: "Hello-Lucy",
 			position: "top_right",

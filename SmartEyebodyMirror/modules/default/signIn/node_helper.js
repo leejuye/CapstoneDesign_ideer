@@ -1,29 +1,6 @@
 "use strict";
 const NodeHelper = require("node_helper");
 const dbHelper = require("../../db_helper");
-let express = require("express");
-let app = express();
-let sessionParser = require("express-session");
-let router = express.Router();
-
-app.use(sessionParser({
-	secret: "yunjin0925",
-	resave: true,
-	saveUninitialized: true
-}));
-
-app.use("/", router);
-
-router.route("/confirmSession").get(function (req, res) {
-	console.log("세션을 확인해보자!!");
-	let msg = "세션이 존재하지 않습니다.";
-	if (req.session.user) {
-		msg = `${req.session.user.name}님의 나이는 ${req.session.user.age}살 입니다. 세션의 생성된 시간 : ${req.session.user.createCurTime}`;
-	}
-
-	res.send(msg);
-
-});
 
 module.exports = NodeHelper.create({
 	dbConn: async function(qry) {
@@ -32,6 +9,7 @@ module.exports = NodeHelper.create({
 			conn = await dbHelper.getConnection();
 			results = await conn.query(qry);
 		} catch(err) {
+			this.sendSocketNotification("SIGN_IN_ERRER");
 			throw err;
 		} finally {
 			if(conn) {conn.end();}
@@ -41,36 +19,17 @@ module.exports = NodeHelper.create({
 		}
 	},
 
-	getUser: async function(payload) {
+	getUser: async function(payload, signIn=false) {
 		const user = await this.dbConn("select * from users where name = '"+payload+"'");
-		return user;
+		if(signIn) {
+			if(user) {this.sendSocketNotification("SIGN_IN_SUCCESS", user);}
+			else {this.sendSocketNotification("NOT_EXIST");}
+		}
 	},
 
 	createUser: async function(payload) {
-		await this.dbConn("insert into users (name) value ('"+payload+"')");
-	},
-
-	signInUser: function(userId) {
-		router.route("/").get(function (req, res) {
-			console.log("루트접속");
-
-			if(req.session.user){
-				console.log("세션이 이미 존재합니다.");
-			}else{
-				req.session.user = {
-					"id" : userId,
-				};
-				console.log("세션 저장 완료! ");
-			}
-			res.redirect("/confirmSession");
-		});
-	},
-	logoutUser: function() {
-		router.route("/destroySession").get(function(req,res){
-			req.session.destroy();
-			console.log("session을 삭제하였습니다.");
-			res.redirect("/confirmSession");
-		});
+		const user = await this.dbConn("insert into users (name) value ('"+payload+"')");
+		this.getUser(payload, true);
 	},
 
 	socketNotificationReceived: function(notification, payload) {
@@ -80,12 +39,10 @@ module.exports = NodeHelper.create({
 				this.sendSocketNotification("ALREADY_EXIST");
 			} else {
 				this.createUser(payload);
-				user = this.getUser(payload);
-				this.signInUser(user.id);
+				user = this.getUser(payload, true);
 			}
 		} else if (notification === "SIGN_IN") {
-			user = this.getUser(payload);
-			this.signInUser(user.id);
+			this.getUser(payload, true);
 		}
 	}
 
