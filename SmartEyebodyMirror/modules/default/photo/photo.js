@@ -78,7 +78,6 @@ Module.register("photo",{
 		} else if(notification === "HERE_INFO") {
 			this.whatPage = "comparePage";
 			this.comparePageData = payload;
-			Log.log(payload);
 		}
 	 	this.updateDom();
 	},
@@ -93,7 +92,7 @@ Module.register("photo",{
 				this.term = payload.term;
 				payload = payload.payload;
 			}
-			
+
 			//SHOW_COMPARE
 			if(payload.isfront || !payload.isfront) {
 				this.isfront = payload.isfront;
@@ -199,6 +198,13 @@ Module.register("photo",{
 			});
 	},
 
+	makeDateFormat: function(date) {
+		var ret = date.substr(0,4) + "." +
+			date.substr(4,2) + "." +
+			date.substr(6,2);
+		return ret;
+	},
+
 	drawComparePage: async function() {
 		var data = this.comparePageData;
 		var wrapper = document.createElement("div");
@@ -210,26 +216,40 @@ Module.register("photo",{
 
 		// Draw before info
 		// base image
+		var imgBox1 = document.createElement("div");
+		imgBox1.className = "info_img_box";
+
 		var img1 = document.createElement("img");
 		img1.src = "/modules/default/photo/image/" + data.beforeFileName + (data.isFront ? "_front" : "_side") + ".jpg";
-		
+		img1.className = "info_img"
+
 		var info1 = document.createElement("div");
 		info1.className = "info_item";
 		this.fillBox(info1, data.beforeData);
 
-		wrapper.appendChild(img1);
+		imgBox1.appendChild(img1);
+		imgBox1.appendChild(document.createTextNode(this.makeDateFormat(data.beforeFileName)));
+
+		wrapper.appendChild(imgBox1);
 		wrapper.appendChild(info1);
 
 		// Draw after info
 		if(data.fileNum > 1){
+			var imgBox2 = document.createElement("div");
+			imgBox2.className = "info_img_box";
+
 			var img2 = document.createElement("img");
 			img2.src = "/modules/default/photo/image/" + data.afterFileName + (data.isFront ? "_front" : "_side") + ".jpg";
+			img2.className = "info_img";
 
 			var info2 = document.createElement("div");
 			info2.className = "info_item";
 			this.fillBox(info2, data.afterData);
 
-			wrapper.appendChild(img2);
+			imgBox2.appendChild(img2);
+			imgBox2.appendChild(document.createTextNode(this.makeDateFormat(data.afterFileName)));
+
+			wrapper.appendChild(imgBox2);
 			wrapper.appendChild(info2);
 
 			var tmp = await this.fillDif(data.beforeData, data.afterData);

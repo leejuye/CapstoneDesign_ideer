@@ -181,7 +181,7 @@ Module.register("compliments", {
 			case "savePicture" :
 				this.config.state = "savePicture";
 				this.sendNotification("PHOTO", "SHOW_COMPARE");
-				break;	
+				break;
 			case "deletePicture" :
 				this.config.state = "deletePicture";
 				this.sendNotification("PHOTO", "SHOW_COMPARE");

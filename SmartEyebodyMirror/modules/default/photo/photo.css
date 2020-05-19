@@ -4,6 +4,13 @@
 	margin-top: 40px;
 }
 
+.info_img_box {
+	width:260px;
+	height: auto;
+	margin: 10px;
+	float: left; 
+}
+
 .info_item {
 	width: 200px;
 	height: 440px;
@@ -27,9 +34,7 @@
 	color: green;
 }
 
-img {
+.info_img {
 	width: 260px;
 	height: auto;
-	margin: 10px;
-	float: left;
 }
