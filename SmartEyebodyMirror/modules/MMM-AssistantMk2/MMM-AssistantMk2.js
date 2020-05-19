@@ -76,7 +76,10 @@ Module.register("MMM-AssistantMk2", {
 			Frontend: true,
 			Model: "jarvis",
 			Sensitivity: null
-		}
+		},
+    command: "",
+    strArray: null,
+    date: 0
 	},
 	plugins: {
 		onReady: [],
@@ -349,10 +352,31 @@ Module.register("MMM-AssistantMk2", {
 			this.doPlugin("onReady");
 			break;
 		case "ASSISTANT_RESULT":
+			command = payload.transcription.transcription;
+				
 			if (this.config.isName) {
-				this.sendNotification("COMPLIMENTS", {payload: "checkUserName", userName: payload.transcription.transcription});
+				this.sendNotification("COMPLIMENTS", {payload: "checkUserName", userName: command});
 				this.config.isName = false;
 			}
+				
+			if (command.indexOf("일 전 사진 보여 줘") >= 0) {
+				this.config.strArray = command.split('일');
+				this.config.date = this.config.strArray[0];
+			} else if (command.indexOf("주 전 사진 보여 줘") >= 0) {
+				this.config.strArray = command.split('주');
+				this.config.date = this.config.strArray[0] * 7;
+			} else if (command.indexOf("개월 전 사진 보여 줘") >= 0) {
+				this.config.strArray = command.split('개월');
+				this.config.date = this.config.strArray[0] * 30;
+			} else if (command.indexOf("년 전 사진 보여 줘") >= 0) {
+				this.config.strArray = command.split('년');
+				this.config.date = this.config.strArray[0] * 365;
+			}
+
+			if (this.config.date > 0) {
+				this.sendNotification("PHOTO", {payload: "/*payload*/", date: this.config.date});
+			}
+				
 			if (payload.session && this.session.hasOwnProperty(payload.session)) {
 				var session = this.session[payload.session];
 				if (typeof session.callback == "function") {
