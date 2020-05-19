@@ -4,7 +4,9 @@ import cv2
 import sys
 import json
 import os
-import pygame #sound
+import contextlib
+with contextlib.redirect_stdout(None):
+    import pygame
 import time
 from picamera import PiCamera
 from PIL import Image
@@ -23,7 +25,14 @@ def playSound(sfx, check = False):
             time.sleep(1)
             return 0
     return True
-            
+
+def toInfo(sizeInfo):
+    try:
+        print(json.dumps(sizeInfo))
+    except Exception:
+        pass
+    sys.stdout.flush()
+
 # overlay
 overlay = None
 if sys.argv[1][len(sys.argv[1])-5] == 't':
@@ -52,9 +61,9 @@ fontSize = 5
 thickness = 2
 
 # sound setting
-pygame.mixer.init()
-sfx1 = pygame.mixer.Sound(curPath + "/sound/bleeper.wav")
-sfx2 = pygame.mixer.Sound(curPath + "/sound/shutter.wav")
+# pygame.mixer.init()
+# sfx1 = pygame.mixer.Sound(curPath + "/sound/bleeper.wav")
+# sfx2 = pygame.mixer.Sound(curPath + "/sound/shutter.wav")
 check = [False, False, False]
 
 # allow the camera to warmup
@@ -77,23 +86,24 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     # crop the image
     x,y,w,h = roi
     dst = dst[y:y+h, x:x+w]
-    
+
     image = dst
-    addedImage = cv2.add(image,overlay)
-    addedImage = np.fliplr(addedImage)
-    addedImage = np.array(addedImage)
-    
+    addedImage = image
+    #addedImage = cv2.add(image,overlay)
+    #addedImage = np.fliplr(addedImage)
+    #addedImage = np.array(addedImage)
+
     #count down text
     cnt = time.time()-start
     if cnt >= 9:
         cv2.putText(addedImage, "1", location, font, fontSize, color, thickness, cv2.LINE_AA)
-        check[0] = playSound("sfx1", check[0])
+#         check[0] = playSound("sfx1", check[0])
     elif cnt >= 8:
         cv2.putText(addedImage, "2", location, font, fontSize, color, thickness, cv2.LINE_AA)
-        check[1] = playSound("sfx1", check[1])
+#         check[1] = playSound("sfx1", check[1])
     elif cnt >= 7:
         cv2.putText(addedImage, "3", location, font, fontSize, color, thickness, cv2.LINE_AA)
-        check[2] = playSound("sfx1", check[2])
+#         check[2] = playSound("sfx1", check[2])
     
     # show the frame
     cv2.namedWindow(winName)
@@ -105,8 +115,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     rawCapture.truncate(0)
     
     # if the `q` key was pressed, break from the loop
-    if key == ord("q") or time.time()-start >= 10:
-        playSound("sfx2")
+    if key == ord("q") or time.time()-start >= 5:
+#         playSound("sfx2")
         camera.capture(curPath + "/image/" + sys.argv[1])
         break
 
@@ -127,3 +137,8 @@ dst = dst[y:y+h, x:x+w]
 dst = np.fliplr(dst)
 cv2.imwrite(curPath + "/image/" + sys.argv[1],dst)
 #cv2.imwrite(curPath + "/image/calibresult.png",dst)
+
+sizeInfo = { "id":141,"shoulder":1.1, "chest":2.2, "waist": 3.3, "hip":4.4,
+	"thigh":5.5, "calf":6.6, "weight":7.7, "bmi":12,
+	"is_front":(sys.argv[1][len(sys.argv[1])-5] == 't'), "file_name":sys.argv[1][0:14] }
+toInfo(sizeInfo)

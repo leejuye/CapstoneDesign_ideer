@@ -41,6 +41,7 @@ Module.register("compliments", {
 		state: "initial",
 		sayTF: false,
 		assistState: "",
+		userName: "",
 		pass: false
 	},
 	lastIndexUsed:-1,
@@ -76,11 +77,11 @@ Module.register("compliments", {
 		}, this.config.updateInterval);
 
 		//TEST
-		/*var self = this;
+		var self = this;
 		setTimeout(function() {
-			self.sendNotification("PHOTO", "SHOW_RESULT");
+			self.sendNotification("PHOTO", "TAKE_PIC");
 			Log.log("@@@@@@@");
-		}, 5000);*/
+		}, 5000);
 	},
 	// Module location
 	getLocation: function() {
@@ -110,8 +111,98 @@ Module.register("compliments", {
 				key: key,
 				text: "NOT_NOW",
 				chime: false
-			})
+			});
 		}, 100);
+	},
+
+	checkPossibleCommand: function(state, payload) {
+	// Set what commands to receive
+		switch (state) {
+		// only take_pic, lookup, shutdown
+		case "initial":
+			switch (payload) {
+			case "dressCheck":
+			case "shutdownRequest":
+				this.config.pass = false;
+				break;
+			case "imHere":
+				this.config.pass = true;
+				this.makeNotNow("나 왔어");
+				break;
+			case "sayYes":
+				this.config.pass = true;
+				this.makeNotNow("응");
+				break;
+			case "sayNo":
+				this.config.pass = true;
+				this.makeNotNow("아니");
+				break;
+			}
+			break;
+
+		// only yes or no
+		case "dressCheck":
+		case "frontResult":
+		case "sideResult":
+		case "savePicture":
+		case "shutdownRequest":
+			switch (payload) {
+			case "sayYes":
+			case "sayNo":
+				this.config.pass = false;
+				break;
+			case "dressCheck":
+				this.config.pass = true;
+				this.makeNotNow("촬영");
+				break;
+			case "imHere":
+				this.config.pass = true;
+				this.makeNotNow("나 왔어");
+				break;
+			case "shutdownRequest":
+				this.config.pass = true;
+				this.makeNotNow("종료");
+				break;
+			}
+			break;
+
+		// only I'm here
+		case "dressWait":
+			switch (payload) {
+			case "imHere":
+				this.config.pass = false;
+				break;
+			case "dressCheck":
+				this.config.pass = true;
+				this.makeNotNow("촬영");
+			case "savePictureOrNot" :
+				this.config.state = "savePictureOrNot";
+				break;
+			case "savePicture" :
+				this.config.state = "savePicture";
+				this.sendNotification("PHOTO", "SHOW_COMPARE");
+				break;	
+			case "deletePicture" :
+				this.config.state = "deletePicture";
+				this.sendNotification("PHOTO", "SHOW_COMPARE");
+				break;
+			case "photoNotExist" :
+				this.config.state = "photoNotExist";
+			case "shutdownRequest":
+				this.config.pass = true;
+				this.makeNotNow("종료");
+				break;
+			case "sayYes":
+				this.config.pass = true;
+				this.makeNotNow("응");
+				break;
+			case "sayNo":
+				this.config.pass = true;
+				this.makeNotNow("아니");
+				break;
+			}
+			break;
+		}
 	},
 
 	// Override notification handler.
@@ -119,87 +210,11 @@ Module.register("compliments", {
 
 		if (notification === "COMPLIMENTS") {
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload + ", from: " + sender);
-			
-			// Set what commands to receive
-			switch (this.config.state) {  
 
-			// only take_pic, lookup, shutdown
-			case "initial":
-				switch (payload) {
-				case "dressCheck":
-				case "shutdownRequest":
-					this.config.pass = false;
-					break;
-				case "imHere":
-					this.config.pass = true;
-					this.makeNotNow("나 왔어");
-					break;
-				case "sayYes":
-					this.config.pass = true;
-					this.makeNotNow("응");
-					break;
-				case "sayNo":
-					this.config.pass = true;
-					this.makeNotNow("아니");
-					break;
-				}
-				break;
-
-			// only yes or no
-			case "dressCheck":
-			case "frontResult":
-			case "sideResult":
-			case "savePicture":
-			case "shutdownRequest":
-				switch (payload) {
-				case "sayYes":
-				case "sayNo":
-					this.config.pass = false;
-					break;
-				case "dressCheck":
-					this.config.pass = true;
-					this.makeNotNow("촬영");
-					break;
-				case "imHere":
-					this.config.pass = true;
-					this.makeNotNow("나 왔어");
-					break;
-				case "shutdownRequest":
-					this.config.pass = true;
-					this.makeNotNow("종료");
-					break;
-				}
-				break;
-
-			// only I'm here
-			case "dressWait":				
-				switch (payload) {
-				case "imHere":
-					this.config.pass = false;
-					break;
-				case "dressCheck":
-					this.config.pass = true;
-					this.makeNotNow("촬영");
-					break;
-				case "shutdownRequest":
-					this.config.pass = true;
-					this.makeNotNow("종료");
-					break;
-				case "sayYes":
-					this.config.pass = true;
-					this.makeNotNow("응");
-					break;
-				case "sayNo":
-					this.config.pass = true;
-					this.makeNotNow("아니");
-					break;
-				}
-				break;
-
-			}
+			this.checkPossibleCommand(this.config.state, payload);
 
 			// Execute commands
-			if (this.config.pass === false) {
+			if (!this.config.pass) {
 				clearInterval(this.compInterval);
 
 				// Remove last compliment
@@ -212,11 +227,15 @@ Module.register("compliments", {
 					this.filenumber = payload.number;
 					payload = payload.payload;
 				}
+				//checkUserName
+				if(payload.userName) {
+					this.config.userName = payload.userName;
+					payload = payload.payload;
+				}
 
 				this.descCommand = payload;
 				console.log(payload);
 				this.lastIndexUsed = -1;
-
 				this.compInterval = setInterval(function() {
 					self.updateDom(self.config.fadeSpeed);
 				}, this.config.updateInterval);
@@ -230,44 +249,42 @@ Module.register("compliments", {
 					}
 				);
 
-				switch (payload) {
+				switch(payload){
 				case "CURRENTWEATHER_DATA":
 					this.setCurrentWeatherType(payload.data);
 					break;
 				case "dressCheck":
-					this.config.state = "dressCheck";
+					this.config.state = payload;
 					setTimeout(() => {
 						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 					}, 7000);
 					break;
 				case "dressWait":
-					this.config.state = "dressWait";
-					this.sendNotification("SNOWBOY", "dressWait");  // no requestGuide in dressWait
+					this.config.state = payload;
 					this.waitInterval = setInterval(function() {
-						// shutdown now
+					// shutdown now
 					}, 600000);  // wait 10 minutes = 600000
 					break;
 				case "imHere":
 					this.sendNotification("PHOTO", "TAKE_PIC");
 					break;
-				case "frontResult":
-					this.config.state = "frontResult";
-					break;
 				case "sideResult":
-					this.config.state = "sideResult";
+					this.sendNotification("PHOTO", "SHOW_RESULT");
 					break;
-				case "savePicture":
-					this.config.state = "savePicture";
+				case "savePictureOrNot":
+					this.sendNotification("PHOTO", "COUNT_FILE");
 					break;
 				case "shutdownRequest":
-					this.config.state = "shutdownRequest";
-					this.config.text = payload;
+					this.config.state = payload;
 					setTimeout(() => {
 						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 					}, 3000);
 					break;
-				case "shutdownNow":
-					this.config.text = payload;
+				case "signUpRequest":
+					this.config.state = payload;
+					setTimeout(() => {
+						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
+					}, 3000);
 					break;
 				case "sayYes":
 					switch(this.config.state){
@@ -275,7 +292,7 @@ Module.register("compliments", {
 						this.sendNotification("PHOTO", "TAKE_PIC");
 						break;
 					case "frontResult":
-						// side start
+					// side start
 						this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
 						break;
 					case "shutdownRequest":
@@ -310,10 +327,33 @@ Module.register("compliments", {
 						break;
 					case "shutdownRequest":
 						break;
+					default:
+						this.config.state = payload;
+						break;
 					}
 					if (this.config.state !== "dressWait") {
 						this.config.state = "initial";
 					}
+				case "frontResult":
+					this.config.badFrontCnt++;
+					if (this.config.badFrontCnt === 3) {
+						this.sendNotification("PHOTO", "tryAgain");
+						this.config.badFrontCnt = 0;
+					} else {
+						this.sendNotification("PHOTO", "RE_TAKE_PIC");
+					}
+					break;
+				case "sideResult":
+					this.config.badSideCnt++;
+					if (this.config.badSideCnt === 3) {
+						this.sendNotification("PHOTO", "tryAgain");
+						this.config.badSideCnt = 0;
+					} else {
+						this.sendNotification("PHOTO", "RE_TAKE_PIC_SIDE");
+					}
+					break;
+				if (this.config.state !== "dressWait") {
+					this.config.state = "";
 				}
 			}
 			this.config.pass = false;
@@ -339,7 +379,7 @@ Module.register("compliments", {
 					if (this.config.noSayCnt === 3) {
 						// shutdown now
 						this.config.noSayCnt = 0;
-					} else { 
+					} else {
 						setTimeout(() => {
 							this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 						}, 3000);
@@ -394,11 +434,11 @@ Module.register("compliments", {
 				compliments = this.config.compliments[this.descCommand];
 			}
 		} else if (hour >= this.config.morningStartTime && hour < this.config.morningEndTime && this.config.compliments.hasOwnProperty("morning")) {
-		    	compliments = this.config.compliments.morning.slice(0);
+    		compliments = this.config.compliments.morning.slice(0);
 		} else if (hour >= this.config.afternoonStartTime && hour < this.config.afternoonEndTime && this.config.compliments.hasOwnProperty("afternoon")) {
-		    	compliments = this.config.compliments.afternoon.slice(0);
+    		compliments = this.config.compliments.afternoon.slice(0);
 		} else if(this.config.compliments.hasOwnProperty("evening")) {
-		    	compliments = this.config.compliments.evening.slice(0);
+    		compliments = this.config.compliments.evening.slice(0);
 		}
 
 		if (typeof compliments === "undefined") {
@@ -465,8 +505,12 @@ Module.register("compliments", {
 		wrapper.className = this.config.classes ? this.config.classes : "thin large bright pre-line";
 		// get the compliment text
 		var complimentText = this.randomCompliment();
-		if( this.descCommand === "savePicture") {
-			complimentText = [complimentText.slice(0,13), this.filenumber, complimentText.slice(13)].join('');
+		if(this.descCommand === "savePicture") {
+			complimentText = [complimentText.slice(0,13), this.filenumber, complimentText.slice(13)].join("");
+		}
+		if(this.descCommand === "checkUserName") {
+			complimentText = `${this.config.userName}${complimentText}`;
+			this.config.userName = "";
 		}
 		// split it into parts on newline text
 		var parts= complimentText.split("\n");
@@ -476,7 +520,7 @@ Module.register("compliments", {
 		for (part of parts){
 			// create a text element for each part
 			compliment.appendChild(document.createTextNode(part));
-			// add a break `
+			// add a break
 			compliment.appendChild(document.createElement("BR"));
 		}
 		// remove the last break
