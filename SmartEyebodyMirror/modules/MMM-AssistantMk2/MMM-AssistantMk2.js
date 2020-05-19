@@ -406,10 +406,9 @@ Module.register("MMM-AssistantMk2", {
 					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "term": this.config.date, "isFront": true});
 					this.config.date = 0;
 				}
-
 				this.config.isLookup = false;
 			}
-				
+
 			if (payload.session && this.session.hasOwnProperty(payload.session)) {
 				var session = this.session[payload.session];
 				if (typeof session.callback == "function") {
