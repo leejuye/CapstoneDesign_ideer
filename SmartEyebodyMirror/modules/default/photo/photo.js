@@ -53,12 +53,13 @@ Module.register("photo",{
 		this.updateDom();
 	},
 
-	compare: function(isFront, term) {
+	compare: function(isFront, term, command) {
 		this.sendNotification("COMPLIMENTS", "noDescription");
 		this.sendSocketNotification("GET_INFO", {
 			"isFront": isFront,
 			"id": 1,
-			"term": term
+			"term": term,
+			"command": command
 		});
 		//is_front, id, term
 	},
@@ -145,7 +146,13 @@ Module.register("photo",{
 				this.sendNotification("COMPLIMENTS", "deletePicture");
 				break;
 			case "SHOW_COMPARE":
-				this.compare(this.isfront, 0);
+				this.compare(this.isFront, 0);
+				break;
+			case "SHOW_PREV":
+				this.compare(this.isFront, this.term, "prev");
+				break;
+			case "SHOW_NEXT":
+				this.compare(this.isFront, this.term, "next");
 				break;
 			}
 		}

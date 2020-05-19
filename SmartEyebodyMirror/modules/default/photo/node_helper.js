@@ -49,11 +49,19 @@ module.exports = NodeHelper.create({
 			return;
 		}
 
-		var qry = "SELECT shoulder,chest,waist,hip,thigh,calf,weight,bmi "
-			+ "FROM size_info WHERE is_front = ? and file_name = ?";
+		let qry;
 
 		var beforeFileName = await this.getBeforeFileName(payload.id);
 		var afterFileName = await this.getAfterFileName(payload.id, payload.isFront, payload.term);
+		if(payload.command === "prev") {
+			qry = "SELECT MAX(file_name) FROM size_info WHERE file_name < ?";
+			afterFileName = await this.dbConn(qry, afterFileName);
+		} else if(payload.command === "next") {
+			qry = "SELECT MIN(file_name) FROM size_info WHERE file_name > ?";
+			afterFileName = await this.dbConn(qry, afterFileName);
+		}
+		qry = "SELECT shoulder,chest,waist,hip,thigh,calf,weight,bmi "
+			+ "FROM size_info WHERE is_front = ? and file_name = ?";
 
 		var beforeData = await this.dbConn(qry, [payload.isFront, beforeFileName]);
 		var afterData = await this.dbConn(qry, [payload.isFront, afterFileName]);
@@ -108,6 +116,11 @@ module.exports = NodeHelper.create({
 		this.dbConn(qry, [data.substring(0, 14), isFront]);
 	},
 
+	changeBaseFile: function(id, fileName) {
+		var qry = "UPDATE users SET base_file = ? WHERE id = ?";
+		this.dbConn(qry, [fileName, id]);
+	},
+
 	socketNotificationReceived: function(notification, payload) {
 		console.log("!!!!! noti: " + notification + " pay: " + payload);
 		if(notification === "PREVIEW") {
@@ -124,6 +137,8 @@ module.exports = NodeHelper.create({
 			this.deleteSizeInfo(payload);
 		} else if(notification === "GET_INFO") {
 			this.getSizeInfo(payload);
+		} else if(notification === "CHANGE_BASE") {
+			this.changeBaseFile(payload.id, payload.fileName);
 		}
 	}
 
