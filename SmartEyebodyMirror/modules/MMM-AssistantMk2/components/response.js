@@ -248,7 +248,7 @@ class AssistantResponseClass {
 					return;
 				}
 			}
-		}												
+		}									
 
 		if (response.lastQuery.text === "NOT_NOW") {
 				this.showing = false

@@ -77,11 +77,11 @@ Module.register("compliments", {
 		}, this.config.updateInterval);
 
 		//TEST
-		var self = this;
+		/*var self = this;
 		setTimeout(function() {
 			self.sendNotification("PHOTO", "COUNT_FILE");
 			Log.log("@@@@@@@");
-		}, 5000);
+		}, 5000);*/
 	},
 	// Module location
 	getLocation: function() {
@@ -115,13 +115,14 @@ Module.register("compliments", {
 		}, 100);
 	},
 
-	checkPossibleCommand: function(state, payload) {
 	// Set what commands to receive
+	checkPossibleCommand: function(state, payload) {
 		switch (state) {
 		// only take_pic, lookup, shutdown
 		case "initial":
 			switch (payload) {
 			case "dressCheck":
+			case "lookup":
 			case "shutdownRequest":
 				this.config.pass = false;
 				break;
@@ -159,6 +160,10 @@ Module.register("compliments", {
 				this.config.pass = true;
 				this.makeNotNow("나 왔어");
 				break;
+			case "lookup":
+				this.config.pass = true;
+				this.makeNotNow("조회");
+				break;
 			case "shutdownRequest":
 				this.config.pass = true;
 				this.makeNotNow("종료");
@@ -175,6 +180,7 @@ Module.register("compliments", {
 			case "dressCheck":
 				this.config.pass = true;
 				this.makeNotNow("촬영");
+				break;
 			case "savePictureOrNot" :
 				this.config.state = "savePictureOrNot";
 				break;
@@ -188,6 +194,11 @@ Module.register("compliments", {
 				break;
 			case "photoNotExist" :
 				this.config.state = "photoNotExist";
+				break;
+			case "lookup":
+				this.config.pass = true;
+				this.makeNotNow("조회");
+				break;
 			case "shutdownRequest":
 				this.config.pass = true;
 				this.makeNotNow("종료");
@@ -283,6 +294,10 @@ Module.register("compliments", {
 				case "savePicture":
 					this.config.state = payload;
 					break;
+				case "lookup":
+					this.config.state = payload;
+					this.sendNotification("ASSISTANT", "lookup");				
+					break;
 				case "shutdownRequest":
 					this.config.state = payload;
 					setTimeout(() => {
@@ -350,6 +365,7 @@ Module.register("compliments", {
 					if (this.config.state !== "dressWait") {
 						this.config.state = "initial";
 					}
+				}
 			}
 			this.config.pass = false;
 		} else if (notification === "ASSISTANT_LISTEN") {  // Assistant is listening
