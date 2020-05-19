@@ -160,7 +160,7 @@ class AssistantResponseClass {
 		}
 	}
 
-  checkBeforeRequest (string, text) {
+	checkBeforeRequest (string, text) {
 		string = string.split(text);
 		string = parseInt(string[0]);
 		if (!isNaN(string)) {  // false = number
@@ -168,14 +168,14 @@ class AssistantResponseClass {
 		} else {
 			return false;
 		}
-  }
+	}
 
-  start (response) {
-    this.hookChimed = false
-    this.response = response
-    if (this.showing) {
-      this.end()
-    }
+	start (response) {
+		this.hookChimed = false
+		this.response = response
+		if (this.showing) {
+			this.end()
+		}
 
 		if (response.error) {
 			if (response.error == "TRANSCRIPTION_FAILS") {
@@ -217,9 +217,9 @@ class AssistantResponseClass {
 			return;
 		}
 		
-    command = response.transcription.transcription;
+    		command = response.transcription.transcription;
 
-    if (command.indexOf("전 사진 보여 줘") >= 0) {
+		if (command.indexOf("전 사진 보여 줘") >= 0) {
 			var string;
 			string = command.split(' 전');
 			string = string[0];
@@ -248,14 +248,15 @@ class AssistantResponseClass {
 					return;
 				}
 			}
+		}												
 
-    if (response.lastQuery.text === "NOT_NOW") {
-			this.showing = false
-			this.status("error")
-			this.showError(this.callbacks.translate("NOT_NOW"))
-			this.end()
-			return
-    }
+		if (response.lastQuery.text === "NOT_NOW") {
+				this.showing = false
+				this.status("error")
+				this.showError(this.callbacks.translate("NOT_NOW"))
+				this.end()
+				return
+		}																									
 			
 		var normalResponse = (response) => {
 			if(!this.isName) {
@@ -286,6 +287,7 @@ class AssistantResponseClass {
 			()=>{ normalResponse(response); } // postProcess none
 		);
 	};
+	
 	stopResponse (callback = ()=>{}) {
 		this.showing = false;
 		var winh = document.getElementById("AMK2_HELPER");

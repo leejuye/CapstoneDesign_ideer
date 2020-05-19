@@ -110,10 +110,6 @@ var config = {
 						pattern: "나 왔어",  // No spaces but ok in this case
 						command: "IM_HERE"
 					},
-					/*"SHOW_DATE_PIC": {
-						pattern: "일 전 사진 보여줘",
-						command: "SHOW_DATE_PIC"
-					},*/
 					"SHUTDOWN": {
 						pattern: "(종료|꺼 줘)",
 						command: "SHUTDOWN_REQUEST"
@@ -151,16 +147,6 @@ var config = {
 							payload: "imHere"
 						}
 					},
-					/*"SHOW_DATE_PIC": {
-						soundExec: {
-							chime: "open"
-						},
-						notificationExec: {
-							notification: "PHOTO",
-							payload: "",
-							value: 
-						}
-					},*/
 					"SHUTDOWN_REQUEST": {
 						soundExec: {
 							chime: "open"
