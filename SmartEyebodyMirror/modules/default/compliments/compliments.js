@@ -42,7 +42,8 @@ Module.register("compliments", {
 		sayTF: false,
 		assistState: "",
 		userName: "",
-		pass: false
+		pass: false,
+		command: ""
 	},
 	lastIndexUsed:-1,
 	// Set currentweather from module
@@ -116,7 +117,7 @@ Module.register("compliments", {
 	},
 
 	// Set what commands to receive
-	checkPossibleCommand: function(state, payload) {
+	checkPossibleCommand: function(state, payload, command) {
 		switch (state) {
 		// only take_pic, lookup, shutdown
 		case "initial":
@@ -127,16 +128,10 @@ Module.register("compliments", {
 				this.config.pass = false;
 				break;
 			case "imHere":
-				this.config.pass = true;
-				this.makeNotNow("나 왔어");
-				break;
 			case "sayYes":
-				this.config.pass = true;
-				this.makeNotNow("응");
-				break;
 			case "sayNo":
 				this.config.pass = true;
-				this.makeNotNow("아니");
+				this.makeNotNow(command);
 				break;
 			}
 			break;
@@ -153,20 +148,11 @@ Module.register("compliments", {
 				this.config.pass = false;
 				break;
 			case "dressCheck":
-				this.config.pass = true;
-				this.makeNotNow("촬영");
-				break;
 			case "imHere":
-				this.config.pass = true;
-				this.makeNotNow("나 왔어");
-				break;
 			case "lookup":
-				this.config.pass = true;
-				this.makeNotNow("조회");
-				break;
 			case "shutdownRequest":
 				this.config.pass = true;
-				this.makeNotNow("종료");
+				this.makeNotNow(command);
 				break;
 			}
 			break;
@@ -178,38 +164,12 @@ Module.register("compliments", {
 				this.config.pass = false;
 				break;
 			case "dressCheck":
-				this.config.pass = true;
-				this.makeNotNow("촬영");
-				break;
-			case "savePictureOrNot" :
-				this.config.state = "savePictureOrNot";
-				break;
-			case "savePicture" :
-				this.config.state = "savePicture";
-				this.sendNotification("PHOTO", "SHOW_COMPARE");
-				break;
-			case "deletePicture" :
-				this.config.state = "deletePicture";
-				this.sendNotification("PHOTO", "SHOW_COMPARE");
-				break;
-			case "photoNotExist" :
-				this.config.state = "photoNotExist";
-				break;
 			case "lookup":
-				this.config.pass = true;
-				this.makeNotNow("조회");
-				break;
 			case "shutdownRequest":
-				this.config.pass = true;
-				this.makeNotNow("종료");
-				break;
 			case "sayYes":
-				this.config.pass = true;
-				this.makeNotNow("응");
-				break;
 			case "sayNo":
 				this.config.pass = true;
-				this.makeNotNow("아니");
+				this.makeNotNow(command);
 				break;
 			}
 			break;
@@ -222,7 +182,10 @@ Module.register("compliments", {
 		if (notification === "COMPLIMENTS") {
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload + ", from: " + sender);
 
-			this.checkPossibleCommand(this.config.state, payload);
+			if (payload.payload === "command") {
+				this.config.command = payload.command;
+			}
+			this.checkPossibleCommand(this.config.state, payload, this.config.command);
 
 			// Execute commands
 			if (!this.config.pass) {
@@ -296,7 +259,7 @@ Module.register("compliments", {
 					break;
 				case "lookup":
 					this.config.state = payload;
-					this.sendNotification("ASSISTANT", "lookup");				
+					this.sendNotification("ASSISTANT", "lookup");
 					break;
 				case "shutdownRequest":
 					this.config.state = payload;
@@ -328,7 +291,7 @@ Module.register("compliments", {
 						this.sendNotification("HIDE_ALL_MODULES");
 						break;
 					}
-					this.config.state = "initial";
+					break;
 				case "sayNo":
 					switch(this.config.state){
 					case "dressCheck":
@@ -353,6 +316,7 @@ Module.register("compliments", {
 						} else {
 							this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
 						}
+						break;
 					case "savePictureOrNot":
 						this.sendNotification("PHOTO", "REMOVE_RESULT");
 						break;
@@ -365,6 +329,7 @@ Module.register("compliments", {
 					if (this.config.state !== "dressWait") {
 						this.config.state = "initial";
 					}
+					break;
 				}
 			}
 			this.config.pass = false;
@@ -398,7 +363,6 @@ Module.register("compliments", {
 				}
 				this.config.assistState = "";
 				this.config.sayTF = false;
-				}
 			}
 		}
 	},

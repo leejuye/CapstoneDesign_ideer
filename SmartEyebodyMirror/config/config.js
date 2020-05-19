@@ -107,7 +107,7 @@ var config = {
 						command: "CAMERA_START"
 					},
 					"IM_HERE": {
-						pattern: "나 왔어",  // No spaces but ok in this case
+						pattern: "(나 왔어|나왔어)",  // No spaces but ok in this case
 						command: "IM_HERE"
 					},
 					"LOOKUP": {
