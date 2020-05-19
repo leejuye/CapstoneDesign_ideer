@@ -79,7 +79,7 @@ Module.register("compliments", {
 		//TEST
 		var self = this;
 		setTimeout(function() {
-			self.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isfront": true});
+			self.sendNotification("PHOTO", "COUNT_FILE");
 			Log.log("@@@@@@@");
 		}, 5000);
 	},
@@ -268,11 +268,20 @@ Module.register("compliments", {
 				case "imHere":
 					this.sendNotification("PHOTO", "TAKE_PIC");
 					break;
+				case "frontStart":
+					this.config.state = payload;
+					break;
+				case "frontResult":
+					this.config.state = payload;
+					break;
 				case "sideResult":
-					this.sendNotification("PHOTO", "SHOW_RESULT");
+					this.config.state = payload;
 					break;
 				case "savePictureOrNot":
-					this.sendNotification("PHOTO", "COUNT_FILE");
+					this.config.state = payload;
+					break;
+				case "savePicture":
+					this.config.state = payload;
 					break;
 				case "shutdownRequest":
 					this.config.state = payload;
@@ -292,11 +301,13 @@ Module.register("compliments", {
 						this.sendNotification("PHOTO", "TAKE_PIC");
 						break;
 					case "frontResult":
-					// side start
 						this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
 						break;
+					case "sideResult":
+						this.sendNotification("PHOTO", "SHOW_RESULT");
+						break;
 					case "savePictureOrNot":
-						this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isfront": true});
+						this.sendNotification("PHOTO", "COUNT_FILE");
 						break;
 					case "shutdownRequest":
 						this.sendNotification("HIDE_ALL_MODULES");
@@ -339,28 +350,6 @@ Module.register("compliments", {
 					if (this.config.state !== "dressWait") {
 						this.config.state = "initial";
 					}
-				case "frontResult":
-					this.config.badFrontCnt++;
-					if (this.config.badFrontCnt === 3) {
-						this.sendNotification("PHOTO", "tryAgain");
-						this.config.badFrontCnt = 0;
-					} else {
-						this.sendNotification("PHOTO", "RE_TAKE_PIC");
-					}
-					break;
-				case "sideResult":
-					this.config.badSideCnt++;
-					if (this.config.badSideCnt === 3) {
-						this.sendNotification("PHOTO", "tryAgain");
-						this.config.badSideCnt = 0;
-					} else {
-						this.sendNotification("PHOTO", "RE_TAKE_PIC_SIDE");
-					}
-					break;
-				}
-				if (this.config.state !== "dressWait") {
-					this.config.state = "";
-				}
 			}
 			this.config.pass = false;
 		} else if (notification === "ASSISTANT_LISTEN") {  // Assistant is listening
@@ -393,6 +382,7 @@ Module.register("compliments", {
 				}
 				this.config.assistState = "";
 				this.config.sayTF = false;
+				}
 			}
 		}
 	},

@@ -17,12 +17,17 @@ module.exports = NodeHelper.create({
 		var filenum = await execSync(cmd);
 		filenum = await parseInt(filenum);
 		console.log("### numOfFiles: ", + filenum);
-
+		
 		return new Promise(function(resolve, reject){
 			resolve(filenum);
 		});
 	},
-
+	
+	saveFile: async function() {
+		var saveFileNum = await numberOfFiles();
+		this.sendSocketNotification("HERE_FILE_NUMBER", saveFileNum)
+	},
+	
 	dbConn: async function(qry, params) {
 		var conn, results;
 		try{
@@ -49,11 +54,19 @@ module.exports = NodeHelper.create({
 			return;
 		}
 
-		var qry = "SELECT shoulder,chest,waist,hip,thigh,calf,weight,bmi "
-			+ "FROM size_info WHERE is_front = ? and file_name = ?";
+		let qry;
 
 		var beforeFileName = await this.getBeforeFileName(payload.id);
 		var afterFileName = await this.getAfterFileName(payload.id, payload.isFront, payload.term);
+		if(payload.command === "prev") {
+			qry = "SELECT MAX(file_name) FROM size_info WHERE file_name < ?";
+			afterFileName = await this.dbConn(qry, afterFileName);
+		} else if(payload.command === "next") {
+			qry = "SELECT MIN(file_name) FROM size_info WHERE file_name > ?";
+			afterFileName = await this.dbConn(qry, afterFileName);
+		}
+		qry = "SELECT shoulder,chest,waist,hip,thigh,calf,weight,bmi "
+			+ "FROM size_info WHERE is_front = ? and file_name = ?";
 
 		var beforeData = await this.dbConn(qry, [payload.isFront, beforeFileName]);
 		var afterData = await this.dbConn(qry, [payload.isFront, afterFileName]);
@@ -108,6 +121,11 @@ module.exports = NodeHelper.create({
 		this.dbConn(qry, [data.substring(0, 14), isFront]);
 	},
 
+	changeBaseFile: function(id, fileName) {
+		var qry = "UPDATE users SET base_file = ? WHERE id = ?";
+		this.dbConn(qry, [fileName, id]);
+	},
+
 	socketNotificationReceived: function(notification, payload) {
 		console.log("!!!!! noti: " + notification + " pay: " + payload);
 		if(notification === "PREVIEW") {
@@ -124,6 +142,10 @@ module.exports = NodeHelper.create({
 			this.deleteSizeInfo(payload);
 		} else if(notification === "GET_INFO") {
 			this.getSizeInfo(payload);
+		} else if(notification === "CHANGE_BASE") {
+			this.changeBaseFile(payload.id, payload.fileName);
+		} else if(notificatio === "GET_FILE_NUMBER") {
+			this.saveFile();
 		}
 	}
 
