@@ -174,15 +174,24 @@ Module.register("compliments", {
 				break;
 			}
 			break;
+
 		// in lookup case
 		case "lookup":
-			if (command.indexOf("전 사진 보여 줘") >= 0) {
+			if (command.indexOf(" 전 사진 보여 줘") >= 0) {
 				this.config.pass = false;
-				break;
+			} else if (command.indexOf("정면") >= 0) {
+				this.config.pass = false;
+			} else if (command.indexOf("측면") >= 0) {
+				this.config.pass = false;
+			} else if (command.indexOf("기준") >= 0 && command.indexOf("변경") >= 0) {
+				this.config.pass = false;
+			} else if (command.indexOf("이전") >= 0) {
+				this.config.pass = false;
+			} else if (command.indexOf("다음") >= 0) {
+				this.config.pass = false;
 			} else {
 				this.config.pass = true;
 				this.makeNotNow(command);
-				break;
 			}
 		}
 	},
@@ -202,7 +211,7 @@ Module.register("compliments", {
 
 			if (payload.payload === "command") {
 				this.config.command = payload.command;
-        this.checkPossibleCommand(this.config.state, payload, this.config.command);
+        			this.checkPossibleCommand(this.config.state, payload, this.config.command);
 			} else {
 			  this.checkPossibleCommand(this.config.state, payload);
       }
