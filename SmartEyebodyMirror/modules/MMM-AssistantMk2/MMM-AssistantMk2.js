@@ -350,8 +350,12 @@ Module.register("MMM-AssistantMk2", {
 			break;
 		case "ASSISTANT_RESULT":
 			if (this.config.isName && payload.transcription) {
-				this.sendNotification("COMPLIMENTS", {payload: "checkUserName", userName: payload.transcription.transcription});
-				this.config.isName = false;
+				if (payload.transcription.transcription.indexOf("신규 등록") > 0 ) {
+					this.sendNotification("COMPLIMENTS", "signUpRequest");
+				} else {
+					this.sendNotification("COMPLIMENTS", {payload: "checkUserName", userName: payload.transcription.transcription});
+					this.config.isName = false;
+				}
 			}
 			if (payload.session && this.session.hasOwnProperty(payload.session)) {
 				var session = this.session[payload.session];
