@@ -57,9 +57,10 @@ Module.register("photo",{
 		this.sendNotification("COMPLIMENTS", "noDescription");
 		this.sendSocketNotification("GET_INFO", {
 			"isFront": isFront,
-			"id": 141,
+			"id": 1,
 			"term": term
 		});
+		//is_front, id, term
 	},
 
 	socketNotificationReceived: function(notification, payload){
@@ -77,6 +78,7 @@ Module.register("photo",{
 		} else if(notification === "HERE_INFO") {
 			this.whatPage = "comparePage";
 			this.comparePageData = payload;
+			Log.log(payload);
 		}
 	 	this.updateDom();
 	},
@@ -90,6 +92,13 @@ Module.register("photo",{
 			if(payload.term) {
 				this.term = payload.term;
 				payload = payload.payload;
+			}
+			
+			//SHOW_COMPARE
+			if(payload.isfront || !payload.isfront) {
+				this.isfront = payload.isfront;
+				payload = payload.payload;
+				Log.log(this.isfront + "&&&&&" + payload);
 			}
 
 			switch(payload) {
@@ -107,7 +116,6 @@ Module.register("photo",{
 				break;
 			case "TAKE_PIC_SIDE":
 				this.fileNameSuffix = '_side.jpg';
-
 				this.sendNotification("COMPLIMENTS", "sideStart");
 				this.sendSocketNotification("PREVIEW", this.fileName + this.fileNameSuffix);
 				break;
@@ -138,7 +146,7 @@ Module.register("photo",{
 				this.sendNotification("COMPLIMENTS", "deletePicture");
 				break;
 			case "SHOW_COMPARE":
-				this.compare(true, 0);
+				this.compare(this.isfront, 0);
 				break;
 			}
 		}
@@ -204,7 +212,7 @@ Module.register("photo",{
 		// base image
 		var img1 = document.createElement("img");
 		img1.src = "/modules/default/photo/image/" + data.beforeFileName + (data.isFront ? "_front" : "_side") + ".jpg";
-
+		
 		var info1 = document.createElement("div");
 		info1.className = "info_item";
 		this.fillBox(info1, data.beforeData);
@@ -227,7 +235,6 @@ Module.register("photo",{
 			var tmp = await this.fillDif(data.beforeData, data.afterData);
 			wrapper.appendChild(tmp);
 		}
-
 		return wrapper;
 	},
 

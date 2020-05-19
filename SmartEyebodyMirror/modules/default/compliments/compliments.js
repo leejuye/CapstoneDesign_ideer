@@ -79,7 +79,7 @@ Module.register("compliments", {
 		//TEST
 		var self = this;
 		setTimeout(function() {
-			self.sendNotification("PHOTO", "SHOW_COMPARE");
+			self.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isfront": true});
 			Log.log("@@@@@@@");
 		}, 5000);
 	},
@@ -295,6 +295,9 @@ Module.register("compliments", {
 					// side start
 						this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
 						break;
+					case "savePictureOrNot":
+						this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isfront": true});
+						break;
 					case "shutdownRequest":
 						this.sendNotification("HIDE_ALL_MODULES");
 						break;
@@ -324,6 +327,8 @@ Module.register("compliments", {
 						} else {
 							this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
 						}
+					case "savePictureOrNot":
+						this.sendNotification("PHOTO", "REMOVE_RESULT");
 						break;
 					case "shutdownRequest":
 						break;
