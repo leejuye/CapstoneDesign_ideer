@@ -17,12 +17,17 @@ module.exports = NodeHelper.create({
 		var filenum = await execSync(cmd);
 		filenum = await parseInt(filenum);
 		console.log("### numOfFiles: ", + filenum);
-
+		
 		return new Promise(function(resolve, reject){
 			resolve(filenum);
 		});
 	},
-
+	
+	saveFile: async function() {
+		var saveFileNum = await numberOfFiles();
+		this.sendSocketNotification("HERE_FILE_NUMBER", saveFileNum)
+	},
+	
 	dbConn: async function(qry, params) {
 		var conn, results;
 		try{
@@ -139,6 +144,8 @@ module.exports = NodeHelper.create({
 			this.getSizeInfo(payload);
 		} else if(notification === "CHANGE_BASE") {
 			this.changeBaseFile(payload.id, payload.fileName);
+		} else if(notificatio === "GET_FILE_NUMBER") {
+			this.saveFile();
 		}
 	}
 

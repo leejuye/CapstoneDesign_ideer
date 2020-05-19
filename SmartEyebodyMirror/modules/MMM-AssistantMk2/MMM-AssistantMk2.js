@@ -374,7 +374,7 @@ Module.register("MMM-AssistantMk2", {
 			}
 
 			if (this.config.date > 0) {
-				this.sendNotification("PHOTO", {payload: "/*payload*/", date: this.config.date});
+				this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "term": this.config.date, "isFront": true});
 			}
 				
 			if (payload.session && this.session.hasOwnProperty(payload.session)) {

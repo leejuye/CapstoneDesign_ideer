@@ -12,11 +12,12 @@ Module.register("photo",{
 	fileNameSuffix: null,
 	whatPage: null,
 	comparePageData: null,
-
+	term: 0,
+	isFront: true,
+	fileNumber: 0,
+	
 	start: function() {
 	 	this.current_user = null;
-		this.term = 0;
-		this.fileNumber = 0;
 		//TEST
 		//this.sendSocketNotification("TEST", null);
 		//this.fileName = "1234";
@@ -79,6 +80,9 @@ Module.register("photo",{
 		} else if(notification === "HERE_INFO") {
 			this.whatPage = "comparePage";
 			this.comparePageData = payload;
+			Log.log(payload);
+		} else if(notificatio === "HERE_FILE_NUMBER") {
+			this.sendNotification("COMPLIMENTS", {"payload": "savePicture", "number": payload});
 		}
 	 	this.updateDom();
 	},
@@ -87,18 +91,13 @@ Module.register("photo",{
 		if(notification === "PHOTO") {
 			Log.log(this.name + "received a notification: " + notification + ", payload : " + payload);
 		 	this.initImage();
-
-		 	//SHOW_COMPARE
-			if(payload.term) {
+			
+			//SHOW_COMPARE
+			if(payload.hasOwnProperty("isFront")) {
+				this.isFront = payload.isFront;
 				this.term = payload.term;
 				payload = payload.payload;
-			}
-
-			//SHOW_COMPARE
-			if(payload.isfront || !payload.isfront) {
-				this.isfront = payload.isfront;
-				payload = payload.payload;
-				Log.log(this.isfront + "&&&&&" + payload);
+				Log.log(this.isFront + "&&&&&" + payload + "&&&&" + this.term);
 			}
 
 			switch(payload) {
@@ -139,14 +138,19 @@ Module.register("photo",{
 				this.whatPage = "resultPage";
 				this.updateDom();
 				this.sendNotification("COMPLIMENTS", "savePictureOrNot");
+				setTimeout(() => {
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+					}, 8000);
 				break;
 			case "REMOVE_RESULT":
 				this.sendSocketNotification("REMOVE_PIC", this.fileName + "_front.jpg");
 				this.sendSocketNotification("REMOVE_PIC", this.fileName + "_side.jpg");
 				this.sendNotification("COMPLIMENTS", "deletePicture");
 				break;
+			case "COUNT_FILE":
+				this.sendSocketNotification("GET_FILE_NUMBER", "save");
 			case "SHOW_COMPARE":
-				this.compare(this.isFront, 0);
+				this.compare(this.isFront, this.term);
 				break;
 			case "SHOW_PREV":
 				this.compare(this.isFront, this.term, "prev");
@@ -154,6 +158,8 @@ Module.register("photo",{
 			case "SHOW_NEXT":
 				this.compare(this.isFront, this.term, "next");
 				break;
+			case "":
+				this.sendSocketNotification("CHANGE_BASE", {"id": this.id, "fileName": this.fileName});
 			}
 		}
 	},
@@ -161,15 +167,16 @@ Module.register("photo",{
 	drawResultPage: function() {
 		var wrapper = document.createElement("div");
 		var img1 = document.createElement("img");
-                img1.src = "/modules/default/photo/image/" + this.fileName + "_front.jpg";
+        img1.src = "/modules/default/photo/image/" + this.fileName + "_front.jpg";
+        var img2 = document.createElement("img");
+        img2.src = "/modules/default/photo/image/" + this.fileName + "_side.jpg";
 
-                var img2 = document.createElement("img");
-                img2.src = "/modules/default/photo/image/" + this.fileName + "_side.jpg";
-
-                wrapper.appendChild(img1);
-                wrapper.appendChild(img2);
-
-		return wrapper;
+        wrapper.appendChild(img1);
+        wrapper.appendChild(img2);
+        
+		return new Promise(function(resolve, reject){
+			resolve(wrapper);
+		});
 	},
 
 	fillBox: function(box, data) {
@@ -205,13 +212,6 @@ Module.register("photo",{
 			});
 	},
 
-	makeDateFormat: function(date) {
-		var ret = date.substr(0,4) + "." +
-			date.substr(4,2) + "." +
-			date.substr(6,2);
-		return ret;
-	},
-
 	drawComparePage: async function() {
 		var data = this.comparePageData;
 		var wrapper = document.createElement("div");
@@ -223,40 +223,26 @@ Module.register("photo",{
 
 		// Draw before info
 		// base image
-		var imgBox1 = document.createElement("div");
-		imgBox1.className = "info_img_box";
-
 		var img1 = document.createElement("img");
 		img1.src = "/modules/default/photo/image/" + data.beforeFileName + (data.isFront ? "_front" : "_side") + ".jpg";
-		img1.className = "info_img"
-
+		
 		var info1 = document.createElement("div");
 		info1.className = "info_item";
 		this.fillBox(info1, data.beforeData);
 
-		imgBox1.appendChild(img1);
-		imgBox1.appendChild(document.createTextNode(this.makeDateFormat(data.beforeFileName)));
-
-		wrapper.appendChild(imgBox1);
+		wrapper.appendChild(img1);
 		wrapper.appendChild(info1);
 
 		// Draw after info
 		if(data.fileNum > 1){
-			var imgBox2 = document.createElement("div");
-			imgBox2.className = "info_img_box";
-
 			var img2 = document.createElement("img");
 			img2.src = "/modules/default/photo/image/" + data.afterFileName + (data.isFront ? "_front" : "_side") + ".jpg";
-			img2.className = "info_img";
 
 			var info2 = document.createElement("div");
 			info2.className = "info_item";
 			this.fillBox(info2, data.afterData);
 
-			imgBox2.appendChild(img2);
-			imgBox2.appendChild(document.createTextNode(this.makeDateFormat(data.afterFileName)));
-
-			wrapper.appendChild(imgBox2);
+			wrapper.appendChild(img2);
 			wrapper.appendChild(info2);
 
 			var tmp = await this.fillDif(data.beforeData, data.afterData);
@@ -271,10 +257,10 @@ Module.register("photo",{
 		return wrapper;
 	},
 
-	getDom: function() {
+	getDom: async function() {
 		switch(this.whatPage) {
 		case "resultPage":
-			wrapper = this.drawResultPage();
+			wrapper = await this.drawResultPage();
 			break;
 		case "comparePage":
 			wrapper = this.drawComparePage();
