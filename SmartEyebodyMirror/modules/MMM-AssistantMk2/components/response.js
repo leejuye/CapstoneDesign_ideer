@@ -216,9 +216,9 @@ class AssistantResponseClass {
 			this.end();
 			return;
 		}
-		
-    	var command = response.transcription.transcription;
 
+    var command = response.transcription.transcription;
+    
 		if (command.indexOf("전 사진 보여 줘") >= 0) {
 			var string;
 			string = command.split(' 전');

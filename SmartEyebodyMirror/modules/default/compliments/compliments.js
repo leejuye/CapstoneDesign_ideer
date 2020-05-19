@@ -42,7 +42,8 @@ Module.register("compliments", {
 		sayTF: false,
 		assistState: "",
 		userName: "",
-		pass: false
+		pass: false,
+		command: ""
 	},
 	lastIndexUsed:-1,
 	// Set currentweather from module
@@ -116,7 +117,7 @@ Module.register("compliments", {
 	},
 
 	// Set what commands to receive
-	checkPossibleCommand: function(state, payload) {
+	checkPossibleCommand: function(state, payload, command) {
 		switch (state) {
 		// only take_pic, lookup, shutdown
 		case "initial":
@@ -127,16 +128,10 @@ Module.register("compliments", {
 				this.config.pass = false;
 				break;
 			case "imHere":
-				this.config.pass = true;
-				this.makeNotNow("나 왔어");
-				break;
 			case "sayYes":
-				this.config.pass = true;
-				this.makeNotNow("응");
-				break;
 			case "sayNo":
 				this.config.pass = true;
-				this.makeNotNow("아니");
+				this.makeNotNow(command);
 				break;
 			}
 			break;
@@ -154,20 +149,11 @@ Module.register("compliments", {
 				this.config.pass = false;
 				break;
 			case "dressCheck":
-				this.config.pass = true;
-				this.makeNotNow("촬영");
-				break;
 			case "imHere":
-				this.config.pass = true;
-				this.makeNotNow("나 왔어");
-				break;
 			case "lookup":
-				this.config.pass = true;
-				this.makeNotNow("조회");
-				break;
 			case "shutdownRequest":
 				this.config.pass = true;
-				this.makeNotNow("종료");
+				this.makeNotNow(command);
 				break;
 			}
 			break;
@@ -179,27 +165,25 @@ Module.register("compliments", {
 				this.config.pass = false;
 				break;
 			case "dressCheck":
-				this.config.pass = true;
-				this.makeNotNow("촬영");
-				break;
 			case "lookup":
-				this.config.pass = true;
-				this.makeNotNow("조회");
-				break;
 			case "shutdownRequest":
-				this.config.pass = true;
-				this.makeNotNow("종료");
-				break;
 			case "sayYes":
-				this.config.pass = true;
-				this.makeNotNow("응");
-				break;
 			case "sayNo":
 				this.config.pass = true;
-				this.makeNotNow("아니");
+				this.makeNotNow(command);
 				break;
 			}
 			break;
+		// in lookup case
+		case "lookup":
+			if (command.indexOf("전 사진 보여 줘") >= 0) {
+				this.config.pass = false;
+				break;
+			} else {
+				this.config.pass = true;
+				this.makeNotNow(command);
+				break;
+			}
 		}
 	},
 
@@ -216,8 +200,15 @@ Module.register("compliments", {
 		if (notification === "COMPLIMENTS") {
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload + ", from: " + sender);
 
-			this.checkPossibleCommand(this.config.state, payload);
+			if (payload.payload === "command") {
+				this.config.command = payload.command;
+        this.checkPossibleCommand(this.config.state, payload, this.config.command);
+			} else {
+			  this.checkPossibleCommand(this.config.state, payload);
+      }
+
 			Log.log(this.config.state +"@@@@" + payload);
+
 			// Execute commands
 			if (!this.config.pass) {
 				clearInterval(this.compInterval);
@@ -294,7 +285,7 @@ Module.register("compliments", {
 					break;
 				case "lookup":
 					this.config.state = payload;
-					this.sendNotification("ASSISTANT", "lookup");				
+					this.sendNotification("ASSISTANT", "lookup");
 					break;
 				case "checkUserName":
 					this.config.tmpName = this.config.userName;
@@ -526,9 +517,9 @@ Module.register("compliments", {
 		wrapper.className = this.config.classes ? this.config.classes : "thin large bright pre-line";
 		// get the compliment text
 		var complimentText = this.randomCompliment();
-		if(this.descCommand === "savePicture") {
-			Log.log("^*^*^&%*$^&*^*#^*&@$^%#*&%^&*@#%^*&^$&*");
+		if(this.descCommand === "savePicture" && complimentText) {
 			complimentText = [complimentText.slice(0,13), this.filenumber, complimentText.slice(13)].join("");
+			this.filenumber = null;
 		}
 		if(this.config.userName && complimentText) {
 			complimentText = `${this.config.userName}${complimentText}`;
