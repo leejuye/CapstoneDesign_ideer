@@ -110,6 +110,10 @@ var config = {
 						pattern: "나 왔어",  // No spaces but ok in this case
 						command: "IM_HERE"
 					},
+					"LOOKUP": {
+						pattern: "조회",
+						command: "LOOKUP"
+					},
 					"SHUTDOWN": {
 						pattern: "(종료|꺼 줘)",
 						command: "SHUTDOWN_REQUEST"
@@ -145,6 +149,15 @@ var config = {
 						notificationExec: {
 							notification: "COMPLIMENTS",
 							payload: "imHere"
+						}
+					},
+					"LOOKUP": {
+						soundExec: {
+							chime: "open"
+						},
+						notificationExec: {
+							notification: "PHOTO",
+							payload: "SHOW_COMPARE"
 						}
 					},
 					"SHUTDOWN_REQUEST": {

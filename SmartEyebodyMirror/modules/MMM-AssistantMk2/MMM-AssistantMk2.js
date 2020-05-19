@@ -15,6 +15,7 @@ var log = function() {
 Module.register("MMM-AssistantMk2", {
 	defaults: {
 		isName: false,
+		isLookup: false,
 		debug:false,
 		useA2D: false,
 		A2DStopCommand: "stop",
@@ -331,6 +332,12 @@ Module.register("MMM-AssistantMk2", {
 		case "SNOWBOY_STOP":
 			if (this.config.useSnowboy) {this.sendSocketNotification("ASSISTANT_BUSY");}
 			break;
+		case "ASSISTANT":
+			if (payload === "lookup") {
+				this.config.isLookup = true;
+			} else {
+				this.config.isLookup = false;
+			}
 		}
 		this.doPlugin("onAfterNotificationReceived", {notification:noti, payload:payload});
 	},

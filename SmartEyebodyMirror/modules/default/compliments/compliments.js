@@ -77,11 +77,11 @@ Module.register("compliments", {
 		}, this.config.updateInterval);
 
 		//TEST
-		var self = this;
+		/*var self = this;
 		setTimeout(function() {
 			self.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isfront": true});
 			Log.log("@@@@@@@");
-		}, 5000);
+		}, 5000);*/
 	},
 	// Module location
 	getLocation: function() {
@@ -115,13 +115,14 @@ Module.register("compliments", {
 		}, 100);
 	},
 
-	checkPossibleCommand: function(state, payload) {
 	// Set what commands to receive
+	checkPossibleCommand: function(state, payload) {
 		switch (state) {
 		// only take_pic, lookup, shutdown
 		case "initial":
 			switch (payload) {
 			case "dressCheck":
+			case "lookup":
 			case "shutdownRequest":
 				this.config.pass = false;
 				break;
@@ -159,6 +160,10 @@ Module.register("compliments", {
 				this.config.pass = true;
 				this.makeNotNow("나 왔어");
 				break;
+			case "lookup":
+				this.config.pass = true;
+				this.makeNotNow("조회");
+				break;
 			case "shutdownRequest":
 				this.config.pass = true;
 				this.makeNotNow("종료");
@@ -175,6 +180,7 @@ Module.register("compliments", {
 			case "dressCheck":
 				this.config.pass = true;
 				this.makeNotNow("촬영");
+				break;
 			case "savePictureOrNot" :
 				this.config.state = "savePictureOrNot";
 				break;
@@ -188,6 +194,11 @@ Module.register("compliments", {
 				break;
 			case "photoNotExist" :
 				this.config.state = "photoNotExist";
+				break;
+			case "lookup":
+				this.config.pass = true;
+				this.makeNotNow("조회");
+				break;
 			case "shutdownRequest":
 				this.config.pass = true;
 				this.makeNotNow("종료");
@@ -274,6 +285,10 @@ Module.register("compliments", {
 				case "savePictureOrNot":
 					this.sendNotification("PHOTO", "COUNT_FILE");
 					break;
+				case "lookup":
+					this.config.state = payload;
+					this.sendNotification("ASSISTANT", "lookup");				
+					break;
 				case "shutdownRequest":
 					this.config.state = payload;
 					setTimeout(() => {
@@ -292,7 +307,7 @@ Module.register("compliments", {
 						this.sendNotification("PHOTO", "TAKE_PIC");
 						break;
 					case "frontResult":
-					// side start
+						// side start
 						this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
 						break;
 					case "savePictureOrNot":
@@ -339,27 +354,6 @@ Module.register("compliments", {
 					if (this.config.state !== "dressWait") {
 						this.config.state = "initial";
 					}
-				case "frontResult":
-					this.config.badFrontCnt++;
-					if (this.config.badFrontCnt === 3) {
-						this.sendNotification("PHOTO", "tryAgain");
-						this.config.badFrontCnt = 0;
-					} else {
-						this.sendNotification("PHOTO", "RE_TAKE_PIC");
-					}
-					break;
-				case "sideResult":
-					this.config.badSideCnt++;
-					if (this.config.badSideCnt === 3) {
-						this.sendNotification("PHOTO", "tryAgain");
-						this.config.badSideCnt = 0;
-					} else {
-						this.sendNotification("PHOTO", "RE_TAKE_PIC_SIDE");
-					}
-					break;
-				}
-				if (this.config.state !== "dressWait") {
-					this.config.state = "";
 				}
 			}
 			this.config.pass = false;
