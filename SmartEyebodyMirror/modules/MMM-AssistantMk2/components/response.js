@@ -275,7 +275,7 @@ class AssistantResponseClass {
 				this.status("error")
 				this.showError(this.callbacks.translate("NOT_NOW"))
 				this.end()
-				return
+				return;
 		}																									
 			
 		var normalResponse = (response) => {

@@ -124,6 +124,8 @@ module.exports = NodeHelper.create({
 	changeBaseFile: function(id, fileName) {
 		var qry = "UPDATE users SET base_file = ? WHERE id = ?";
 		this.dbConn(qry, [fileName, id]);
+		this.sendSocketNotification("CHANGE_COMPLETE", "complete");
+		
 	},
 
 	socketNotificationReceived: function(notification, payload) {

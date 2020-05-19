@@ -234,7 +234,6 @@ Module.register("compliments", {
 				}
 				//checkUserName, signInSuccess, notExistUserName
 				if(payload.userName) {
-					Log.log("@@@@!!!!!!!@@@");
 					Log.log(payload);
 					this.config.userName = payload.userName;
 					payload = payload.payload;
@@ -290,7 +289,7 @@ Module.register("compliments", {
 					this.config.state = payload;
 					setTimeout(() => {
 						this.sendNotification("PHOTO", "SHOW_COMPARE");
-					}, 10000);
+					}, 5000);
 					break;
 				case "lookup":
 					this.config.state = payload;
@@ -304,6 +303,12 @@ Module.register("compliments", {
 					break;
 				case "signUpRequest":
 					this.sendNotificationToAssis(payload, true);
+					break;
+				case "changeBase":
+					this.config.state = payload;
+					setTimeout(() => {
+						this.sendNotification("PHOTO", "SHOW_COMPARE");
+					}, 5000);
 					break;
 				case "sayYes":
 					switch(this.config.state){
