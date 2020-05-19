@@ -173,6 +173,16 @@ Module.register("compliments", {
 				break;
 			}
 			break;
+		// in lookup case
+		case "lookup":
+			if (command.indexOf("전 사진 보여 줘") >= 0) {
+				this.config.pass = false;
+				break;
+			} else {
+				this.config.pass = true;
+				this.makeNotNow(command);
+				break;
+			}
 		}
 	},
 
