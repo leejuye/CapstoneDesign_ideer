@@ -1,12 +1,5 @@
 Module.register("signIn",{
 
-	start: function() {
-		const self = this;
-		setTimeout(function() {
-			self.sendSocketNotification("SIGN_IN", "방주영");
-		}, 5000);
-	},
-
 	notificationReceived: function (notification, payload) {
 		switch(notification) {
 		case "CHECK_NAME_IN_DB":

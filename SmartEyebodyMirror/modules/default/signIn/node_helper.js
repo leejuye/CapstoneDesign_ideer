@@ -25,6 +25,9 @@ module.exports = NodeHelper.create({
 			if(user) {this.sendSocketNotification("SIGN_IN_SUCCESS", user);}
 			else {this.sendSocketNotification("NOT_EXIST");}
 		}
+		else {
+			this.sendSocketNotification("SIGN_IN_ERRER");
+		}
 	},
 
 	createUser: async function(payload) {
@@ -35,7 +38,7 @@ module.exports = NodeHelper.create({
 	socketNotificationReceived: function(notification, payload) {
 		if(notification === "CHECK_USER") {
 			var user = this.getUser(payload);
-			if(user) {
+			if(user.id) {
 				this.sendSocketNotification("ALREADY_EXIST");
 			} else {
 				this.createUser(payload);

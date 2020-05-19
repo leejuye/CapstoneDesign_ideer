@@ -173,7 +173,7 @@ Module.register("MMM-AssistantMk2", {
 				{return this.Assistant2Display(response);}
 			}
 		};
-		this.assistantResponse = new AssistantResponse(this.helperConfig["responseConfig"], callbacks, this.config.isName);
+		this.assistantResponse = new AssistantResponse(this.helperConfig["responseConfig"], callbacks);
 	},
 
 	playSound: function(sound) {
