@@ -16,6 +16,7 @@ Module.register("photo",{
 	isFront: true,
 	fileNumber: 0,
 	ver: 1,
+	id: 1,
 
 	start: function() {
 	 	this.current_user = null;
@@ -80,9 +81,14 @@ Module.register("photo",{
 			}, 8000)
 		} else if(notification === "HERE_INFO") {
 			this.whatPage = "comparePage";
+			this.fileName = payload.afterFileName;
 			this.comparePageData = payload;
 		} else if(notification === "HERE_FILE_NUMBER") {
 			this.sendNotification("COMPLIMENTS", {"payload": "savePicture", "number": payload});
+		} else if(notification === "CHANGE_COMPLETE") {
+			this.initImage();
+			this.term = 0;
+			this.sendNotification("COMPLIMENTS","changeBase");
 		}
 	 	this.updateDom();
 	},
@@ -156,6 +162,7 @@ Module.register("photo",{
 				break;
 			case "SHOW_COMPARE":
 				this.compare(this.isFront, this.term, null);
+				Log.log("!!!!@@@!!!! who are you@!!");
 				break;
 			case "SHOW_PREV":
 				this.compare(this.isFront, this.term, "prev");
@@ -163,8 +170,9 @@ Module.register("photo",{
 			case "SHOW_NEXT":
 				this.compare(this.isFront, this.term, "next");
 				break;
-			case "":
+			case "CHANGE_BASE":
 				this.sendSocketNotification("CHANGE_BASE", {"id": this.id, "fileName": this.fileName});
+				this.updateDom();																		
 				break;
 			}
 		}
@@ -227,6 +235,7 @@ Module.register("photo",{
 	},
 
 	drawComparePage: async function() {
+		Log.log("><><><><><><<><><><><><>");
 		var data = this.comparePageData;
 		var wrapper = document.createElement("div");
 

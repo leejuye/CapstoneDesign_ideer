@@ -248,14 +248,26 @@ class AssistantResponseClass {
 					return;
 				}
 			}
-		}									
-
+		} else if(command.indexOf("정면") >= 0) {
+			this.showing = false;
+			this.end();
+			return;
+		}else if(command.indexOf("측면") >= 0) {
+			this.showing = false;
+			this.end();
+			return;
+		} else if(command.indexOf("기준 변경") >= 0) {
+			this.showing = false;
+			this.end();
+			return;
+		}
+		
 		if (response.lastQuery.text === "NOT_NOW") {
 				this.showing = false
 				this.status("error")
 				this.showError(this.callbacks.translate("NOT_NOW"))
 				this.end()
-				return
+				return;
 		}																									
 			
 		var normalResponse = (response) => {
