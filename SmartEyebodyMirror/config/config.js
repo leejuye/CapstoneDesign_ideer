@@ -42,6 +42,9 @@ var config = {
 		    module: "hideshow"
 		},*/
 		{
+		    module: "signIn",
+		},
+		{
 		    module: "compliments",
 		 	position: "lower_third"
 		},

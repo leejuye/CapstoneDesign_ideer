@@ -193,6 +193,14 @@ Module.register("compliments", {
 		}
 	},
 
+	sendNotificationToAssis: function(payload, isName=false) {
+		console.log(isName);
+		this.config.state = payload;
+		setTimeout(() => {
+			this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: isName});
+		}, 3000);
+	},
+
 	// Override notification handler.
 	notificationReceived: function(notification, payload, sender) {
 
@@ -257,16 +265,12 @@ Module.register("compliments", {
 					this.sendNotification("PHOTO", "TAKE_PIC");
 					break;
 				case "shutdownRequest":
-					this.config.state = payload;
-					setTimeout(() => {
-						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-					}, 3000);
+				case "checkUserName":
+				case "alreadyExistName":
+					this.sendNotificationToAssis(payload);
 					break;
 				case "signUpRequest":
-					this.config.state = payload;
-					setTimeout(() => {
-						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
-					}, 3000);
+					this.sendNotificationToAssis(payload, true);
 					break;
 				case "sayYes":
 					switch(this.config.state){
@@ -279,6 +283,13 @@ Module.register("compliments", {
 						break;
 					case "shutdownRequest":
 						this.sendNotification("HIDE_ALL_MODULES");
+						break;
+					case "checkUserName":
+						this.sendNotification("CHECK_NAME_IN_DB", this.config.userName);
+						this.config.userName = "";
+						break;
+					case "alreadyExistName":
+						this.sendNotification("SIGN_IN_USER", this.config.userName);
 						break;
 					}
 					this.config.state = "initial";
@@ -308,6 +319,12 @@ Module.register("compliments", {
 						}
 						break;
 					case "shutdownRequest":
+						break;
+					case "checkUserName":
+						this.config.userName = "";
+						this.sendNotification("ASSISTANT_COMMAND", {
+							command: "SIGN_UP_REQUEST"
+						});
 						break;
 					default:
 						this.config.state = payload;
@@ -470,9 +487,8 @@ Module.register("compliments", {
 		if(this.descCommand === "savePicture") {
 			complimentText = [complimentText.slice(0,13), this.filenumber, complimentText.slice(13)].join("");
 		}
-		if(this.descCommand === "checkUserName") {
+		if(this.config.userName) {
 			complimentText = `${this.config.userName}${complimentText}`;
-			this.config.userName = "";
 		}
 		// split it into parts on newline text
 		var parts= complimentText.split("\n");

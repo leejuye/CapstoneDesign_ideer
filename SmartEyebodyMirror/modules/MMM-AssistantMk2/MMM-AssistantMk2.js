@@ -342,14 +342,14 @@ Module.register("MMM-AssistantMk2", {
 			log(payload);
 			break;
 		case "INITIALIZED":
-			log("Initialized.");
+			log("Initialized");
 			this.sendNotification("ASSISTANT_READY");
 			if (this.config.useSnowboy) {this.sendSocketNotification("ASSISTANT_READY");}
 			this.assistantResponse.status("standby");
 			this.doPlugin("onReady");
 			break;
 		case "ASSISTANT_RESULT":
-			if (this.config.isName) {
+			if (this.config.isName && payload.transcription) {
 				this.sendNotification("COMPLIMENTS", {payload: "checkUserName", userName: payload.transcription.transcription});
 				this.config.isName = false;
 			}
