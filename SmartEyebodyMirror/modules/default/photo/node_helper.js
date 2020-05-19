@@ -9,25 +9,24 @@ const parts = ["id", "shoulder", "chest", "waist", "hip", "thigh", "calf",
 	"weight", "bmi", "is_front", "file_name"]
 
 module.exports = NodeHelper.create({
-	numberOfFiles: async function() {
+	numberOfFiles: async function(id) {
 		const execSync = require('child_process').execSync;
-		const path = "/home/pi/CapstoneDesign_ideer/SmartEyebodyMirror/modules/default/photo/image/";
+		const path = "/home/pi/CapstoneDesign_ideer/SmartEyebodyMirror/modules/default/photo/image/" + id + "/";
 		const cmd = 'find ' + path + ' -type f -name "*_front.jpg" | wc -l';
 
 		var filenum = await execSync(cmd);
 		filenum = await parseInt(filenum);
-		console.log("### numOfFiles: ", + filenum);
-		
+
 		return new Promise(function(resolve, reject){
 			resolve(filenum);
 		});
 	},
-	
-	saveFile: async function() {
-		var saveFileNum = await this.numberOfFiles();
+
+	saveFile: async function(id) {
+		var saveFileNum = await this.numberOfFiles(id);
 		this.sendSocketNotification("HERE_FILE_NUMBER", saveFileNum);
 	},
-	
+
 	dbConn: async function(qry, params) {
 		var conn, results;
 		try{
@@ -46,7 +45,7 @@ module.exports = NodeHelper.create({
 	},
 
 	getSizeInfo: async function(payload) {
-		var fileNum = await this.numberOfFiles();
+		var fileNum = await this.numberOfFiles(payload.id);
 		if(fileNum == 0) {
 			this.sendSocketNotification("HERE_INFO", {
 				"fileNum": fileNum
@@ -59,11 +58,11 @@ module.exports = NodeHelper.create({
 		var beforeFileName = await this.getBeforeFileName(payload.id);
 		var afterFileName = await this.getAfterFileName(payload.id, payload.isFront, payload.term);
 		if(payload.command === "prev") {
-			qry = "SELECT MAX(file_name) FROM size_info WHERE file_name < ?";
-			afterFileName = await this.dbConn(qry, afterFileName);
+			qry = "SELECT MAX(file_name) FROM size_info WHERE file_name < ? and id = ?";
+			afterFileName = await this.dbConn(qry, [afterFileName, payload.id]);
 		} else if(payload.command === "next") {
-			qry = "SELECT MIN(file_name) FROM size_info WHERE file_name > ?";
-			afterFileName = await this.dbConn(qry, afterFileName);
+			qry = "SELECT MIN(file_name) FROM size_info WHERE file_name > ? and id = ?";
+			afterFileName = await this.dbConn(qry, [afterFileName, payload.id]);
 		}
 		qry = "SELECT shoulder,chest,waist,hip,thigh,calf,weight,bmi "
 			+ "FROM size_info WHERE is_front = ? and file_name = ?";
@@ -132,22 +131,21 @@ module.exports = NodeHelper.create({
 		console.log("!!!!! noti: " + notification + " pay: " + payload);
 		if(notification === "PREVIEW") {
 			var self = this;
-			PythonShell.run("modules/default/photo/preview.py", {args: [payload]},
+			PythonShell.run("modules/default/photo/preview.py", {args: [payload.fileName, payload.id]},
 			function (err, result) {
-				console.log('########################' + result);
 				if (err) throw err;
 				self.setSizeInfo(result);
-				self.sendSocketNotification("PREVIEW_DONE",payload);
+				self.sendSocketNotification("PREVIEW_DONE",payload.fileName);
 			});
 		} else if(notification === "REMOVE_PIC") {
-			fs.unlinkSync("modules/default/photo/image/" + payload);
-			this.deleteSizeInfo(payload);
+			fs.unlinkSync("modules/default/photo/image/" + payload.id + "/" + payload.fileName);
+			this.deleteSizeInfo(payload.fileName);
 		} else if(notification === "GET_INFO") {
 			this.getSizeInfo(payload);
 		} else if(notification === "CHANGE_BASE") {
 			this.changeBaseFile(payload.id, payload.fileName);
 		} else if(notification === "GET_FILE_NUMBER") {
-			this.saveFile();
+			this.saveFile(payload);
 		}
 	}
 

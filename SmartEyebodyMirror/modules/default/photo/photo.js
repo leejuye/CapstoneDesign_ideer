@@ -16,7 +16,7 @@ Module.register("photo",{
 	isFront: true,
 	fileNumber: 0,
 	ver: 1,
-	id: 1,
+	id: null,
 
 	start: function() {
 	 	this.current_user = null;
@@ -61,7 +61,7 @@ Module.register("photo",{
 		this.sendNotification("COMPLIMENTS", "noDescription");
 		this.sendSocketNotification("GET_INFO", {
 			"isFront": isFront,
-			"id": 1,
+			"id": this.id,
 			"term": term,
 			"command": command
 		});
@@ -69,9 +69,8 @@ Module.register("photo",{
 
 	socketNotificationReceived: function(notification, payload){
 		if(notification === "PREVIEW_DONE") {
-			this.config.imageSrc = "/modules/default/photo/image/" + payload + "?version=" + this.ver++;
+			this.config.imageSrc = "/modules/default/photo/image/" + this.id + "/" + payload + "?version=" + this.ver++;
 			if(payload.indexOf("front") != -1) {
-				Log.log("front result");
 				this.sendNotification("COMPLIMENTS","frontResult");
 			} else {
 				this.sendNotification("COMPLIMENTS","sideResult");
@@ -85,6 +84,12 @@ Module.register("photo",{
 			this.comparePageData = payload;
 		} else if(notification === "HERE_FILE_NUMBER") {
 			this.sendNotification("COMPLIMENTS", {"payload": "savePicture", "number": payload});
+			if(payload == 1) {
+				this.sendSocketNotification("CHANGE_BASE", {
+					"id": this.id,
+					"fileName": this.fileName
+				});
+			}
 		} else if(notification === "CHANGE_COMPLETE") {
 			this.initImage();
 			this.term = 0;
@@ -94,7 +99,10 @@ Module.register("photo",{
 	},
 
 	notificationReceived: function(notification, payload, sender) {
-		if(notification === "PHOTO") {
+		if(notification === "SIGN_IN_INFO"){
+			this.id = payload.id;
+		}
+		else if(notification === "PHOTO") {
 			Log.log(this.name + "received a notification: " + notification + ", payload : " + payload);
 		 	this.initImage();
 
@@ -107,15 +115,16 @@ Module.register("photo",{
 				payload = payload.payload;
 				console.log(this.isFront + "&&&&&" + payload + "&&&&" + this.term);
 			}
-			
-			
-			
+
 			switch(payload) {
 			case "TAKE_PIC":
 				this.initFileName();
 				this.fileNameSuffix = '_front.jpg';
 				this.sendNotification("COMPLIMENTS", "frontStart");
-				this.sendSocketNotification("PREVIEW", this.fileName + this.fileNameSuffix);
+				this.sendSocketNotification("PREVIEW", {
+					"fileName": this.fileName + this.fileNameSuffix,
+					"id": this.id
+				});
 				break;
 			case "tryAgain":
 				this.sendNotification("COMPLIMENTS", "tryAgain");
@@ -126,7 +135,10 @@ Module.register("photo",{
 			case "TAKE_PIC_SIDE":
 				this.fileNameSuffix = '_side.jpg';
 				this.sendNotification("COMPLIMENTS", "sideStart");
-				this.sendSocketNotification("PREVIEW", this.fileName + this.fileNameSuffix);
+				this.sendSocketNotification("PREVIEW", {
+					"fileName": this.fileName + this.fileNameSuffix,
+					"id": this.id
+				});
 				break;
 			case "dressCheck":
 				this.sendNotification("COMPLIMENTS", "dressCheck");
@@ -135,14 +147,20 @@ Module.register("photo",{
 				this.sendNotification("COMPLIMENTS", "dressWait");
 				break;
 			case "RE_TAKE_PIC":
-				this.sendSocketNotification("REMOVE_PIC", this.fileName + this.fileNameSuffix);
+				this.sendSocketNotification("REMOVE_PIC",{
+					"id": this.id,
+					"fileName": this.fileName + this.fileNameSuffix
+				});
 				if(this.fileNameSuffix === '_front.jpg'){
 					this.initFileName();
 					this.sendNotification("COMPLIMENTS", "frontStart");
 				} else {
 					this.sendNotification("COMPLIMENTS", "sideStart");
 				}
-				this.sendSocketNotification("PREVIEW", this.fileName + this.fileNameSuffix);
+				this.sendSocketNotification("PREVIEW", {
+					"fileName": this.fileName + this.fileNameSuffix,
+					"id": this.id
+				});
 				break;
 			case "SHOW_RESULT":
 				this.whatPage = "resultPage";
@@ -153,12 +171,18 @@ Module.register("photo",{
 				this.updateDom();
 				break;
 			case "REMOVE_RESULT":
-				this.sendSocketNotification("REMOVE_PIC", this.fileName + "_front.jpg");
-				this.sendSocketNotification("REMOVE_PIC", this.fileName + "_side.jpg");
+				this.sendSocketNotification("REMOVE_PIC",{
+					"fileName": this.fileName + "_front.jpg",
+					"id": this.id
+				});
+				this.sendSocketNotification("REMOVE_PIC",{
+					"fileName": this.fileName + "_side.jpg",
+					"id": this.id
+				});
 				this.sendNotification("COMPLIMENTS", "deletePicture");
 				break;
 			case "COUNT_FILE":
-				this.sendSocketNotification("GET_FILE_NUMBER", "save");
+				this.sendSocketNotification("GET_FILE_NUMBER", this.id);
 				break;
 			case "SHOW_COMPARE":
 				this.compare(this.isFront, this.term, null);
@@ -181,10 +205,10 @@ Module.register("photo",{
 	drawResultPage: function() {
 		var wrapper = document.createElement("div");
 		var img1 = document.createElement("img");
-		img1.src = "/modules/default/photo/image/" + this.fileName + "_front.jpg"
+		img1.src = "/modules/default/photo/image/" + this.id + "/" + this.fileName + "_front.jpg"
 
 		var img2 = document.createElement("img");
-		img2.src = "/modules/default/photo/image/" + this.fileName + "_side.jpg";
+		img2.src = "/modules/default/photo/image/" + this.id + "/" + this.fileName + "_side.jpg";
 
 		wrapper.appendChild(img1);
 		wrapper.appendChild(img2);
@@ -250,7 +274,7 @@ Module.register("photo",{
 		imgBox1.className = "info_img_box";
 
 		var img1 = document.createElement("img");
-		img1.src = "/modules/default/photo/image/" + data.beforeFileName + (data.isFront ? "_front" : "_side") + ".jpg";
+		img1.src = "/modules/default/photo/image/" + this.id + "/" + data.beforeFileName + (data.isFront ? "_front" : "_side") + ".jpg";
 		img1.className = "info_img"
 
 		var info1 = document.createElement("div");
@@ -269,7 +293,7 @@ Module.register("photo",{
 			imgBox2.className = "info_img_box";
 
 			var img2 = document.createElement("img");
-			img2.src = "/modules/default/photo/image/" + data.afterFileName + (data.isFront ? "_front" : "_side") + ".jpg";
+			img2.src = "/modules/default/photo/image/" + this.id + "/" + data.afterFileName + (data.isFront ? "_front" : "_side") + ".jpg";
 			img2.className = "info_img";
 
 			var info2 = document.createElement("div");
