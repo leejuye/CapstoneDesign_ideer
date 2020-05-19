@@ -78,9 +78,9 @@ Module.register("MMM-AssistantMk2", {
 			Model: "jarvis",
 			Sensitivity: null
 		},
-    command: "",
-    strArray: null,
-    date: 0
+    		command: "",
+    		strArray: null,
+    		date: 0
 	},
 	plugins: {
 		onReady: [],
@@ -359,31 +359,43 @@ Module.register("MMM-AssistantMk2", {
 			this.doPlugin("onReady");
 			break;
 		case "ASSISTANT_RESULT":
-			if (this.config.isName && payload.transcription) {
-				if (payload.transcription.transcription.indexOf("신규 등록") > 0 ) {
-					this.sendNotification("COMPLIMENTS", "signUpRequest");
-				} else {
-					this.sendNotification("COMPLIMENTS", {payload: "checkUserName", userName: payload.transcription.transcription});
-					this.config.isName = false;
+			if (payload.transcription) {
+				this.config.command = payload.transcription.transcription;
+				this.sendNotification("COMPLIMENTS", {"payload": "command", "command": this.config.command});
+		
+        if (this.config.isName) {
+          if (payload.transcription.transcription.indexOf("신규 등록") >= 0 ) {
+            this.sendNotification("COMPLIMENTS", "signUpRequest");
+          } else {
+            this.sendNotification("COMPLIMENTS", {payload: "checkUserName", userName: payload.transcription.transcription});
+            this.config.isName = false;
+          }
+        }
+        
+				if (this.config.isLookup) {
+					if (this.config.command.indexOf("일 전 사진 보여 줘") >= 0) {
+						this.config.strArray = this.command.split('일');
+						this.config.date = this.config.strArray[0];
+					} else if (this.config.command.indexOf("주 전 사진 보여 줘") >= 0) {
+						this.config.strArray = this.command.split('주');
+						this.config.date = this.config.strArray[0] * 7;
+					} else if (this.config.command.indexOf("개월 전 사진 보여 줘") >= 0) {
+						this.config.strArray = this.command.split('개월');
+						this.config.date = this.config.strArray[0] * 30;
+					} else if (this.config.command.indexOf("년 전 사진 보여 줘") >= 0) {
+						this.config.strArray = this.command.split('년');
+						this.config.date = this.config.strArray[0] * 365;
+					}
+         
+					if (this.config.date > 0) {
+						this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "term": this.config.date, "isFront": true});
+					}
+				
+					if (command.indexOf("측면") >= 0) {
+						this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": false});
+					}
 				}
-			}
-
-			if (this.command.indexOf("일 전 사진 보여 줘") >= 0) {
-				this.config.strArray = this.command.split('일');
-				this.config.date = this.config.strArray[0];
-			} else if (this.command.indexOf("주 전 사진 보여 줘") >= 0) {
-				this.config.strArray = this.command.split('주');
-				this.config.date = this.config.strArray[0] * 7;
-			} else if (this.command.indexOf("개월 전 사진 보여 줘") >= 0) {
-				this.config.strArray = this.command.split('개월');
-				this.config.date = this.config.strArray[0] * 30;
-			} else if (this.command.indexOf("년 전 사진 보여 줘") >= 0) {
-				this.config.strArray = this.split('년');
-				this.config.date = this.config.strArray[0] * 365;
-			}
-
-			if (this.config.date > 0) {
-				this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "term": this.config.date, "isFront": true});
+				this.config.isLookup = false;
 			}
 				
 			if (payload.session && this.session.hasOwnProperty(payload.session)) {
