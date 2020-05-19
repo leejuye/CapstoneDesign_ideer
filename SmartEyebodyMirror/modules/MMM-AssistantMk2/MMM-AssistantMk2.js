@@ -388,7 +388,7 @@ Module.register("MMM-AssistantMk2", {
 					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "term": this.config.date, "isFront": true});
 				}
 
-				if (command.indexOf("측면") >= 0) {
+				if (this.config.command.indexOf("측면") >= 0) {
 					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": false});
 				}
 				this.config.isLookup = false;
