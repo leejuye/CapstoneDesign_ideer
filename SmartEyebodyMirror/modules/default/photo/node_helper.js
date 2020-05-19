@@ -24,8 +24,8 @@ module.exports = NodeHelper.create({
 	},
 	
 	saveFile: async function() {
-		var saveFileNum = await numberOfFiles();
-		this.sendSocketNotification("HERE_FILE_NUMBER", saveFileNum)
+		var saveFileNum = await this.numberOfFiles();
+		this.sendSocketNotification("HERE_FILE_NUMBER", saveFileNum);
 	},
 	
 	dbConn: async function(qry, params) {
@@ -144,7 +144,7 @@ module.exports = NodeHelper.create({
 			this.getSizeInfo(payload);
 		} else if(notification === "CHANGE_BASE") {
 			this.changeBaseFile(payload.id, payload.fileName);
-		} else if(notificatio === "GET_FILE_NUMBER") {
+		} else if(notification === "GET_FILE_NUMBER") {
 			this.saveFile();
 		}
 	}
