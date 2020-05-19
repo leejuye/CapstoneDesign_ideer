@@ -248,15 +248,27 @@ class AssistantResponseClass {
 					return;
 				}
 			}
+		} else if (command.indexOf("정면") >= 0) {
+			this.showing = false;
+			this.end();
+			return;
 		} else if (command.indexOf("측면") >= 0) {
 			this.showing = false;
 			this.end();
 			return;
-		} else if (command.indexOf("기준 변경") >= 0) {
+		} else if (command.indexOf("기준") >= 0 && command.indexOf("변경") >= 0) {
 			this.showing = false;
 			this.end();
 			return;
-		}								
+		} else if (command.indexOf("이전") >= 0) {
+			this.showing = false;
+			this.end();
+			return;
+		} else if (command.indexOf("다음") >= 0) {
+			this.showing = false;
+			this.end();
+			return;
+		}
 
 		if (response.lastQuery.text === "NOT_NOW") {
 				this.showing = false
@@ -286,6 +298,7 @@ class AssistantResponseClass {
 			// 	this.end();
 			// }
 		};
+		
 		this.postProcess(
 			response,
 			()=>{

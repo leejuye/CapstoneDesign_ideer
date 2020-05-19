@@ -390,14 +390,21 @@ Module.register("MMM-AssistantMk2", {
 						this.config.strArray = string.split('년');
 						this.config.date = this.config.strArray[0] * 365;
 					}
+				} else if (this.config.command.indexOf("정면") >= 0) {
+					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": true});
 				} else if (this.config.command.indexOf("측면") >= 0) {
 					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": false});
-				} else if (this.config.command.indexOf("기준 변경") >= 0) {
+				} else if (this.config.command.indexOf("기준") >= 0 && this.config.command.indexOf("변경") >= 0) {
 					this.sendNotification("PHOTO", "CHANGE_BASE");
+				} else if (this.config.command.indexOf("이전") >= 0) {
+					this.sendNotification("PHOTO", "SHOW_PREV");
+				} else if (this.config.command.indexOf("다음") >= 0) {
+					this.sendNotification("PHOTO", "SHOW_NEXT");
 				}
  
 				if (this.config.date > 0) {
 					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "term": this.config.date, "isFront": true});
+					this.config.date = 0;
 				}
 
 				this.config.isLookup = false;
