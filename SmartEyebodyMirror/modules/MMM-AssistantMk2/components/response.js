@@ -217,9 +217,9 @@ class AssistantResponseClass {
 			return;
 		}
 
-    var command = response.transcription.transcription;
+		var command = response.transcription.transcription;
     
-		if (command.indexOf("전 사진 보여 줘") >= 0) {
+		if (command.indexOf(" 전 사진 보여 줘") >= 0) {
 			var string;
 			string = command.split(' 전');
 			string = string[0];
@@ -248,7 +248,15 @@ class AssistantResponseClass {
 					return;
 				}
 			}
-		}									
+		} else if (command.indexOf("측면") >= 0) {
+			this.showing = false;
+			this.end();
+			return;
+		} else if (command.indexOf("기준 변경") >= 0) {
+			this.showing = false;
+			this.end();
+			return;
+		}								
 
 		if (response.lastQuery.text === "NOT_NOW") {
 				this.showing = false
