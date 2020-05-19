@@ -5,5 +5,5 @@ module.exports = (function() {
 		user: "deer",
 		password: "0811j!!",
 		database: "ideer"
-	}
+	};
 })();

@@ -203,6 +203,13 @@ Module.register("compliments", {
 		}
 	},
 
+	sendNotificationToAssis: function(payload, isName=false) {
+		this.config.state = payload;
+		setTimeout(() => {
+			this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: isName});
+		}, 3000);
+	},
+
 	// Override notification handler.
 	notificationReceived: function(notification, payload, sender) {
 
@@ -225,15 +232,15 @@ Module.register("compliments", {
 					this.filenumber = payload.number;
 					payload = payload.payload;
 				}
-				
-				//checkUserName
+				//checkUserName, signInSuccess, notExistUserName
 				if(payload.userName) {
+					Log.log("@@@@!!!!!!!@@@");
+					Log.log(payload);
 					this.config.userName = payload.userName;
 					payload = payload.payload;
 				}
 
 				this.descCommand = payload;
-				console.log(payload);
 				this.lastIndexUsed = -1;
 				this.compInterval = setInterval(function() {
 					self.updateDom(self.config.fadeSpeed);
@@ -289,17 +296,14 @@ Module.register("compliments", {
 					this.config.state = payload;
 					this.sendNotification("ASSISTANT", "lookup");				
 					break;
+				case "checkUserName":
+					this.config.tmpName = this.config.userName;
 				case "shutdownRequest":
-					this.config.state = payload;
-					setTimeout(() => {
-						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-					}, 3000);
+				case "alreadyExistName":
+					this.sendNotificationToAssis(payload);
 					break;
 				case "signUpRequest":
-					this.config.state = payload;
-					setTimeout(() => {
-						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
-					}, 3000);
+					this.sendNotificationToAssis(payload, true);
 					break;
 				case "sayYes":
 					switch(this.config.state){
@@ -317,6 +321,14 @@ Module.register("compliments", {
 						break;
 					case "shutdownRequest":
 						this.sendNotification("HIDE_ALL_MODULES");
+						break;
+					case "checkUserName":
+						console.log("!!!!!!@@@@@@@@@!!!!!!!");
+						console.log(payload);
+						this.sendNotification("CHECK_NAME_IN_DB", this.config.tmpName);
+						break;
+					case "alreadyExistName":
+						this.sendNotification("SIGN_IN_USER", this.config.userName);
 						break;
 					}
 					break;
@@ -349,6 +361,11 @@ Module.register("compliments", {
 						this.sendNotification("PHOTO", "REMOVE_RESULT");
 						break;
 					case "shutdownRequest":
+						break;
+					case "checkUserName":
+						this.sendNotification("ASSISTANT_COMMAND", {
+							command: "SIGN_UP_REQUEST"
+						});
 						break;
 					default:
 						this.config.state = payload;
@@ -513,9 +530,9 @@ Module.register("compliments", {
 			Log.log("^*^*^&%*$^&*^*#^*&@$^%#*&%^&*@#%^*&^$&*");
 			complimentText = [complimentText.slice(0,13), this.filenumber, complimentText.slice(13)].join("");
 		}
-		if(this.descCommand === "checkUserName") {
+		if(this.config.userName && complimentText) {
 			complimentText = `${this.config.userName}${complimentText}`;
-			this.config.userName = "";
+			this.config.userName= "";
 		}
 		// split it into parts on newline text
 		var parts= complimentText.split("\n");
@@ -523,7 +540,7 @@ Module.register("compliments", {
 		var compliment=document.createElement("span");
 		// process all the parts of the compliment text
 		for (part of parts){
-			// create a text element for each part
+			// create a text element for each partzzz
 			compliment.appendChild(document.createTextNode(part));
 			// add a break
 			compliment.appendChild(document.createElement("BR"));

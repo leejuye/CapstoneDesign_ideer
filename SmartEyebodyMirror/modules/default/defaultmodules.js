@@ -19,7 +19,8 @@ var defaultModules = [
 	"updatenotification",
 	"weather",
 	"hideshow",
-	"photo"
+	"photo",
+	"signIn",
 ];
 
 /*************** DO NOT EDIT THE LINE BELOW ***************/

@@ -1,10 +1,10 @@
-const mariadb = require('mariadb');
-var dbInfo = require('./db_config');
+const mariadb = require("mariadb");
+var dbInfo = require("./db_config");
 
 const pool = mariadb.createPool({
-        host: dbInfo.host, port:dbInfo.port,
-        user: dbInfo.user, password: dbInfo.password,
-        database: dbInfo.database, connectionLimit: 5
+	host: dbInfo.host, port:dbInfo.port,
+	user: dbInfo.user, password: dbInfo.password,
+	database: dbInfo.database, connectionLimit: 5
 });
 
 function dbHelper() {
@@ -20,7 +20,7 @@ function dbHelper() {
 	                        resolve(conn);
 			});
 	        }
-        };
+	};
 }
 
 module.exports = new dbHelper();

@@ -177,7 +177,7 @@ Module.register("MMM-AssistantMk2", {
 				{return this.Assistant2Display(response);}
 			}
 		};
-		this.assistantResponse = new AssistantResponse(this.helperConfig["responseConfig"], callbacks, this.config.isName);
+		this.assistantResponse = new AssistantResponse(this.helperConfig["responseConfig"], callbacks);
 	},
 
 	playSound: function(sound) {
@@ -352,20 +352,22 @@ Module.register("MMM-AssistantMk2", {
 			log(payload);
 			break;
 		case "INITIALIZED":
-			log("Initialized.");
+			log("Initialized");
 			this.sendNotification("ASSISTANT_READY");
 			if (this.config.useSnowboy) {this.sendSocketNotification("ASSISTANT_READY");}
 			this.assistantResponse.status("standby");
 			this.doPlugin("onReady");
 			break;
 		case "ASSISTANT_RESULT":
-			this.command = payload.transcription.transcription;
-				
-			if (this.config.isName) {
-				this.sendNotification("COMPLIMENTS", {payload: "checkUserName", userName: this.command});
-				this.config.isName = false;
+			if (this.config.isName && payload.transcription) {
+				if (payload.transcription.transcription.indexOf("신규 등록") > 0 ) {
+					this.sendNotification("COMPLIMENTS", "signUpRequest");
+				} else {
+					this.sendNotification("COMPLIMENTS", {payload: "checkUserName", userName: payload.transcription.transcription});
+					this.config.isName = false;
+				}
 			}
-				
+
 			if (this.command.indexOf("일 전 사진 보여 줘") >= 0) {
 				this.config.strArray = this.command.split('일');
 				this.config.date = this.config.strArray[0];
