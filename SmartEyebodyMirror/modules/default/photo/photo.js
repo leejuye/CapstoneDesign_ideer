@@ -64,7 +64,6 @@ Module.register("photo",{
 			"term": term,
 			"command": command
 		});
-		//is_front, id, term
 	},
 
 	socketNotificationReceived: function(notification, payload){
@@ -82,8 +81,8 @@ Module.register("photo",{
 		} else if(notification === "HERE_INFO") {
 			this.whatPage = "comparePage";
 			this.comparePageData = payload;
-			Log.log(payload);
-		} else if(notificatio === "HERE_FILE_NUMBER") {
+		} else if(notification === "HERE_FILE_NUMBER") {
+			console.log("zizizizizizizizi");
 			this.sendNotification("COMPLIMENTS", {"payload": "savePicture", "number": payload});
 		}
 	 	this.updateDom();
@@ -97,11 +96,14 @@ Module.register("photo",{
 			//SHOW_COMPARE
 			if(payload.hasOwnProperty("isFront")) {
 				this.isFront = payload.isFront;
-				this.term = payload.term;
 				payload = payload.payload;
 				Log.log(this.isFront + "&&&&&" + payload + "&&&&" + this.term);
 			}
-
+			
+			if(payload.hasOwnProperty("term")) {
+				this.term = payload.term;
+			}
+			
 			switch(payload) {
 			case "TAKE_PIC":
 				this.initFileName();
@@ -138,11 +140,11 @@ Module.register("photo",{
 				break;
 			case "SHOW_RESULT":
 				this.whatPage = "resultPage";
-				this.updateDom();
 				this.sendNotification("COMPLIMENTS", "savePictureOrNot");
 				setTimeout(() => {
 					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-					}, 8000);
+				}, 8000);
+				this.updateDom();
 				break;
 			case "REMOVE_RESULT":
 				this.sendSocketNotification("REMOVE_PIC", this.fileName + "_front.jpg");
@@ -151,8 +153,9 @@ Module.register("photo",{
 				break;
 			case "COUNT_FILE":
 				this.sendSocketNotification("GET_FILE_NUMBER", "save");
+				break;
 			case "SHOW_COMPARE":
-				this.compare(this.isFront, this.term);
+				this.compare(this.isFront, this.term, null);
 				break;
 			case "SHOW_PREV":
 				this.compare(this.isFront, this.term, "prev");
@@ -162,6 +165,7 @@ Module.register("photo",{
 				break;
 			case "":
 				this.sendSocketNotification("CHANGE_BASE", {"id": this.id, "fileName": this.fileName});
+				break;
 			}
 		}
 	},
@@ -226,7 +230,7 @@ Module.register("photo",{
 		var data = this.comparePageData;
 		var wrapper = document.createElement("div");
 
-		if(data.fileNum == 0){
+		if(data.fileNum === 0){
 			this.sendNotification("COMPLIMENTS", "photoNotExist");
 			return wrapper;
 		}

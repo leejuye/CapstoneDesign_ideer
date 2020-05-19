@@ -145,6 +145,7 @@ Module.register("compliments", {
 		case "dressCheck":
 		case "frontResult":
 		case "sideResult":
+		case "savePictureOrNot":
 		case "savePicture":
 		case "shutdownRequest":
 			switch (payload) {
@@ -181,20 +182,6 @@ Module.register("compliments", {
 				this.config.pass = true;
 				this.makeNotNow("촬영");
 				break;
-			case "savePictureOrNot" :
-				this.config.state = "savePictureOrNot";
-				break;
-			case "savePicture" :
-				this.config.state = "savePicture";
-				this.sendNotification("PHOTO", "SHOW_COMPARE");
-				break;
-			case "deletePicture" :
-				this.config.state = "deletePicture";
-				this.sendNotification("PHOTO", "SHOW_COMPARE");
-				break;
-			case "photoNotExist" :
-				this.config.state = "photoNotExist";
-				break;
 			case "lookup":
 				this.config.pass = true;
 				this.makeNotNow("조회");
@@ -223,7 +210,7 @@ Module.register("compliments", {
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload + ", from: " + sender);
 
 			this.checkPossibleCommand(this.config.state, payload);
-
+			Log.log(this.config.state +"@@@@" + payload);
 			// Execute commands
 			if (!this.config.pass) {
 				clearInterval(this.compInterval);
@@ -234,10 +221,11 @@ Module.register("compliments", {
 				self.updateDom();
 
 				//savePicture
-				if(payload.number) {
+				if(payload.hasOwnProperty("number")) {
 					this.filenumber = payload.number;
 					payload = payload.payload;
 				}
+				
 				//checkUserName
 				if(payload.userName) {
 					this.config.userName = payload.userName;
@@ -293,6 +281,9 @@ Module.register("compliments", {
 					break;
 				case "savePicture":
 					this.config.state = payload;
+					setTimeout(() => {
+						this.sendNotification("PHOTO", "SHOW_COMPARE");
+					}, 10000);
 					break;
 				case "lookup":
 					this.config.state = payload;
@@ -328,7 +319,7 @@ Module.register("compliments", {
 						this.sendNotification("HIDE_ALL_MODULES");
 						break;
 					}
-					this.config.state = "initial";
+					break;
 				case "sayNo":
 					switch(this.config.state){
 					case "dressCheck":
@@ -366,6 +357,7 @@ Module.register("compliments", {
 					if (this.config.state !== "dressWait") {
 						this.config.state = "initial";
 					}
+					break;
 				}
 			}
 			this.config.pass = false;
@@ -518,6 +510,7 @@ Module.register("compliments", {
 		// get the compliment text
 		var complimentText = this.randomCompliment();
 		if(this.descCommand === "savePicture") {
+			Log.log("^*^*^&%*$^&*^*#^*&@$^%#*&%^&*@#%^*&^$&*");
 			complimentText = [complimentText.slice(0,13), this.filenumber, complimentText.slice(13)].join("");
 		}
 		if(this.descCommand === "checkUserName") {
