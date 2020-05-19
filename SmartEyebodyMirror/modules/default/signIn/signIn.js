@@ -18,7 +18,8 @@ Module.register("signIn",{
 		if(notification === "ALREADY_EXIST") {
 			this.sendNotification("COMPLIMENTS", "alreadyExistName");
 		} else if (notification === "SIGN_IN_SUCCESS") {
-			this.sendNotification("COMPLIMENTS", {payload: "signInSuccess", userName: payload});
+			this.sendNotification("COMPLIMENTS", {payload: "signInSuccess", userName: payload.name});
+			this.sendNotification("SIGN_IN_INFO", payload);
 		} else if (notification === "NOT_EXIST") {
 			this.sendNotification("COMPLIMENTS", {payload: "notExistUserName", userName: payload.name});
 		}
