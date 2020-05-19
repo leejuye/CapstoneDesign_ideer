@@ -42,6 +42,9 @@ var config = {
 		    module: "hideshow"
 		},*/
 		{
+		    module: "signIn",
+		},
+		{
 		    module: "compliments",
 		 	position: "lower_third"
 		},
@@ -119,7 +122,7 @@ var config = {
 						command: "SHUTDOWN_REQUEST"
 					},
 					"SIGN_UP": {
-						pattern: "(신규 등록|회원 가입)",
+						pattern: "(신규 등록|회원 가입|신규등록)",
 						command: "SIGN_UP_REQUEST"
 					},
 					"YES": {
