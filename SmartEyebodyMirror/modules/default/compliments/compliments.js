@@ -79,7 +79,7 @@ Module.register("compliments", {
 		//TEST
 		var self = this;
 		setTimeout(function() {
-			self.sendNotification("PHOTO", "TAKE_PIC");
+			self.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isfront": true});
 			Log.log("@@@@@@@");
 		}, 5000);
 	},
@@ -181,7 +181,7 @@ Module.register("compliments", {
 			case "savePicture" :
 				this.config.state = "savePicture";
 				this.sendNotification("PHOTO", "SHOW_COMPARE");
-				break;	
+				break;
 			case "deletePicture" :
 				this.config.state = "deletePicture";
 				this.sendNotification("PHOTO", "SHOW_COMPARE");
@@ -295,6 +295,9 @@ Module.register("compliments", {
 					// side start
 						this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
 						break;
+					case "savePictureOrNot":
+						this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isfront": true});
+						break;
 					case "shutdownRequest":
 						this.sendNotification("HIDE_ALL_MODULES");
 						break;
@@ -324,6 +327,8 @@ Module.register("compliments", {
 						} else {
 							this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
 						}
+					case "savePictureOrNot":
+						this.sendNotification("PHOTO", "REMOVE_RESULT");
 						break;
 					case "shutdownRequest":
 						break;
@@ -352,6 +357,7 @@ Module.register("compliments", {
 						this.sendNotification("PHOTO", "RE_TAKE_PIC_SIDE");
 					}
 					break;
+				}
 				if (this.config.state !== "dressWait") {
 					this.config.state = "";
 				}

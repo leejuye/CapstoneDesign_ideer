@@ -20,7 +20,7 @@ Module.register("photo",{
 		//TEST
 		//this.sendSocketNotification("TEST", null);
 		//this.fileName = "1234";
-		this.id = 1;
+		//this.id = 1;
 		//this.term = -7;
 		//this.sendSocketNotification("GET_AFTER_FILENAME", {"id": this.id, "term": this.term});
 		//TEST END
@@ -53,29 +53,16 @@ Module.register("photo",{
 		this.updateDom();
 	},
 
-	compare: function() {
-		if(this.fileNumber === 0) {
-			this.sendNotification("COMPLIMENTS", "photoNotExist");
-			Log.log('@@@@@@filenum0:' + this.fileNumber);
-		} else if(this.fileNumber === 1) {
-			this.whatPage = "comparePhotos";
-			Log.log('@@@@@@filenum1:' + this.fileNumber);
-			this.sendSocketNotification("GET_BEFORE_FILENAME", this.id);
-		} else if(this.fileNumber >= 2) {
-			this.whatPage = "comparePhotos";
-			Log.log('@@@@@@filenum2:' + this.fileNumber);
-			this.sendSocketNotification("GET_BEFORE_FILENAME", this.id);
-			this.sendSocketNotification("GET_AFTER_FILENAME", {"id": this.id, "term": this.term});
-		}
+	compare: function(isFront, term) {
 		this.sendNotification("COMPLIMENTS", "noDescription");
-		//if fileNumber === 1?
 		this.sendSocketNotification("GET_INFO", {
-			"beforeFileName": "1234",
-			"afterFileName": "1235",
-			"isFront": true
+			"isFront": isFront,
+			"id": 1,
+			"term": term
 		});
+		//is_front, id, term
 	},
-	
+
 	socketNotificationReceived: function(notification, payload){
 		if(notification === "PREVIEW_DONE") {
 			this.config.imageSrc = "/modules/default/photo/image/" + payload;
@@ -88,16 +75,6 @@ Module.register("photo",{
 			setTimeout(() => {
 				this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 			}, 8000)
-		} else if(notification === "FILE_NUMBER_CALL") {
-			this.fileNumber = payload;
-			this.compare();
-		} else if(notification === "FILE_NUMBER_SAVE") {
-			this.fileNumber = payload;
-			this.sendNotification("COMPLIMENTS", {"payload": "savePicture", "number": payload});
-		} else if(notification === "HERE_BEFORE_FILENAME") {
-			this.beforeFileName = payload;
-		} else if(notification === "HERE_AFTER_FILENAME") {
-			this.afterFileName = payload;
 		} else if(notification === "HERE_INFO") {
 			this.whatPage = "comparePage";
 			this.comparePageData = payload;
@@ -116,6 +93,13 @@ Module.register("photo",{
 				payload = payload.payload;
 			}
 
+			//SHOW_COMPARE
+			if(payload.isfront || !payload.isfront) {
+				this.isfront = payload.isfront;
+				payload = payload.payload;
+				Log.log(this.isfront + "&&&&&" + payload);
+			}
+
 			switch(payload) {
 			case "TAKE_PIC":
 				this.initFileName();
@@ -131,7 +115,6 @@ Module.register("photo",{
 				break;
 			case "TAKE_PIC_SIDE":
 				this.fileNameSuffix = '_side.jpg';
-
 				this.sendNotification("COMPLIMENTS", "sideStart");
 				this.sendSocketNotification("PREVIEW", this.fileName + this.fileNameSuffix);
 				break;
@@ -162,10 +145,7 @@ Module.register("photo",{
 				this.sendNotification("COMPLIMENTS", "deletePicture");
 				break;
 			case "SHOW_COMPARE":
-				this.sendSocketNotification("FILE_NUM", "recall");
-				break;
-			case "COUNT_FILE":
-				this.sendSocketNotification("FILE_NUM", "save");
+				this.compare(this.isfront, 0);
 				break;
 			}
 		}
@@ -187,7 +167,7 @@ Module.register("photo",{
 
 	fillBox: function(box, data) {
 		for(key in data) {
-			box.appendChild(document.createTextNode(key + ": " + data[key] + "cm"));
+			box.appendChild(document.createTextNode(key + ": " + data[key].toFixed(2) + "cm"));
 			box.appendChild(document.createElement("BR"));
 		}
 		box.lastElementChild.remove();
@@ -199,6 +179,7 @@ Module.register("photo",{
 
 		for(key in data1) {
 			var dif = data2[key] - data1[key];
+			dif = dif.toFixed(2);
 
 			var span = document.createElement('span');
 			span.className = dif >= 0 ? "red_font" : "green_font";
@@ -217,37 +198,63 @@ Module.register("photo",{
 			});
 	},
 
+	makeDateFormat: function(date) {
+		var ret = date.substr(0,4) + "." +
+			date.substr(4,2) + "." +
+			date.substr(6,2);
+		return ret;
+	},
+
 	drawComparePage: async function() {
-		var wrapper = document.createElement("div");
 		var data = this.comparePageData;
+		var wrapper = document.createElement("div");
+
+		if(data.fileNum == 0){
+			this.sendNotification("COMPLIMENTS", "photoNotExist");
+			return wrapper;
+		}
 
 		// Draw before info
 		// base image
+		var imgBox1 = document.createElement("div");
+		imgBox1.className = "info_img_box";
+
 		var img1 = document.createElement("img");
 		img1.src = "/modules/default/photo/image/" + data.beforeFileName + (data.isFront ? "_front" : "_side") + ".jpg";
+		img1.className = "info_img"
 
 		var info1 = document.createElement("div");
 		info1.className = "info_item";
 		this.fillBox(info1, data.beforeData);
 
-		wrapper.appendChild(img1);
+		imgBox1.appendChild(img1);
+		imgBox1.appendChild(document.createTextNode(this.makeDateFormat(data.beforeFileName)));
+
+		wrapper.appendChild(imgBox1);
 		wrapper.appendChild(info1);
 
 		// Draw after info
-		var img2 = document.createElement("img");
-		img2.src = "/modules/default/photo/image/" + data.afterFileName + (data.isFront ? "_front" : "_side") + ".jpg";
+		if(data.fileNum > 1){
+			var imgBox2 = document.createElement("div");
+			imgBox2.className = "info_img_box";
 
-		var info2 = document.createElement("div");
-		info2.className = "info_item";
-		this.fillBox(info2, data.afterData);
+			var img2 = document.createElement("img");
+			img2.src = "/modules/default/photo/image/" + data.afterFileName + (data.isFront ? "_front" : "_side") + ".jpg";
+			img2.className = "info_img";
 
-		wrapper.appendChild(img2);
-		wrapper.appendChild(info2);
+			var info2 = document.createElement("div");
+			info2.className = "info_item";
+			this.fillBox(info2, data.afterData);
 
-		var tmp = await this.fillDif(data.beforeData, data.afterData);
-		wrapper.appendChild(tmp);
+			imgBox2.appendChild(img2);
+			imgBox2.appendChild(document.createTextNode(this.makeDateFormat(data.afterFileName)));
 
-		this.term = 0;
+			wrapper.appendChild(imgBox2);
+			wrapper.appendChild(info2);
+
+			var tmp = await this.fillDif(data.beforeData, data.afterData);
+			wrapper.appendChild(tmp);
+		}
 		return wrapper;
 	},
 
