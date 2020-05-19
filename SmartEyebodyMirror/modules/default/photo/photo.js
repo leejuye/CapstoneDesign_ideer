@@ -60,7 +60,7 @@ Module.register("photo",{
 		this.sendNotification("COMPLIMENTS", "noDescription");
 		this.sendSocketNotification("GET_INFO", {
 			"isFront": isFront,
-			"id": 141,
+			"id": 1,
 			"term": term,
 			"command": command
 		});
@@ -82,7 +82,6 @@ Module.register("photo",{
 			this.whatPage = "comparePage";
 			this.comparePageData = payload;
 		} else if(notification === "HERE_FILE_NUMBER") {
-			console.log("zizizizizizizizi");
 			this.sendNotification("COMPLIMENTS", {"payload": "savePicture", "number": payload});
 		}
 	 	this.updateDom();
@@ -96,13 +95,14 @@ Module.register("photo",{
 			//SHOW_COMPARE
 			if(payload.hasOwnProperty("isFront")) {
 				this.isFront = payload.isFront;
+				if(payload.term) {
+					this.term = payload.term;
+				}
 				payload = payload.payload;
-				Log.log(this.isFront + "&&&&&" + payload + "&&&&" + this.term);
+				console.log(this.isFront + "&&&&&" + payload + "&&&&" + this.term);
 			}
 			
-			if(payload.hasOwnProperty("term")) {
-				this.term = payload.term;
-			}
+			
 			
 			switch(payload) {
 			case "TAKE_PIC":

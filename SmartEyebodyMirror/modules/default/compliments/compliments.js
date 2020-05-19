@@ -509,9 +509,9 @@ Module.register("compliments", {
 		wrapper.className = this.config.classes ? this.config.classes : "thin large bright pre-line";
 		// get the compliment text
 		var complimentText = this.randomCompliment();
-		if(this.descCommand === "savePicture") {
-			Log.log("^*^*^&%*$^&*^*#^*&@$^%#*&%^&*@#%^*&^$&*");
+		if(this.descCommand === "savePicture" && complimentText) {
 			complimentText = [complimentText.slice(0,13), this.filenumber, complimentText.slice(13)].join("");
+			this.filenumber = null;
 		}
 		if(this.descCommand === "checkUserName") {
 			complimentText = `${this.config.userName}${complimentText}`;
