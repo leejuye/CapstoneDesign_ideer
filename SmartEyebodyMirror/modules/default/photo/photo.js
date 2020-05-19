@@ -15,7 +15,8 @@ Module.register("photo",{
 	term: 0,
 	isFront: true,
 	fileNumber: 0,
-	
+	ver: 1,
+
 	start: function() {
 	 	this.current_user = null;
 		//TEST
@@ -46,6 +47,7 @@ Module.register("photo",{
 			this.fillZero(d.getHours(), 2) +
 			this.fillZero(d.getMinutes(), 2) +
 			this.fillZero(d.getSeconds(), 2);
+		this.ver = 1;
 	},
 
 	initImage: function() {
@@ -58,7 +60,7 @@ Module.register("photo",{
 		this.sendNotification("COMPLIMENTS", "noDescription");
 		this.sendSocketNotification("GET_INFO", {
 			"isFront": isFront,
-			"id": 1,
+			"id": 141,
 			"term": term,
 			"command": command
 		});
@@ -66,7 +68,7 @@ Module.register("photo",{
 
 	socketNotificationReceived: function(notification, payload){
 		if(notification === "PREVIEW_DONE") {
-			this.config.imageSrc = "/modules/default/photo/image/" + payload;
+			this.config.imageSrc = "/modules/default/photo/image/" + payload + "?version=" + this.ver++;
 			if(payload.indexOf("front") != -1) {
 				Log.log("front result");
 				this.sendNotification("COMPLIMENTS","frontResult");
@@ -90,7 +92,7 @@ Module.register("photo",{
 		if(notification === "PHOTO") {
 			Log.log(this.name + "received a notification: " + notification + ", payload : " + payload);
 		 	this.initImage();
-			
+
 			//SHOW_COMPARE
 			if(payload.hasOwnProperty("isFront")) {
 				this.isFront = payload.isFront;
@@ -171,13 +173,14 @@ Module.register("photo",{
 	drawResultPage: function() {
 		var wrapper = document.createElement("div");
 		var img1 = document.createElement("img");
-        img1.src = "/modules/default/photo/image/" + this.fileName + "_front.jpg";
-        var img2 = document.createElement("img");
-        img2.src = "/modules/default/photo/image/" + this.fileName + "_side.jpg";
+		img1.src = "/modules/default/photo/image/" + this.fileName + "_front.jpg"
 
-        wrapper.appendChild(img1);
-        wrapper.appendChild(img2);
-        
+		var img2 = document.createElement("img");
+		img2.src = "/modules/default/photo/image/" + this.fileName + "_side.jpg";
+
+		wrapper.appendChild(img1);
+		wrapper.appendChild(img2);
+
 		return new Promise(function(resolve, reject){
 			resolve(wrapper);
 		});
@@ -216,6 +219,13 @@ Module.register("photo",{
 			});
 	},
 
+	makeDateFormat: function(date) {
+		var ret = date.substr(0,4) + "." +
+			date.substr(4,2) + "." +
+			date.substr(6,2);
+		return ret;
+	},
+
 	drawComparePage: async function() {
 		var data = this.comparePageData;
 		var wrapper = document.createElement("div");
@@ -227,26 +237,40 @@ Module.register("photo",{
 
 		// Draw before info
 		// base image
+		var imgBox1 = document.createElement("div");
+		imgBox1.className = "info_img_box";
+
 		var img1 = document.createElement("img");
 		img1.src = "/modules/default/photo/image/" + data.beforeFileName + (data.isFront ? "_front" : "_side") + ".jpg";
-		
+		img1.className = "info_img"
+
 		var info1 = document.createElement("div");
 		info1.className = "info_item";
 		this.fillBox(info1, data.beforeData);
 
-		wrapper.appendChild(img1);
+		imgBox1.appendChild(img1);
+		imgBox1.appendChild(document.createTextNode(this.makeDateFormat(data.beforeFileName)));
+
+		wrapper.appendChild(imgBox1);
 		wrapper.appendChild(info1);
 
 		// Draw after info
 		if(data.fileNum > 1){
+			var imgBox2 = document.createElement("div");
+			imgBox2.className = "info_img_box";
+
 			var img2 = document.createElement("img");
 			img2.src = "/modules/default/photo/image/" + data.afterFileName + (data.isFront ? "_front" : "_side") + ".jpg";
+			img2.className = "info_img";
 
 			var info2 = document.createElement("div");
 			info2.className = "info_item";
 			this.fillBox(info2, data.afterData);
 
-			wrapper.appendChild(img2);
+			imgBox2.appendChild(img2);
+			imgBox2.appendChild(document.createTextNode(this.makeDateFormat(data.afterFileName)));
+
+			wrapper.appendChild(imgBox2);
 			wrapper.appendChild(info2);
 
 			var tmp = await this.fillDif(data.beforeData, data.afterData);

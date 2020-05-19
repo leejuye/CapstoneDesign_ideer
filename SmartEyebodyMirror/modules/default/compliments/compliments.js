@@ -77,11 +77,11 @@ Module.register("compliments", {
 		}, this.config.updateInterval);
 
 		//TEST
-		/*var self = this;
+		var self = this;
 		setTimeout(function() {
-			self.sendNotification("PHOTO", "COUNT_FILE");
+			self.sendNotification("PHOTO", "SHOW_COMPARE");
 			Log.log("@@@@@@@");
-		}, 5000);*/
+		}, 5000);
 	},
 	// Module location
 	getLocation: function() {
@@ -391,7 +391,7 @@ Module.register("compliments", {
 				}
 				this.config.assistState = "";
 				this.config.sayTF = false;
-				}
+			}
 		}
 	},
 
