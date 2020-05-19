@@ -3,11 +3,12 @@ const NodeHelper = require("node_helper");
 const dbHelper = require("../../db_helper");
 
 module.exports = NodeHelper.create({
-	dbConn: async function(qry) {
+	dbConn: async function(qry, params) {
 		var conn, results;
 		try{
 			conn = await dbHelper.getConnection();
-			results = await conn.query(qry);
+			results = await conn.query(qry, params);
+			console.log("RESULT: " + results[0]);
 		} catch(err) {
 			this.sendSocketNotification("SIGN_IN_ERRER");
 			throw err;
@@ -20,29 +21,30 @@ module.exports = NodeHelper.create({
 	},
 
 	getUser: async function(payload, signIn=false) {
-		const user = await this.dbConn("select * from users where name = '"+payload+"'");
+		const user = await this.dbConn("select * from users where name = ?", payload);
 		if(signIn) {
-			if(user) {this.sendSocketNotification("SIGN_IN_SUCCESS", user);}
+			if(user) {this.sendSocketNotification("SIGN_IN_SUCCESS", user.name);}
 			else {this.sendSocketNotification("NOT_EXIST");}
 		}
-		else {
-			this.sendSocketNotification("SIGN_IN_ERRER");
-		}
+		return new Promise(function(resolve, reject) {
+			return resolve(user);
+		});
 	},
 
-	createUser: async function(payload) {
-		const user = await this.dbConn("insert into users (name) value ('"+payload+"')");
-		this.getUser(payload, true);
+	createUser: function(payload) {
+		const user = this.dbConn("insert into users (name) value (?)", payload);
 	},
 
-	socketNotificationReceived: function(notification, payload) {
+	socketNotificationReceived: async function(notification, payload) {
 		if(notification === "CHECK_USER") {
-			var user = this.getUser(payload);
-			if(user.id) {
+			var user = await this.getUser(payload);
+			if(user != undefined) {
+				console.log("@@@@@@@");
 				this.sendSocketNotification("ALREADY_EXIST");
 			} else {
+				console.log("^^^^^^^^^");
 				this.createUser(payload);
-				user = this.getUser(payload, true);
+				this.sendSocketNotification("SIGN_IN_SUCCESS", payload);
 			}
 		} else if (notification === "SIGN_IN") {
 			this.getUser(payload, true);
