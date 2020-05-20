@@ -32,15 +32,17 @@ var config = {
 
 	modules: [
 		{
+			module: "MMM-pages",
+			config: {
+				modules:
+						[[ "weight" ],
+						 [ "clock", "compliments", "photo", "MMM-AssistantMk2"]],
+				fixed: [],
+			}
+		},
+		{
 		    module: "MMM-Dynamic-Modules"
 		},
-		/*{
-			module: "helloworld",
-			position: "bottom_bar"
-		},*/
-		// {
-		//     module: "hideshow"
-		// },
 		{
 		    module: "signIn",
 		},

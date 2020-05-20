@@ -21,6 +21,7 @@ Module.register("weight",{
 		if(notification === "GET_WEIGHT_SUCCESS") {
 			Log.log(payload);
 			this.sendNotification("START_MIRROR");
+			this.sendNotification("PAGE_CHANGED", 1);
 			setTimeout(() => {
 				this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
 			}, 8000);

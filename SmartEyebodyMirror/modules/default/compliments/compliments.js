@@ -62,20 +62,20 @@ Module.register("compliments", {
 	start: function() {
 		Log.info("Starting module: " + this.name);
 
-		this.lastComplimentIndex = -1;
+		// this.lastComplimentIndex = -1;
 
-		var self = this;
-		if (this.config.remoteFile !== null) {
-			this.complimentFile(function(response) {
-				self.config.compliments = JSON.parse(response);
-				//self.updateDom();
-			});
-		}
+		// var self = this;
+		// if (this.config.remoteFile !== null) {
+		// 	this.complimentFile(function(response) {
+		// 		self.config.compliments = JSON.parse(response);
+		// 		//self.updateDom();
+		// 	});
+		// }
 
-		// Schedule update timer.
-		this.compInterval = setInterval(function() {
-			self.updateDom(self.config.fadeSpeed);
-		}, this.config.updateInterval);
+		// // Schedule update timer.
+		// this.compInterval = setInterval(function() {
+		// 	self.updateDom(self.config.fadeSpeed);
+		// }, this.config.updateInterval);
 
 		//TEST
 		// var self = this;
@@ -197,15 +197,30 @@ Module.register("compliments", {
 	// Override notification handler.
 	notificationReceived: function(notification, payload, sender) {
 
-		if (notification === "COMPLIMENTS") {
+		if (notification === "START_MIRROR") {
+			this.lastComplimentIndex = -1;
+
+			var self = this;
+			if (this.config.remoteFile !== null) {
+				this.complimentFile(function(response) {
+					self.config.compliments = JSON.parse(response);
+				//self.updateDom();
+				});
+			}
+
+			// Schedule update timer.
+			this.compInterval = setInterval(function() {
+				self.updateDom(self.config.fadeSpeed);
+			}, this.config.updateInterval);
+		}else if(notification === "COMPLIMENTS") {
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload + ", from: " + sender);
 
 			if (payload.payload === "command") {
 				this.config.command = payload.command;
-        this.checkPossibleCommand(this.config.state, payload, this.config.command);
+				this.checkPossibleCommand(this.config.state, payload, this.config.command);
 			} else {
 			  this.checkPossibleCommand(this.config.state, payload);
-      }
+			}
 
 			Log.log(this.config.state +"@@@@" + payload);
 

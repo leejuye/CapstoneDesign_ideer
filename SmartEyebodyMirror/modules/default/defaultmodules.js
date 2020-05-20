@@ -18,7 +18,6 @@ var defaultModules = [
 	"weatherforecast",
 	"updatenotification",
 	"weather",
-	"hideshow",
 	"photo",
 	"signIn",
 	"weight",
