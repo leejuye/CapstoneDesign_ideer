@@ -310,6 +310,13 @@ Module.register("compliments", {
 						this.sendNotification("PHOTO", "SHOW_COMPARE");
 					}, 5000);
 					break;
+				case "prev":
+				case "next":
+					this.config.state = payload;
+					setTimeout(() => {
+						this.sendNotification("PHOTO", "SHOW_COMPARE");
+					}, 5000);
+					break;
 				case "sayYes":
 					switch(this.config.state){
 					case "dressCheck":
