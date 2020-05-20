@@ -71,6 +71,9 @@
 	"notExistUserName": [
 		"해당 이름은 존재하지 않습니다."
 	],
+	"getWeightError": [
+		"몸무게를 받아오는데 오류가 생겼습니다.\n다시 시도해주세요"
+	],
 	"noDescription": [
 		""
 	],

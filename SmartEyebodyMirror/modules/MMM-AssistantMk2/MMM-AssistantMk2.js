@@ -362,38 +362,53 @@ Module.register("MMM-AssistantMk2", {
 			if (payload.transcription) {
 				this.config.command = payload.transcription.transcription;
 				this.sendNotification("COMPLIMENTS", {"payload": "command", "command": this.config.command});
-
+		
 				if (this.config.isName) {
-					if (payload.transcription.transcription.indexOf("신규 등록") >= 0 ) {
-						this.sendNotification("COMPLIMENTS", "signUpRequest");
-					} else {
-						this.sendNotification("COMPLIMENTS", {payload: "checkUserName", userName: payload.transcription.transcription});
-						this.config.isName = false;
-					}
+				  if (payload.transcription.transcription.indexOf("신규 등록") >= 0 ) {
+				    this.sendNotification("COMPLIMENTS", "signUpRequest");
+				  } else {
+				    this.sendNotification("COMPLIMENTS", {payload: "checkUserName", userName: payload.transcription.transcription});
+				    this.config.isName = false;
+				  }
 				}
-
-				if (this.config.isLookup) {
-					if (this.config.command.indexOf("일 전 사진 보여 줘") >= 0) {
-						this.config.strArray = this.command.split("일");
+        	
+				if (this.config.command.indexOf(" 전 사진 보여 줘") >= 0) {
+					var string;
+					string = this.config.command.split(' 전');
+					string = string[0];
+					
+					if (string.indexOf('일') >= 0) {
+						this.config.strArray = string.split('일');
 						this.config.date = this.config.strArray[0];
-					} else if (this.config.command.indexOf("주 전 사진 보여 줘") >= 0) {
-						this.config.strArray = this.command.split("주");
+					} else if (string.indexOf('주') >= 0) {
+						this.config.strArray = string.split('주');
 						this.config.date = this.config.strArray[0] * 7;
-					} else if (this.config.command.indexOf("개월 전 사진 보여 줘") >= 0) {
-						this.config.strArray = this.command.split("개월");
+					} else if (string.indexOf('개월') >= 0) {
+						this.config.strArray = string.split('개월');
 						this.config.date = this.config.strArray[0] * 30;
-					} else if (this.config.command.indexOf("년 전 사진 보여 줘") >= 0) {
-						this.config.strArray = this.command.split("년");
+					} else if (string.indexOf('년') >= 0) {
+						this.config.strArray = string.split('년');
 						this.config.date = this.config.strArray[0] * 365;
 					}
+				} else if (this.config.command.indexOf("정면") >= 0) {
+					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": true});
+				} else if (this.config.command.indexOf("측면") >= 0) {
+					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": false});
+				} else if (this.config.command.indexOf("기준") >= 0 && this.config.command.indexOf("변경") >= 0) {
+					this.sendNotification("PHOTO", "CHANGE_BASE");
+				} else if (this.config.command.indexOf("이전") >= 0) {
+					this.sendNotification("PHOTO", "SHOW_PREV");
+				} else if (this.config.command.indexOf("다음") >= 0) {
+					this.sendNotification("PHOTO", "SHOW_NEXT");
+				}
 
-					if (this.config.date > 0) {
-						this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "term": this.config.date, "isFront": true});
-					}
+				if (this.config.date > 0) {
+					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "term": this.config.date, "isFront": true});
+					this.config.date = 0;
+				}
 
-					if (command.indexOf("측면") >= 0) {
-						this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": false});
-					}
+				if (this.config.command.indexOf("측면") >= 0) {
+					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": false});
 				}
 				this.config.isLookup = false;
 			}
@@ -718,7 +733,7 @@ Module.register("MMM-AssistantMk2", {
 			"help": null
 		};
 
-		if (response.screen && (response.screen.links.length > 0 || response.screen.photos.length > 0)) {
+		if (response.screen && (response.screen.links.length > 0 || response.screen.photos.length > 0)) {
 			opt.photos = response.screen.photos;
 			opt.urls= response.screen.links;
 			opt.transcription= response.transcription;

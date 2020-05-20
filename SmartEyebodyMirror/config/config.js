@@ -35,7 +35,7 @@ var config = {
 			module: "MMM-pages",
 			config: {
 				modules:
-						[[ "weight" ],
+						[[], ["compliments"],
 						 [ "clock", "compliments", "photo", "MMM-AssistantMk2"]],
 				fixed: [],
 			}

@@ -280,6 +280,11 @@ Module.register("compliments", {
 				case "imHere":
 					this.sendNotification("PHOTO", "TAKE_PIC");
 					break;
+				case "getWeightError":
+					this.sendNotification("PAGE_CHANGED", 1);
+					this.config.state = payload;
+					this.sendNotification("RESTART_GET_WEIGHT");
+					break;
 				case "frontStart":
 					this.config.state = payload;
 					break;
