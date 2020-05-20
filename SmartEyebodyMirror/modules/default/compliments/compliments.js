@@ -78,11 +78,13 @@ Module.register("compliments", {
 		// }, this.config.updateInterval);
 
 		//TEST
+
 		// var self = this;
 		// setTimeout(function() {
 		// 	self.sendNotification("PHOTO", "SHOW_COMPARE");
 		// 	Log.log("@@@@@@@");
 		// }, 5000);
+
 	},
 	// Module location
 	getLocation: function() {
@@ -174,15 +176,24 @@ Module.register("compliments", {
 				break;
 			}
 			break;
+
 		// in lookup case
 		case "lookup":
-			if (command.indexOf("전 사진 보여 줘") >= 0) {
+			if (command.indexOf(" 전 사진 보여 줘") >= 0) {
 				this.config.pass = false;
-				break;
+			} else if (command.indexOf("정면") >= 0) {
+				this.config.pass = false;
+			} else if (command.indexOf("측면") >= 0) {
+				this.config.pass = false;
+			} else if (command.indexOf("기준") >= 0 && command.indexOf("변경") >= 0) {
+				this.config.pass = false;
+			} else if (command.indexOf("이전") >= 0) {
+				this.config.pass = false;
+			} else if (command.indexOf("다음") >= 0) {
+				this.config.pass = false;
 			} else {
 				this.config.pass = true;
 				this.makeNotNow(command);
-				break;
 			}
 		}
 	},
@@ -240,7 +251,6 @@ Module.register("compliments", {
 				}
 				//checkUserName, signInSuccess, notExistUserName
 				if(payload.userName) {
-					Log.log("@@@@!!!!!!!@@@");
 					Log.log(payload);
 					this.config.userName = payload.userName;
 					payload = payload.payload;
@@ -301,7 +311,7 @@ Module.register("compliments", {
 					this.config.state = payload;
 					setTimeout(() => {
 						this.sendNotification("PHOTO", "SHOW_COMPARE");
-					}, 10000);
+					}, 5000);
 					break;
 				case "lookup":
 					this.config.state = payload;
@@ -315,6 +325,19 @@ Module.register("compliments", {
 					break;
 				case "signUpRequest":
 					this.sendNotificationToAssis(payload, true);
+					break;
+				case "changeBase":
+					this.config.state = payload;
+					setTimeout(() => {
+						this.sendNotification("PHOTO", "SHOW_COMPARE");
+					}, 5000);
+					break;
+				case "prev":
+				case "next":
+					this.config.state = payload;
+					setTimeout(() => {
+						this.sendNotification("PHOTO", "SHOW_COMPARE");
+					}, 5000);
 					break;
 				case "sayYes":
 					switch(this.config.state){
