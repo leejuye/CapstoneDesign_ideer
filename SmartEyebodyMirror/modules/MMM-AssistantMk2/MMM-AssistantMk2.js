@@ -401,10 +401,14 @@ Module.register("MMM-AssistantMk2", {
 				} else if (this.config.command.indexOf("다음") >= 0) {
 					this.sendNotification("PHOTO", "SHOW_NEXT");
 				}
- 
+
 				if (this.config.date > 0) {
 					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "term": this.config.date, "isFront": true});
 					this.config.date = 0;
+				}
+
+				if (this.config.command.indexOf("측면") >= 0) {
+					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": false});
 				}
 				this.config.isLookup = false;
 			}

@@ -116,10 +116,10 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     # if the `q` key was pressed, break from the loop
     if key == ord("q") or time.time()-start >= 5:
         playSound("sfx2")
-        camera.capture(curPath + "/image/" + sys.argv[1])
+        camera.capture(curPath + "/image/" + sys.argv[2] + "/" + sys.argv[1])
         break
 
-img = cv2.imread(curPath + "/image/" + sys.argv[1])
+img = cv2.imread(curPath + "/image/" + sys.argv[2] + "/" + sys.argv[1])
 
 # undistort image
 h,  w = img.shape[:2]
@@ -134,10 +134,10 @@ x,y,w,h = roi
 dst = dst[y:y+h, x:x+w]
 
 dst = np.fliplr(dst)
-cv2.imwrite(curPath + "/image/" + sys.argv[1],dst)
+cv2.imwrite(curPath + "/image/" + sys.argv[2] + "/" + sys.argv[1],dst)
 #cv2.imwrite(curPath + "/image/calibresult.png",dst)
 
-sizeInfo = { "id":141,"shoulder":1.1, "chest":2.2, "waist": 3.3, "hip":4.4,
-    "thigh":5.5, "calf":6.6, "weight":7.7, "bmi":12,
-    "is_front":(sys.argv[1][len(sys.argv[1])-5] == 't'), "file_name":sys.argv[1][0:14] }
+sizeInfo = { "id":sys.argv[2],"shoulder":1.1, "chest":2.2, "waist": 3.3, "hip":4.4,
+	"thigh":5.5, "calf":6.6, "weight":7.7, "bmi":12,
+	"is_front":(sys.argv[1][len(sys.argv[1])-5] == 't'), "file_name":sys.argv[1][0:14] }
 toInfo(sizeInfo)

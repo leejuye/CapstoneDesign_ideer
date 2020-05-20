@@ -1,6 +1,7 @@
 "use strict";
 const NodeHelper = require("node_helper");
 const dbHelper = require("../../db_helper");
+const fs = require("fs");
 
 module.exports = NodeHelper.create({
 	dbConn: async function(qry, params) {
@@ -34,6 +35,7 @@ module.exports = NodeHelper.create({
 	createUser: async function(payload) {
 		let user = await this.dbConn("insert into users (name) value (?)", payload);
 		user = await this.getUser(payload, true);
+		fs.mkdirSync("modules/default/photo/image/" + user.id);
 	},
 
 	socketNotificationReceived: async function(notification, payload) {
