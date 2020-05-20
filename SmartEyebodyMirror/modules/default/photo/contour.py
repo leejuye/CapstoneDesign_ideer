@@ -91,7 +91,7 @@ def line(dic, image, cnts, Ypoints, isSide, r):
         drawArr = sorted(drawArr, key = lambda x: x[1][0] - x[0][0], reverse=True)
         
         if len(drawArr) >= drawCnt[isSide][j]:
-            dic[partName[j]] = (drawArr[0][1][0] - drawArr[0][0][0])*r
+            dic[partName[j]] = round((drawArr[0][1][0] - drawArr[0][0][0])*r, 2)
             for i in range(0, drawCnt[isSide][j]):
                 cv2.line(image, drawArr[i][0], drawArr[i][1], (0, 255, 0), 2)
 
