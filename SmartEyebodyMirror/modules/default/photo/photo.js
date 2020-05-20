@@ -79,6 +79,9 @@ Module.register("photo",{
 			setTimeout(() => {
 				this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 			}, 8000)
+		} else if(notification === "UPDATE_TERM") {
+			this.term = this.term + payload;
+			Log.log("&&&&&&&&&&&&&&&&&&&&&&&&" + this.term);
 		} else if(notification === "HERE_INFO") {
 			this.whatPage = "comparePage";
 			this.fileName = payload.afterFileName;
@@ -162,7 +165,6 @@ Module.register("photo",{
 				break;
 			case "SHOW_COMPARE":
 				this.compare(this.isFront, this.term, null);
-				Log.log("!!!!@@@!!!! who are you@!!");
 				break;
 			case "SHOW_PREV":
 				this.compare(this.isFront, this.term, "prev");
@@ -228,14 +230,13 @@ Module.register("photo",{
 	},
 
 	makeDateFormat: function(date) {
-		var ret = date.substr(0,4) + "." +
-			date.substr(4,2) + "." +
-			date.substr(6,2);
+		var ret = date.toString().substr(0,4) + "." +
+			date.toString().substr(4,2) + "." +
+			date.toString().substr(6,2);
 		return ret;
 	},
 
 	drawComparePage: async function() {
-		Log.log("><><><><><><<><><><><><>");
 		var data = this.comparePageData;
 		var wrapper = document.createElement("div");
 

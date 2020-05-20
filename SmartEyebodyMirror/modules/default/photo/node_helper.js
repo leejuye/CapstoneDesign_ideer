@@ -57,20 +57,30 @@ module.exports = NodeHelper.create({
 		let qry;
 
 		var beforeFileName = await this.getBeforeFileName(payload.id);
+		
 		var afterFileName = await this.getAfterFileName(payload.id, payload.isFront, payload.term);
+		var preAfter = afterFileName;
+		
 		if(payload.command === "prev") {
-			qry = "SELECT MAX(file_name) FROM size_info WHERE file_name < ?";
-			afterFileName = await this.dbConn(qry, afterFileName);
+			qry = "SELECT DATE_FORMAT(MAX(file_name), '%Y%m%d%H%i%S') AS dfchange FROM size_info WHERE file_name < ?";
+			afterFileName = await this.dbConn(qry, [afterFileName]);
 		} else if(payload.command === "next") {
-			qry = "SELECT MIN(file_name) FROM size_info WHERE file_name > ?";
-			afterFileName = await this.dbConn(qry, afterFileName);
+			qry = "SELECT DATE_FORMAT(MIN(file_name), '%Y%m%d%H%i%S') AS dfchange FROM size_info WHERE file_name > ?";
+			afterFileName = await this.dbConn(qry, [afterFileName]);
 		}
 		qry = "SELECT shoulder,chest,waist,hip,thigh,calf,weight,bmi "
 			+ "FROM size_info WHERE is_front = ? and file_name = ?";
 
 		var beforeData = await this.dbConn(qry, [payload.isFront, beforeFileName]);
-		var afterData = await this.dbConn(qry, [payload.isFront, afterFileName]);
-
+		if(afterFileName.hasOwnProperty("dfchange")) {
+			var afterData = await this.dbConn(qry, [payload.isFront, afterFileName.dfchange]);
+			afterFileName = afterFileName.dfchange;
+			qry = "SELECT DATEDIFF(CAST(? AS DATETIME), CAST(? AS DATETIME)) AS ut";
+			var updateTerm = await this.dbConn(qry, [preAfter, afterFileName]);
+			this.sendSocketNotification("UPDATE_TERM", [updateTerm.ut]);
+		} else {
+			var afterData = await this.dbConn(qry, [payload.isFront, afterFileName]);
+		}
 		this.sendSocketNotification("HERE_INFO", {
 			"beforeFileName": beforeFileName,
 			"beforeData": beforeData,
