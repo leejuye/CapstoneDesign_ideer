@@ -78,11 +78,11 @@ Module.register("compliments", {
 		}, this.config.updateInterval);
 
 		//TEST
-		var self = this;
-		setTimeout(function() {
-			self.sendNotification("PHOTO", "SHOW_COMPARE");
-			Log.log("@@@@@@@");
-		}, 5000);
+		// var self = this;
+		// setTimeout(function() {
+		// 	self.sendNotification("PHOTO", "SHOW_COMPARE");
+		// 	Log.log("@@@@@@@");
+		// }, 5000);
 	},
 	// Module location
 	getLocation: function() {
@@ -314,12 +314,10 @@ Module.register("compliments", {
 						this.sendNotification("HIDE_ALL_MODULES");
 						break;
 					case "checkUserName":
-						console.log("!!!!!!@@@@@@@@@!!!!!!!");
-						console.log(payload);
 						this.sendNotification("CHECK_NAME_IN_DB", this.config.tmpName);
 						break;
 					case "alreadyExistName":
-						this.sendNotification("SIGN_IN_USER", this.config.userName);
+						this.sendNotification("SIGN_IN_USER", this.config.tmpName);
 						break;
 					}
 					break;

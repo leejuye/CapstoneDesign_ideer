@@ -21,6 +21,7 @@ var defaultModules = [
 	"hideshow",
 	"photo",
 	"signIn",
+	"weight",
 ];
 
 /*************** DO NOT EDIT THE LINE BELOW ***************/

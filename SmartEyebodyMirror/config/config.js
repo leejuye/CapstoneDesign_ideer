@@ -37,28 +37,31 @@ var config = {
 		/*{
 			module: "helloworld",
 			position: "bottom_bar"
-		},
+		},*/
 		{
 		    module: "hideshow"
-		},*/
+		},
 		{
 		    module: "signIn",
 		},
 		{
+		    module: "weight",
+		},
+		{
 		    module: "compliments",
-		 	position: "lower_third"
+		 	// position: "lower_third"
 		},
 		{
 		 	module: "clock",
-		 	position: "top_center"
+		 	// position: "top_center"
 		},
 		{
 			module: "photo",
-			position: "top_left"
+			// position: "top_left"
 		},
 		{
 			module: "MMM-AssistantMk2",
-			position: "top_left",  // fullscreen_above, top_left
+			// position: "top_left",  // fullscreen_above, top_left
 			config: {
 				debug: false,
 				useA2D: true,

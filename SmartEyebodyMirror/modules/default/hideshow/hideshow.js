@@ -47,26 +47,27 @@ Module.register("hideshow",{
 				);
 			}, 5000);
 			break;
+		case "SMART_MIRROR":
+			this.sendNotification("CHANGE_POSITIONS",
+				modules = {
+					"compliments":{
+						visible: "true",
+						position: "center",
+					},
+					"MMM-AssistantMk2":{
+						visible: "true",
+						position: "top_left",
+					},
+					"clock":{
+						visible: "true",
+						position: "top_center",
+					},
+				}
+			);
+			break;
 		default:
 			break;
 		}
-		// else if (notification === "ASSISTANT_ACTIVATE") {
-		// 	this.sendNotification("CHANGE_POSITIONS",
-		// 		modules = {
-		// 			"compliments":{
-		// 				visible: "true",
-		// 				position: "center",
-		// 			},
-		// 			"MMM-AssistantMk2":{
-		// 				visible: "true",
-		// 				position: "top_left",
-		// 			},
-		// 			"clock":{
-		// 				visible: "true",
-		// 				position: "top_center",
-		// 			},
-		// 		}
-		// 	);
-		// }
+
 	},
 });
