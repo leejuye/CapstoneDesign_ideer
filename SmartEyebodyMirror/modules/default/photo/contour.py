@@ -76,7 +76,7 @@ def contour(backImage, image):
     return image, cnts
 
 
-def line(dic, image, cnts, Ypoints, isSide=False):
+def line(dic, image, cnts, Ypoints, isSide, r):
     for j in range(0, len(Ypoints) - isSide):
         arr = []
         for i in cnts:
@@ -91,7 +91,7 @@ def line(dic, image, cnts, Ypoints, isSide=False):
         drawArr = sorted(drawArr, key = lambda x: x[1][0] - x[0][0], reverse=True)
         
         if len(drawArr) >= drawCnt[isSide][j]:
-            dic[partName[j]] = drawArr[0][1][0] - drawArr[0][0][0]
+            dic[partName[j]] = round((drawArr[0][1][0] - drawArr[0][0][0])*r, 2)
             for i in range(0, drawCnt[isSide][j]):
                 cv2.line(image, drawArr[i][0], drawArr[i][1], (0, 255, 0), 2)
 
@@ -112,8 +112,11 @@ Ypoints = getYpoints(top, bottom)
 frontSizeInfo = {}
 sideSizeInfo = {}
 
-line(frontSizeInfo, frontContour, cntsFront[0], Ypoints, False)
-line(sideSizeInfo, sideContour, cntsSide[0], Ypoints, True)
+r = bottom - top
+r = 161.0/r
+
+line(frontSizeInfo, frontContour, cntsFront[0], Ypoints, False, r)
+line(sideSizeInfo, sideContour, cntsSide[0], Ypoints, True, r)
 
 #cv2.imwrite(curPath + userID + "/" + fileName + "_front.jpg", frontContour)
 #cv2.imwrite(curPath + userID + "/" + fileName + "_side.jpg", sideContour)
@@ -123,24 +126,24 @@ cv2.imwrite(curPath + "_side.jpg", sideContour)
 
 # temporary data
 frontSizeInfo["weight"] = 0
-sizeSizeInfo["weight"] = 0
+sideSizeInfo["weight"] = 0
 
 frontSizeInfo["bmi"] = 0
-sizeSizeInfo["bmi"] = 0
+sideSizeInfo["bmi"] = 0
 
 frontSizeInfo["chest"] = 0
-sizeSizeInfo["chest"] = 0
+sideSizeInfo["chest"] = 0
 # end
 
 frontSizeInfo["is_front"] = True
-sizeSizeInfo["is_front"] = False
+sideSizeInfo["is_front"] = False
 
 frontSizeInfo["file_name"] = fileName
-sizeSizeInfo["file_name"] = fileName
+sideSizeInfo["file_name"] = fileName
 
 frontSizeInfo["id"] = userID
-sizeSizeInfo["id"] = usedID
+sideSizeInfo["id"] = userID
 
 sizeInfo = dict(front=frontSizeInfo, side=sideSizeInfo)
-#print(sizeInfo)
-toInfo(sizeInfo)
+print(sizeInfo)
+#toInfo(sizeInfo)

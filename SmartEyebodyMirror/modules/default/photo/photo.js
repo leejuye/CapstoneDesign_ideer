@@ -274,7 +274,7 @@ Module.register("photo",{
 			dif = dif.toFixed(2);
 
 			var span = document.createElement('span');
-			span.className = dif >= 0 ? "red_font" : "green_font";
+			span.className = dif > 0 ? "red_font" : "green_font";
 			
 			if(key === "weight") {
 				dif = "(" + (dif < 0 ? "" : "+") + dif + "kg)";
