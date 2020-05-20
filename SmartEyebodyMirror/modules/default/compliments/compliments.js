@@ -178,23 +178,23 @@ Module.register("compliments", {
 			break;
 
 		// in lookup case
-		case "lookup":
-			if (command.indexOf(" 전 사진 보여 줘") >= 0) {
-				this.config.pass = false;
-			} else if (command.indexOf("정면") >= 0) {
-				this.config.pass = false;
-			} else if (command.indexOf("측면") >= 0) {
-				this.config.pass = false;
-			} else if (command.indexOf("기준") >= 0 && command.indexOf("변경") >= 0) {
-				this.config.pass = false;
-			} else if (command.indexOf("이전") >= 0) {
-				this.config.pass = false;
-			} else if (command.indexOf("다음") >= 0) {
-				this.config.pass = false;
-			} else {
-				this.config.pass = true;
-				this.makeNotNow(command);
-			}
+		// case "lookup":
+		// 	if (command.indexOf(" 전 사진 보여 줘") >= 0) {
+		// 		this.config.pass = false;
+		// 	} else if (command.indexOf("정면") >= 0) {
+		// 		this.config.pass = false;
+		// 	} else if (command.indexOf("측면") >= 0) {
+		// 		this.config.pass = false;
+		// 	} else if (command.indexOf("기준") >= 0 && command.indexOf("변경") >= 0) {
+		// 		this.config.pass = false;
+		// 	} else if (command.indexOf("이전") >= 0) {
+		// 		this.config.pass = false;
+		// 	} else if (command.indexOf("다음") >= 0) {
+		// 		this.config.pass = false;
+		// 	} else {
+		// 		this.config.pass = true;
+		// 		this.makeNotNow(command);
+		// 	}
 		}
 	},
 
@@ -223,7 +223,7 @@ Module.register("compliments", {
 			this.compInterval = setInterval(function() {
 				self.updateDom(self.config.fadeSpeed);
 			}, this.config.updateInterval);
-		}else if(notification === "COMPLIMENTS") {
+		} else if(notification === "COMPLIMENTS") {
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload + ", from: " + sender);
 
 			if (payload.payload === "command") {
@@ -233,7 +233,7 @@ Module.register("compliments", {
 			  this.checkPossibleCommand(this.config.state, payload);
 			}
 
-			Log.log(this.config.state +"@@@@" + payload);
+			// Log.log(this.config.state +"@@@@" + payload);
 
 			// Execute commands
 			if (!this.config.pass) {
@@ -249,7 +249,7 @@ Module.register("compliments", {
 					this.filenumber = payload.number;
 					payload = payload.payload;
 				}
-				//checkUserName, signInSuccess, notExistUserName
+				//checkUserName, signInSuccess
 				if(payload.userName) {
 					Log.log(payload);
 					this.config.userName = payload.userName;
@@ -319,6 +319,7 @@ Module.register("compliments", {
 					this.sendNotificationToAssis(payload);
 					break;
 				case "signUpRequest":
+				case "notExistUserName":
 					this.sendNotificationToAssis(payload, true);
 					break;
 				case "changeBase":
