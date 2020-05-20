@@ -48,6 +48,7 @@ Module.register("hideshow",{
 			}, 5000);
 			break;
 		case "SMART_MIRROR":
+			Log.log("!@!@!@!@!@!@!@!")
 			this.sendNotification("CHANGE_POSITIONS",
 				modules = {
 					"compliments":{
