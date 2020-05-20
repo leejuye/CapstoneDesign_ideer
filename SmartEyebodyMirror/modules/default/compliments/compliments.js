@@ -244,11 +244,12 @@ Module.register("compliments", {
 				var self = this;
 				self.updateDom();
 
-				//savePicture
+				// savePicture
 				if(payload.hasOwnProperty("number")) {
 					this.filenumber = payload.number;
 					payload = payload.payload;
 				}
+				
 				//checkUserName, signInSuccess, notExistUserName
 				if(payload.userName) {
 					Log.log(payload);
@@ -303,9 +304,6 @@ Module.register("compliments", {
 					break;
 				case "savePicture":
 					this.config.state = payload;
-					setTimeout(() => {
-						this.sendNotification("PHOTO", "SHOW_COMPARE");
-					}, 5000);
 					break;
 				case "lookup":
 					this.config.state = payload;
@@ -330,8 +328,9 @@ Module.register("compliments", {
 				case "prev":
 				case "next":
 					this.config.state = payload;
+					var self = this;
 					setTimeout(() => {
-						this.sendNotification("PHOTO", "SHOW_COMPARE");
+						this.updateDom();
 					}, 5000);
 					break;
 				case "sayYes":
