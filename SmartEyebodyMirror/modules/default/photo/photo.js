@@ -80,7 +80,7 @@ Module.register("photo",{
 				this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 			}, 8000)
 		} else if(notification === "UPDATE_TERM") {
-			this.term = this.term + payload;
+			this.term = parseInt(this.term) + parseInt(payload);
 			Log.log("&&&&&&&&&&&&&&&&&&&&&&&&" + this.term);
 		} else if(notification === "HERE_INFO") {
 			this.whatPage = "comparePage";
@@ -92,6 +92,8 @@ Module.register("photo",{
 			this.initImage();
 			this.term = 0;
 			this.sendNotification("COMPLIMENTS","changeBase");
+		} else if(notification === "CHANGE_NULL") {
+			this.sendNotification("COMPLIMENTS", payload);
 		}
 	 	this.updateDom();
 	},

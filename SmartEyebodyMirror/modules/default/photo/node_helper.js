@@ -67,28 +67,35 @@ module.exports = NodeHelper.create({
 		} else if(payload.command === "next") {
 			qry = "SELECT DATE_FORMAT(MIN(file_name), '%Y%m%d%H%i%S') AS dfchange FROM size_info WHERE file_name > ?";
 			afterFileName = await this.dbConn(qry, [afterFileName]);
+			
 		}
+		
 		qry = "SELECT shoulder,chest,waist,hip,thigh,calf,weight,bmi "
 			+ "FROM size_info WHERE is_front = ? and file_name = ?";
-
+		
 		var beforeData = await this.dbConn(qry, [payload.isFront, beforeFileName]);
-		if(afterFileName.hasOwnProperty("dfchange")) {
-			var afterData = await this.dbConn(qry, [payload.isFront, afterFileName.dfchange]);
-			afterFileName = afterFileName.dfchange;
-			qry = "SELECT DATEDIFF(CAST(? AS DATETIME), CAST(? AS DATETIME)) AS ut";
-			var updateTerm = await this.dbConn(qry, [preAfter, afterFileName]);
-			this.sendSocketNotification("UPDATE_TERM", [updateTerm.ut]);
+		
+		if(afterFileName.hasOwnProperty("dfchange") && afterFileName.dfchange === null){
+			this.sendSocketNotification("CHANGE_NULL", payload.command);
 		} else {
-			var afterData = await this.dbConn(qry, [payload.isFront, afterFileName]);
+			if(afterFileName.hasOwnProperty("dfchange")) {
+				var afterData = await this.dbConn(qry, [payload.isFront, afterFileName.dfchange]);
+				afterFileName = afterFileName.dfchange;
+				qry = "SELECT DATEDIFF(CAST(? AS DATETIME), CAST(? AS DATETIME)) AS ut";
+				var updateTerm = await this.dbConn(qry, [preAfter, afterFileName]);
+				this.sendSocketNotification("UPDATE_TERM", [updateTerm.ut]);
+			} else {
+				var afterData = await this.dbConn(qry, [payload.isFront, afterFileName]);
+			}
+			this.sendSocketNotification("HERE_INFO", {
+				"beforeFileName": beforeFileName,
+				"beforeData": beforeData,
+				"afterFileName": afterFileName,
+				"afterData": afterData,
+				"isFront": payload.isFront,
+				"fileNum": fileNum
+			});
 		}
-		this.sendSocketNotification("HERE_INFO", {
-			"beforeFileName": beforeFileName,
-			"beforeData": beforeData,
-			"afterFileName": afterFileName,
-			"afterData": afterData,
-			"isFront": payload.isFront,
-			"fileNum": fileNum
-		});
 
 	},
 
