@@ -19,8 +19,10 @@ fileName = sys.argv[1]
 userID = sys.argv[2]
 
 frontImage = cv2.imread(curPath + userID + '/' + fileName + '_front.jpg')
+print(curPath + userID + '/' + fileName + '_front.jpg')
 sideImage = cv2.imread(curPath + userID + '/' + fileName + '_side.jpg')
 backImage = cv2.imread(curPath + 'background.jpg')
+print(curPath + 'background.jpg')
 
 ratio = [0.8, 0.62, 0.50, 0.38, 0.2]
 drawCnt = [[2, 2, 1, 1, 1], [1, 1, 1, 1, 1]]
@@ -113,8 +115,11 @@ sideSizeInfo = {}
 line(frontSizeInfo, frontContour, cntsFront[0], Ypoints, False)
 line(sideSizeInfo, sideContour, cntsSide[0], Ypoints, True)
 
-cv2.imwrite(curPath + userID + "/" + fileName + "_front.jpg", frontContour)
-cv2.imwrite(curPath + userID + "/" + fileName + "_side.jpg", sideContour)
+#cv2.imwrite(curPath + userID + "/" + fileName + "_front.jpg", frontContour)
+#cv2.imwrite(curPath + userID + "/" + fileName + "_side.jpg", sideContour)
+
+cv2.imwrite(curPath + "_front.jpg", frontContour)
+cv2.imwrite(curPath + "_side.jpg", sideContour)
 
 # temporary data
 frontSizeInfo["weight"] = 0

@@ -17,17 +17,22 @@ Module.register("photo",{
 	fileNumber: 0,
 	ver: 1,
 	id: null,
-
+	firstBase: false,
+	rightFileName: null,
+	
 	start: function() {
 	 	this.current_user = null;
 		//TEST
-		//this.sendSocketNotification("TEST", null);
-		//this.fileName = "1234";
-		//this.id = 1;
+		this.fileName = "20200521121212";
+		this.id = 1234;
 		//this.term = -7;
 		//this.sendSocketNotification("GET_AFTER_FILENAME", {"id": this.id, "term": this.term});
 		//TEST END
-
+		this.sendSocketNotification("SET_INFO", {
+			"fileName": this.fileName,
+			"id": this.id
+		});
+		this.initFileName();
 	 	Log.info("Starting module: " + this.name);
 	},
 
@@ -48,6 +53,7 @@ Module.register("photo",{
 			this.fillZero(d.getHours(), 2) +
 			this.fillZero(d.getMinutes(), 2) +
 			this.fillZero(d.getSeconds(), 2);
+		this.rightFileName = this.fileName;
 		this.ver = 1;
 	},
 
@@ -57,12 +63,13 @@ Module.register("photo",{
 		this.updateDom();
 	},
 
-	compare: function(isFront, term, command) {
+	compare: function(isFront, term, rightFileName, command) {
 		this.sendNotification("COMPLIMENTS", "noDescription");
 		this.sendSocketNotification("GET_INFO", {
 			"isFront": isFront,
 			"id": this.id,
 			"term": term,
+			"rightFileName": this.rightFileName,
 			"command": command
 		});
 	},
@@ -78,12 +85,10 @@ Module.register("photo",{
 			setTimeout(() => {
 				this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 			}, 8000)
-		} else if(notification === "UPDATE_TERM") {
-			this.term = parseInt(this.term) + parseInt(payload);
-			Log.log("&&&&&&&&&&&&&&&&&&&&&&&&" + this.term);
 		} else if(notification === "HERE_INFO") {
 			this.whatPage = "comparePage";
 			this.fileName = payload.afterFileName;
+			this.rightFileName = payload.afterFileName;
 			this.comparePageData = payload;
 		} else if(notification === "HERE_FILE_NUMBER") {
 			this.sendNotification("COMPLIMENTS", {"payload": "savePicture", "number": payload});
@@ -92,15 +97,24 @@ Module.register("photo",{
 					"id": this.id,
 					"fileName": this.fileName
 				});
+				this.firstBase = true;
 			}
+		} else if (notification === "CONTOUR_DONE") {
+			this.compare(this.isFront, this.term, this.rightFileName, null);
 		} else if(notification === "CHANGE_COMPLETE") {
+			if(this.firstBase === false) {
+				this.sendNotification("COMPLIMENTS","changeBase");
+			}
 			this.initImage();
 			this.term = 0;
-			this.sendNotification("COMPLIMENTS","changeBase");
+			this.firstBase === false;
 		} else if(notification === "CHANGE_NULL") {
+			this.whatPage = "comparePage";
 			this.sendNotification("COMPLIMENTS", payload);
 		}
-	 	this.updateDom();
+		if(notification !== "CONTOUR_DONE") {
+			this.updateDom();
+		}
 	},
 
 	notificationReceived: function(notification, payload, sender) {
@@ -120,7 +134,7 @@ Module.register("photo",{
 				payload = payload.payload;
 				console.log(this.isFront + "&&&&&" + payload + "&&&&" + this.term);
 			}
-
+			
 			switch(payload) {
 			case "TAKE_PIC":
 				this.initFileName();
@@ -187,16 +201,20 @@ Module.register("photo",{
 				this.sendNotification("COMPLIMENTS", "deletePicture");
 				break;
 			case "COUNT_FILE":
+				this.sendSocketNotification("SET_INFO", {
+					"fileName": this.fileName,
+					"id": this.id
+				});
 				this.sendSocketNotification("GET_FILE_NUMBER", this.id);
 				break;
 			case "SHOW_COMPARE":
-				this.compare(this.isFront, this.term, null);
+				this.compare(this.isFront, this.term, this.rightFileName, null);
 				break;
 			case "SHOW_PREV":
-				this.compare(this.isFront, this.term, "prev");
+				this.compare(this.isFront, this.term, this.rightFileName, "prev");
 				break;
 			case "SHOW_NEXT":
-				this.compare(this.isFront, this.term, "next");
+				this.compare(this.isFront, this.term, this.rightFileName, "next");
 				break;
 			case "CHANGE_BASE":
 				this.sendSocketNotification("CHANGE_BASE", {"id": this.id, "fileName": this.fileName});
@@ -223,8 +241,25 @@ Module.register("photo",{
 	},
 
 	fillBox: function(box, data) {
+		var ko = {
+			"shoulder": '어깨',
+			"chest": '가슴',
+			"waist": '허리',
+			"hip": '골반',
+			"thigh": '허벅지',
+			"calf": '종아리',
+			"weight": '몸무게',
+			"bmi":'BMI'
+		}
+
 		for(key in data) {
-			box.appendChild(document.createTextNode(key + ": " + data[key].toFixed(2) + "cm"));
+			if(key === "weight") {
+				box.appendChild(document.createTextNode(ko[key] + ": " + data[key].toFixed(2) + "kg"));
+			} else if(key === "bmi") {
+				box.appendChild(document.createTextNode(ko[key] + ": " + data[key].toFixed(2)));
+			} else {
+				box.appendChild(document.createTextNode(ko[key] + ": " + data[key].toFixed(2) + "cm"));
+			}
 			box.appendChild(document.createElement("BR"));
 		}
 		box.lastElementChild.remove();
@@ -240,8 +275,15 @@ Module.register("photo",{
 
 			var span = document.createElement('span');
 			span.className = dif >= 0 ? "red_font" : "green_font";
-
-			dif = "(" + (dif < 0 ? "" : "+") + dif + "cm)";
+			
+			if(key === "weight") {
+				dif = "(" + (dif < 0 ? "" : "+") + dif + "kg)";
+			} else if(key === "bmi") {
+				dif = "(" + (dif < 0 ? "" : "+") + dif + ")";
+			} else {
+				dif = "(" + (dif < 0 ? "" : "+") + dif + "cm)";
+			}
+			
 			dif = document.createTextNode(dif);
 			span.appendChild(dif);
 

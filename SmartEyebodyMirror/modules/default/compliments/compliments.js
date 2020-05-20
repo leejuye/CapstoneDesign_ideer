@@ -62,27 +62,29 @@ Module.register("compliments", {
 	start: function() {
 		Log.info("Starting module: " + this.name);
 
-		this.lastComplimentIndex = -1;
+		 this.lastComplimentIndex = -1;
 
-		var self = this;
-		if (this.config.remoteFile !== null) {
-			this.complimentFile(function(response) {
-				self.config.compliments = JSON.parse(response);
-				//self.updateDom();
-			});
-		}
+		 var self = this;
+		 if (this.config.remoteFile !== null) {
+		 	this.complimentFile(function(response) {
+		 		self.config.compliments = JSON.parse(response);
+		 		//self.updateDom();
+		 	});
+		 }
 
-		// Schedule update timer.
-		this.compInterval = setInterval(function() {
-			self.updateDom(self.config.fadeSpeed);
-		}, this.config.updateInterval);
+		 // Schedule update timer.
+		 this.compInterval = setInterval(function() {
+		 	self.updateDom(self.config.fadeSpeed);
+		 }, this.config.updateInterval);
 
 		//TEST
-		/*var self = this;
-		setTimeout(function() {
-			self.sendNotification("PHOTO", "SHOW_COMPARE");
-			Log.log("@@@@@@@");
-		}, 5000);*/
+
+		// var self = this;
+		// setTimeout(function() {
+		// 	self.sendNotification("PHOTO", "SHOW_COMPARE");
+		// 	Log.log("@@@@@@@");
+		// }, 5000);
+
 	},
 	// Module location
 	getLocation: function() {
@@ -206,15 +208,30 @@ Module.register("compliments", {
 	// Override notification handler.
 	notificationReceived: function(notification, payload, sender) {
 
-		if (notification === "COMPLIMENTS") {
+		if (notification === "START_MIRROR") {
+			this.lastComplimentIndex = -1;
+
+			var self = this;
+			if (this.config.remoteFile !== null) {
+				this.complimentFile(function(response) {
+					self.config.compliments = JSON.parse(response);
+				//self.updateDom();
+				});
+			}
+
+			// Schedule update timer.
+			this.compInterval = setInterval(function() {
+				self.updateDom(self.config.fadeSpeed);
+			}, this.config.updateInterval);
+		}else if(notification === "COMPLIMENTS") {
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload + ", from: " + sender);
 
 			if (payload.payload === "command") {
 				this.config.command = payload.command;
-        			this.checkPossibleCommand(this.config.state, payload, this.config.command);
+				this.checkPossibleCommand(this.config.state, payload, this.config.command);
 			} else {
 			  this.checkPossibleCommand(this.config.state, payload);
-      }
+			}
 
 			Log.log(this.config.state +"@@@@" + payload);
 
@@ -227,11 +244,12 @@ Module.register("compliments", {
 				var self = this;
 				self.updateDom();
 
-				//savePicture
+				// savePicture
 				if(payload.hasOwnProperty("number")) {
 					this.filenumber = payload.number;
 					payload = payload.payload;
 				}
+				
 				//checkUserName, signInSuccess, notExistUserName
 				if(payload.userName) {
 					Log.log(payload);
@@ -258,12 +276,6 @@ Module.register("compliments", {
 				case "CURRENTWEATHER_DATA":
 					this.setCurrentWeatherType(payload.data);
 					break;
-				case "dressCheck":
-					this.config.state = payload;
-					setTimeout(() => {
-						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-					}, 7000);
-					break;
 				case "dressWait":
 					this.config.state = payload;
 					this.waitInterval = setInterval(function() {
@@ -272,6 +284,11 @@ Module.register("compliments", {
 					break;
 				case "imHere":
 					this.sendNotification("PHOTO", "TAKE_PIC");
+					break;
+				case "getWeightError":
+					this.sendNotification("PAGE_CHANGED", 1);
+					this.config.state = payload;
+					this.sendNotification("RESTART_GET_WEIGHT");
 					break;
 				case "frontStart":
 					this.config.state = payload;
@@ -287,9 +304,6 @@ Module.register("compliments", {
 					break;
 				case "savePicture":
 					this.config.state = payload;
-					setTimeout(() => {
-						this.sendNotification("PHOTO", "SHOW_COMPARE");
-					}, 5000);
 					break;
 				case "lookup":
 					this.config.state = payload;
@@ -297,6 +311,7 @@ Module.register("compliments", {
 					break;
 				case "checkUserName":
 					this.config.tmpName = this.config.userName;
+				case "dressCheck":
 				case "shutdownRequest":
 				case "alreadyExistName":
 					this.sendNotificationToAssis(payload);
@@ -313,8 +328,9 @@ Module.register("compliments", {
 				case "prev":
 				case "next":
 					this.config.state = payload;
+					var self = this;
 					setTimeout(() => {
-						this.sendNotification("PHOTO", "SHOW_COMPARE");
+						this.updateDom();
 					}, 5000);
 					break;
 				case "sayYes":
@@ -332,11 +348,9 @@ Module.register("compliments", {
 						this.sendNotification("PHOTO", "COUNT_FILE");
 						break;
 					case "shutdownRequest":
-						this.sendNotification("HIDE_ALL_MODULES");
+						this.sendNotification("SHUTDOWN_MIRROR");
 						break;
 					case "checkUserName":
-						console.log("!!!!!!@@@@@@@@@!!!!!!!");
-						console.log(payload);
 						this.sendNotification("CHECK_NAME_IN_DB", this.config.tmpName);
 						break;
 					case "alreadyExistName":
