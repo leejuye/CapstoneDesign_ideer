@@ -28,7 +28,7 @@ def playSound(sfx, check = False):
 
 def toInfo(sizeInfo):
     try:
-        print(json.dumps(sizeInfo))
+        print("success")
     except Exception:
         pass
     sys.stdout.flush()
@@ -134,10 +134,7 @@ x,y,w,h = roi
 dst = dst[y:y+h, x:x+w]
 
 dst = np.fliplr(dst)
-cv2.imwrite(curPath + "/image/" + sys.argv[2] + "/" + sys.argv[1],dst)
+cv2.imwrite(curPath + "/image/" + sys.argv[2] + "/" + sys.argv[1], dst)
 #cv2.imwrite(curPath + "/image/calibresult.png",dst)
 
-sizeInfo = { "id":sys.argv[2],"shoulder":1.1, "chest":2.2, "waist": 3.3, "hip":4.4,
-	"thigh":5.5, "calf":6.6, "weight":7.7, "bmi":12,
-	"is_front":(sys.argv[1][len(sys.argv[1])-5] == 't'), "file_name":sys.argv[1][0:14] }
-toInfo(sizeInfo)
+toInfo()

@@ -117,15 +117,15 @@ module.exports = NodeHelper.create({
 	},
 
 	setSizeInfo: async function(data) {
-		var qry = "INSERT INTO size_info VALUES (?,?,?,?,?,?,?,?,?,?,?)";
-
-		const arr = [];
+		const qry = "INSERT INTO size_info VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+		const params = [];
+		
 		data = JSON.parse(data);
 
 		for (var i in parts) {
-			arr.push(data[parts[i]]);
+			params.push(data[parts[i]]);
 		}
-		this.dbConn(qry, arr);
+		this.dbConn(qry, params);
 	},
 
 	deleteSizeInfo: function(data) {
@@ -140,7 +140,6 @@ module.exports = NodeHelper.create({
 		var qry = "UPDATE users SET base_file = ? WHERE id = ?";
 		this.dbConn(qry, [fileName, id]);
 		this.sendSocketNotification("CHANGE_COMPLETE", "complete");
-		
 	},
 
 	socketNotificationReceived: function(notification, payload) {
@@ -150,12 +149,20 @@ module.exports = NodeHelper.create({
 			PythonShell.run("modules/default/photo/preview.py", {args: [payload.fileName, payload.id]},
 			function (err, result) {
 				if (err) throw err;
-				self.setSizeInfo(result);
-				self.sendSocketNotification("PREVIEW_DONE",payload.fileName);
+				self.sendSocketNotification("PREVIEW_DONE", payload.fileName);
 			});
 		} else if(notification === "REMOVE_PIC") {
 			fs.unlinkSync("modules/default/photo/image/" + payload.id + "/" + payload.fileName);
 			this.deleteSizeInfo(payload.fileName);
+		} else if(notification === "SET_INFO") {
+			var self = this;
+			PythonShell.run("modules/default/photo/contour.py", {args: [payload.fileName, payload.id]},
+			function (err, result) {
+				if (err) throw err;
+				self.setSizeInfo(result.front);
+				self.setSizeInfo(result.side);
+				self.sendSocketNotification("CONTOUR_DONE");
+			});
 		} else if(notification === "GET_INFO") {
 			this.getSizeInfo(payload);
 		} else if(notification === "CHANGE_BASE") {
