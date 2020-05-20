@@ -80,8 +80,6 @@ var config = {
 					timer: 3000,
 					myMagicWord: true,
 					delay: 0.5,
-					//Your prefer sound play program. By example, if you are running this on OSX, `afplay` could be available.
-					//needed if you don't use HTML5
 					playProgram: "mpg321",
 					chime: {
 					  beep: "beep.mp3",
@@ -104,125 +102,7 @@ var config = {
     					lang: "ko-KR"  // ko-KR, en-US
   					}
 				},
-				/*recipes: [
-					"test_with_soundExec.js",
-					"Reboot-Restart-Shutdown.js",
-					"actions.js"
-				],*/
-				transcriptionHooks: {	// Recognize all words that contain patterns.
-					"CAMERA": {
-						pattern: "(촬영|찍어)",  // No spaces
-						command: "CAMERA_START"
-					},
-					"IM_HERE": {
-						pattern: "(나 왔어|나왔어)",  // No spaces but ok in this case
-						command: "IM_HERE"
-					},
-					"LOOKUP": {
-						pattern: "조회",
-						command: "LOOKUP"
-					},
-					"SHUTDOWN": {
-						pattern: "(종료|꺼 줘)",
-						command: "SHUTDOWN_REQUEST"
-					},
-					"SIGN_UP": {
-						pattern: "(신규 등록|회원 가입|신규등록)",
-						command: "SIGN_UP_REQUEST"
-					},
-					"YES": {
-						pattern: "응",
-						command: "YES"
-					},
-					"NO": {
-						pattern: "아니",
-						command: "NO"
-					},
-				},
-				actions: {},
-				commands: {
-					"CAMERA_START": {
-						soundExec: {
-							chime: "open"
-						},
-						notificationExec: {
-							notification: "COMPLIMENTS",
-							payload: "dressCheck"
-						}
-					},
-					"IM_HERE": {
-						soundExec: {
-							chime: "open"
-						},
-						notificationExec: {
-							notification: "COMPLIMENTS",
-							payload: "imHere"
-						}
-					},
-					"LOOKUP": {
-						soundExec: {
-							chime: "open"
-						},
-						notificationExec: {
-							notification: "PHOTO",
-							payload: "SHOW_COMPARE"
-						}
-					},
-					"SHUTDOWN_REQUEST": {
-						soundExec: {
-							chime: "open"
-						},
-						notificationExec: {
-							notification: "COMPLIMENTS",
-							payload: "shutdownRequest"
-						},
-					},
-					"SIGN_UP_REQUEST": {
-						soundExec: {
-							chime: "open"
-						},
-						notificationExec: {
-							notification: "COMPLIMENTS",
-							payload: "signUpRequest"
-						},
-					},
-					"YES": {
-						soundExec: {
-							chime: "open"
-						},
-						notificationExec: {
-							notification: "COMPLIMENTS",
-							payload: "sayYes"
-						}
-					},
-					"NO": {
-						soundExec: {
-							chime: "close"
-						},
-						notificationExec: {
-							notification: "COMPLIMENTS",
-							payload: "sayNo"
-						}
-					},
-				},
-				plugins: {
-					onReady: [],
-					onBeforeAudioResponse: [],
-					onAfterAudioResponse: [],
-					onBeforeScreenResponse: [],
-					onAfterScreenResponse: [],
-					onBeforeInactivated: [],
-					onAfterInactivated: [],
-					onBeforeActivated: [],
-					onAfterActivated: [],
-					onError: [],
-					onBeforeNotificationReceived: [],
-					onAfterNotificationReceived: [],
-					onBeforeSocketNotificationReceived: [],
-					onAfterSocketNotificationReceived: [],
-				},
-				responseHooks: {},
-			},
+			}
 		},
 		{
 			module: "MMM-Snowboy",

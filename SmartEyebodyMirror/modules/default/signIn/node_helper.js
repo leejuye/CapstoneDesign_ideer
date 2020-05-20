@@ -9,7 +9,6 @@ module.exports = NodeHelper.create({
 		try{
 			conn = await dbHelper.getConnection();
 			results = await conn.query(qry, params);
-			console.log("RESULT: " + results[0]);
 		} catch(err) {
 			this.sendSocketNotification("SIGN_IN_ERRER");
 			throw err;
@@ -25,7 +24,7 @@ module.exports = NodeHelper.create({
 		const user = await this.dbConn("select * from users where name = ?", payload);
 		if(signIn) {
 			if(user) {this.sendSocketNotification("SIGN_IN_SUCCESS", user);}
-			else {this.sendSocketNotification("NOT_EXIST");}
+			else {this.sendSocketNotification("NOT_EXIST", user.name);}
 		}
 		return new Promise(function(resolve, reject) {
 			return resolve(user);
@@ -40,15 +39,17 @@ module.exports = NodeHelper.create({
 
 	socketNotificationReceived: async function(notification, payload) {
 		if(notification === "CHECK_USER") {
-			var user = await this.getUser(payload);
-			if(user != undefined) {
+			var user = await this.getUser(payload.name);
+			if(user) {
 				this.sendSocketNotification("ALREADY_EXIST");
+				if(!payload.isNew){this.getUser(payload.name, true);}
 			} else {
-				this.createUser(payload);
+				if (payload.isNew) {
+					this.createUser(payload.name);
+				} else {
+					this.sendSocketNotification("NOT_EXIST", payload.name);
+				}
 			}
-		} else if (notification === "SIGN_IN") {
-			this.getUser(payload, true);
 		}
 	}
-
 });

@@ -15,6 +15,7 @@ var log = function() {
 Module.register("MMM-AssistantMk2", {
 	defaults: {
 		isName: false,
+		isNewUser: false,
 		isLookup: false,
 		debug:false,
 		useA2D: false,
@@ -98,9 +99,114 @@ Module.register("MMM-AssistantMk2", {
 		onBeforeSocketNotificationReceived: [],
 		onAfterSocketNotificationReceived: [],
 	},
-	commands: {},
+	commands: {
+		"CAMERA_START": {
+			soundExec: {
+				chime: "open"
+			},
+			notificationExec: {
+				notification: "COMPLIMENTS",
+				payload: "dressCheck"
+			}
+		},
+		"IM_HERE": {
+			soundExec: {
+				chime: "open"
+			},
+			notificationExec: {
+				notification: "COMPLIMENTS",
+				payload: "imHere"
+			}
+		},
+		"LOOKUP": {
+			soundExec: {
+				chime: "open"
+			},
+			notificationExec: {
+				notification: "PHOTO",
+				payload: "SHOW_COMPARE"
+			}
+		},
+		"SHUTDOWN_REQUEST": {
+			soundExec: {
+				chime: "open"
+			},
+			notificationExec: {
+				notification: "COMPLIMENTS",
+				payload: "shutdownRequest"
+			},
+		},
+		"SIGN_UP_REQUEST": {
+			soundExec: {
+				chime: "open"
+			},
+			notificationExec: {
+				notification: "COMPLIMENTS",
+				payload: "signUpRequest"
+			},
+		},
+		"LOOK_SIDE": {
+			soundExec: {
+				chime: "open"
+			},
+			notificationExec: {
+				notification: "PHOTO_CHANGE",
+				payload: "payload"
+			},
+		},
+		"YES": {
+			soundExec: {
+				chime: "open"
+			},
+			notificationExec: {
+				notification: "COMPLIMENTS",
+				payload: "sayYes"
+			}
+		},
+		"NO": {
+			soundExec: {
+				chime: "close"
+			},
+			notificationExec: {
+				notification: "COMPLIMENTS",
+				payload: "sayNo"
+			}
+		},},
 	actions: {},
-	transcriptionHooks: {},
+	transcriptionHooks: {
+		"CAMERA": {
+			pattern: "(촬영|찍어)",  // No spaces
+			command: "CAMERA_START"
+		},
+		"IM_HERE": {
+			pattern: "(나 왔어|나왔어)",  // No spaces but ok in this case
+			command: "IM_HERE"
+		},
+		"LOOKUP": {
+			pattern: "조회",
+			command: "LOOKUP"
+		},
+		"SHUTDOWN": {
+			pattern: "(종료|꺼 줘)",
+			command: "SHUTDOWN_REQUEST"
+		},
+		"SIGN_UP": {
+			pattern: "(신규 등록|회원 가입|신규등록)",
+			command: "SIGN_UP_REQUEST"
+		},
+		"SIDE": {
+			pattern: "측면",
+			command: "LOOK_SIDE"
+		},
+		"YES": {
+			pattern: "응",
+			command: "YES"
+		},
+		"NO": {
+			pattern: "아니",
+			command: "NO"
+		},
+	},
 	responseHooks: {},
 
 	getScripts: function() {
@@ -361,33 +467,33 @@ Module.register("MMM-AssistantMk2", {
 		case "ASSISTANT_RESULT":
 			if (payload.transcription) {
 				this.config.command = payload.transcription.transcription;
-				this.sendNotification("COMPLIMENTS", {"payload": "command", "command": this.config.command});
-		
+				// this.sendNotification("COMPLIMENTS", {"payload": "command", "command": this.config.command});
+
 				if (this.config.isName) {
-				  if (payload.transcription.transcription.indexOf("신규 등록") >= 0 ) {
-				    this.sendNotification("COMPLIMENTS", "signUpRequest");
-				  } else {
-				    this.sendNotification("COMPLIMENTS", {payload: "checkUserName", userName: payload.transcription.transcription});
-				    this.config.isName = false;
-				  }
+				  	if (payload.transcription.transcription.indexOf("신규 등록") >= 0 ) {
+						this.sendNotification("COMPLIMENTS", "signUpRequest");
+					} else {
+						this.sendNotification("COMPLIMENTS", {payload: "checkUserName", userName: payload.transcription.transcription});
+				    	this.config.isName = false;
+				  	}
 				}
-        	
+
 				if (this.config.command.indexOf(" 전 사진 보여 줘") >= 0) {
 					var string;
-					string = this.config.command.split(' 전');
+					string = this.config.command.split(" 전");
 					string = string[0];
-					
-					if (string.indexOf('일') >= 0) {
-						this.config.strArray = string.split('일');
+
+					if (string.indexOf("일") >= 0) {
+						this.config.strArray = string.split("일");
 						this.config.date = this.config.strArray[0];
-					} else if (string.indexOf('주') >= 0) {
-						this.config.strArray = string.split('주');
+					} else if (string.indexOf("주") >= 0) {
+						this.config.strArray = string.split("주");
 						this.config.date = this.config.strArray[0] * 7;
-					} else if (string.indexOf('개월') >= 0) {
-						this.config.strArray = string.split('개월');
+					} else if (string.indexOf("개월") >= 0) {
+						this.config.strArray = string.split("개월");
 						this.config.date = this.config.strArray[0] * 30;
-					} else if (string.indexOf('년') >= 0) {
-						this.config.strArray = string.split('년');
+					} else if (string.indexOf("년") >= 0) {
+						this.config.strArray = string.split("년");
 						this.config.date = this.config.strArray[0] * 365;
 					}
 				} else if (this.config.command.indexOf("정면") >= 0) {
@@ -472,6 +578,7 @@ Module.register("MMM-AssistantMk2", {
 			this.registerActionsObject(p.actions);
 		}
 		if (p.hasOwnProperty("transcriptionHooks")) {
+			Log.log(p);
 			this.registerTranscriptionHooksObject(p.transcriptionHooks);
 		}
 		if (p.hasOwnProperty("responseHooks")) {

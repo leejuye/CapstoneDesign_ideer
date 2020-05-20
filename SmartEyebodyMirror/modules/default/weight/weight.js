@@ -2,6 +2,7 @@ Module.register("weight",{
 
 	start: function() {
 		this.sendStart();
+		// this.sendNotification("PAGE_CHANGED", 2);
 	},
 
 	sendStart: function() {
