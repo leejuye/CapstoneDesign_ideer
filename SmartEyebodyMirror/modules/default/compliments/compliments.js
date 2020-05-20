@@ -275,12 +275,6 @@ Module.register("compliments", {
 				case "CURRENTWEATHER_DATA":
 					this.setCurrentWeatherType(payload.data);
 					break;
-				case "dressCheck":
-					this.config.state = payload;
-					setTimeout(() => {
-						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-					}, 7000);
-					break;
 				case "dressWait":
 					this.config.state = payload;
 					this.waitInterval = setInterval(function() {
@@ -319,6 +313,7 @@ Module.register("compliments", {
 					break;
 				case "checkUserName":
 					this.config.tmpName = this.config.userName;
+				case "dressCheck":
 				case "shutdownRequest":
 				case "alreadyExistName":
 					this.sendNotificationToAssis(payload);

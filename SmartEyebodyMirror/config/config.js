@@ -51,7 +51,7 @@ var config = {
 		},
 		{
 		    module: "compliments",
-			position: "lower_third",
+			position: "middle_center",
 		},
 		{
 		 	module: "clock",
