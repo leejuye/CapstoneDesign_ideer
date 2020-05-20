@@ -313,6 +313,7 @@ Module.register("compliments", {
 				case "dressCheck":
 				case "shutdownRequest":
 				case "alreadyExistName":
+				case "signInSuccess":
 					this.sendNotificationToAssis(payload);
 					break;
 				case "signUpRequest":
