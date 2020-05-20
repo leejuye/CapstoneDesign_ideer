@@ -26,7 +26,7 @@ def playSound(sfx, check = False):
             return 0
     return True
 
-def toInfo(sizeInfo):
+def toInfo():
     try:
         print("success")
     except Exception:

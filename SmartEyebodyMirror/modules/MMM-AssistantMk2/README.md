@@ -6,6 +6,7 @@
 
 **3.3.1 (11/05/2020)**
  * **ADD**: new format of response on volume request
+ * **FIX**: Installer dependencies with @bugsounet/snowboy
 
 **3.3.0 (08/05/2020)**
  * **ADD**: update to lpcm16/addbuffermp3 npm library

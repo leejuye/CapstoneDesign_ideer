@@ -64,7 +64,7 @@ echo
 Installer_yesno "Do you want to execute automatic intallation ?" || exit 0
 
 # check dependencies
-dependencies=(git wget libasound2-dev sox libsox-fmt-all gcc-7 libsox-fmt-mp3 build-essential mpg321 vlc)
+dependencies=(git wget libasound2-dev sox libsox-fmt-all gcc-7 libsox-fmt-mp3 build-essential mpg321 vlc libmagic-dev libatlas-base-dev)
 Installer_info "Checking all dependencies..."
 Installer_check_dependencies
 Installer_success "All Dependencies needed are installed !"

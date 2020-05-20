@@ -23,15 +23,15 @@ Module.register("photo",{
 	start: function() {
 	 	this.current_user = null;
 		//TEST
-		this.fileName = "20200521121212";
-		this.id = 1234;
+		// this.fileName = "20200521121212";
+		// this.id = 1234;
 		//this.term = -7;
 		//this.sendSocketNotification("GET_AFTER_FILENAME", {"id": this.id, "term": this.term});
 		//TEST END
-		this.sendSocketNotification("SET_INFO", {
-			"fileName": this.fileName,
-			"id": this.id
-		});
+		// this.sendSocketNotification("SET_INFO", {
+		// 	"fileName": this.fileName,
+		// 	"id": this.id
+		// });
 		this.initFileName();
 	 	Log.info("Starting module: " + this.name);
 	},

@@ -27,7 +27,7 @@ Module.register("weight",{
 	socketNotificationReceived: function(notification, payload) {
 		if(notification === "GET_WEIGHT_SUCCESS") {
 			Log.log(payload);
-			this.sendNotification("START_MIRROR");
+			this.sendNotification("START_MIRROR", payload);
 			this.sendNotification("PAGE_CHANGED", 2);
 			setTimeout(() => {
 				this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
