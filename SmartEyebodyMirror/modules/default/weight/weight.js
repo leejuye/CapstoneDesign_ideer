@@ -13,6 +13,13 @@ Module.register("weight",{
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload);
 			this.sendSocketNotification("START_GET_WEIGHT");
 			break;
+		case "SHUTDOWN_MIRROR":
+			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload);
+			this.sendNotification("COMPLIMENTS", "shutdownNow");
+			setTimeout(() => {
+				this.sendNotification("PAGE_CHANGED", 0);
+			}, 5000);
+			break;
 		default:
 			break;
 		}

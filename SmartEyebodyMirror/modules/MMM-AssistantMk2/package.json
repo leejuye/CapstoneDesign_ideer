@@ -1,6 +1,6 @@
 {
   "name": "MMM-AssistantMk2",
-  "version": "3.2.3",
+  "version": "3.3.0",
   "description": "An embedded Google Assistant on MagicMirror.",
   "main": "MMM-AssistantMk2.js",
   "scripts": {
@@ -30,6 +30,8 @@
   },
   "homepage": "https://github.com/bugsounet/MMM-AssistantMk2",
   "dependencies": {
+    "@bugsounet/buffertomp3": "^1.0.0",
+    "@bugsounet/lpcm16": "^1.0.0",
     "cheerio": "^1.0.0-rc.3",
     "google-assistant": "^0.5.4",
     "grpc": "1.23.4",
@@ -39,6 +41,6 @@
   },
   "devDependencies": {
     "@bugsounet/snowboy": "^1.4.7",
-    "electron-rebuild": "^1.10.1"
+    "electron-rebuild": "^1.11.0"
   }
 }

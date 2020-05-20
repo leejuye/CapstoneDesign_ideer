@@ -64,6 +64,10 @@ var recipe = {
       pattern: "mets radio fg",
       command: "fg"
     },
+    "info": {
+      pattern: "mets les infos",
+      command: "info"
+    }
   },
 
   commands: {
@@ -277,6 +281,27 @@ var recipe = {
         chime: "open"
       }
     },
+
+    /** rien a voir avec la radio ... c'est la chaine TV de france info ;) **/
+    "info": {
+      notificationExec: {
+        notification: "A2D",
+        payload: (params) => {
+          /** emule une réponse du serveur pour A2D **/
+          return {
+            "photos": [],
+            "urls": [ "https://m.youtube.com/watch?v=wwNZKfBLAsc" ],
+            "transcription": { transcription: 'France Info TV', done: true },
+            "trysay": null,
+            "help": null
+          }
+        }
+      },
+      soundExec: {
+        //say: "Je mets la chaine de France info",
+        chime: "open"
+      },
+    }
   }
 }
 exports.recipe = recipe

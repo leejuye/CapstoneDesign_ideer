@@ -331,7 +331,7 @@ Module.register("compliments", {
 						this.sendNotification("PHOTO", "COUNT_FILE");
 						break;
 					case "shutdownRequest":
-						this.sendNotification("HIDE_ALL_MODULES");
+						this.sendNotification("SHUTDOWN_MIRROR");
 						break;
 					case "checkUserName":
 						this.sendNotification("CHECK_NAME_IN_DB", this.config.tmpName);

@@ -57,7 +57,7 @@ class AssistantResponse extends AssistantResponseClass{
         module.hide(15, {lockString: "AMK2_LOCKED"})
         AMK2.className= "in" + (this.fullscreenAbove ? " fullscreen_above": "")
       })
-    } else  if(!(this.secretMode || this.sayMode)) {
+    } else  if(!(this.secretMode)) {
       if (status && status.actual == "standby") { // only on standby mode
         AMK2.className= "out" + (this.fullscreenAbove ? " fullscreen_above": "")
         this.displayTimer = setTimeout (() => {
