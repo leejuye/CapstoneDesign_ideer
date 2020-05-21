@@ -3,12 +3,14 @@ import cv2
 import imutils
 import sys
 import os
+import json
 #import findPos as op
 
 def toInfo(sizeInfo):
     try:
         print(json.dumps(sizeInfo))
-    except Exception:
+    except Exception as ex:
+        print(ex)
         pass
     sys.stdout.flush()
 
@@ -19,10 +21,10 @@ fileName = sys.argv[1]
 userID = sys.argv[2]
 
 frontImage = cv2.imread(curPath + userID + '/' + fileName + '_front.jpg')
-print(curPath + userID + '/' + fileName + '_front.jpg')
+#print(curPath + userID + '/' + fileName + '_front.jpg')
 sideImage = cv2.imread(curPath + userID + '/' + fileName + '_side.jpg')
 backImage = cv2.imread(curPath + 'background.jpg')
-print(curPath + 'background.jpg')
+#print(curPath + 'background.jpg')
 
 ratio = [0.8, 0.62, 0.50, 0.38, 0.2]
 drawCnt = [[2, 2, 1, 1, 1], [1, 1, 1, 1, 1]]
@@ -94,6 +96,8 @@ def line(dic, image, cnts, Ypoints, isSide, r):
             dic[partName[j]] = round((drawArr[0][1][0] - drawArr[0][0][0])*r, 2)
             for i in range(0, drawCnt[isSide][j]):
                 cv2.line(image, drawArr[i][0], drawArr[i][1], (0, 255, 0), 2)
+        else:
+            dic[partName[j]] = 0.0
 
 
 frontContour, cntsFront = contour(backImage, frontImage)
@@ -133,6 +137,8 @@ sideSizeInfo["bmi"] = 0
 
 frontSizeInfo["chest"] = 0
 sideSizeInfo["chest"] = 0
+
+sideSizeInfo["shoulder"] = 0
 # end
 
 frontSizeInfo["is_front"] = True
@@ -145,5 +151,5 @@ frontSizeInfo["id"] = userID
 sideSizeInfo["id"] = userID
 
 sizeInfo = dict(front=frontSizeInfo, side=sideSizeInfo)
-print(sizeInfo)
-#toInfo(sizeInfo)
+#print(sizeInfo)
+toInfo(sizeInfo)

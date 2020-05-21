@@ -117,7 +117,7 @@ module.exports = NodeHelper.create({
 		const qry = "INSERT INTO size_info VALUES(?,?,?,?,?,?,?,?,?,?,?)";
 		const params = [];
 		
-		data = JSON.parse(data);
+		//data = JSON.parse(data);
 
 		for (var i in parts) {
 			params.push(data[parts[i]]);
@@ -155,7 +155,12 @@ module.exports = NodeHelper.create({
 			var self = this;
 			PythonShell.run("modules/default/photo/contour.py", {args: [payload.fileName, payload.id]},
 			function (err, result) {
-				if (err) throw err;
+				if (err) {
+					console.log(err);
+					throw err;
+				}
+				result = JSON.parse(result);
+				
 				self.setSizeInfo(result.front);
 				self.setSizeInfo(result.side);
 				self.sendSocketNotification("CONTOUR_DONE");
