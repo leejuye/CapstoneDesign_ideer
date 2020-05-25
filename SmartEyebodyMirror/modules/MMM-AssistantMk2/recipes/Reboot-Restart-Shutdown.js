@@ -3,9 +3,6 @@
 /**   set partern in your language       **/
 /**   @bugsounet                         **/
 
-Log.log("***** This is RRS.js *****");
-console.log("##### This is RRS.js #####");
-
 var recipe = {
   transcriptionHooks: {
     "AMK2_REBOOT": {
@@ -17,7 +14,7 @@ var recipe = {
       command: "AMK2_RESTART"
     },
     "AMK2_REBOOT": {
-      pattern: "shut down please",
+      pattern: "shutdown please",
       command: "AMK2_SHUTDOWN"
     },
   },

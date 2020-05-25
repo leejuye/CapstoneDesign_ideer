@@ -17,8 +17,10 @@ var defaultModules = [
 	"newsfeed",
 	"weatherforecast",
 	"updatenotification",
-	"weather", 
-	"photo"
+	"weather",
+	"photo",
+	"signIn",
+	"weight",
 ];
 
 /*************** DO NOT EDIT THE LINE BELOW ***************/

@@ -3,19 +3,16 @@
 `MMM-AssistantMk2` is an embedded Google assistant on MagicMirror.
 
 ## NEW UPDATES
-**3.2.1 (16/04/2020)**
- * **FIX**: Send A2D response only on no hooked response
- * **FIX**: repository change owner
- * **ADD**: preprared recipe with-radio_fr.js recipe for A2D Radio (FR Only)
- * **ADD**: npm run rebuild -> REFRESH installation on MagicMirror version change
 
-**3.2.0 (09/04/2020)**
- * **ADD**: Chinese_simplified translate (thx to @wlmqpsc)
- * **ADD**: ability to play personnal sound on recipes soundExec command (see wiki)
- * **FIX**: no fade in animation on first use in Fullscreen ui
- * **DEL**: full addon code and cleanning
- * **ADD**: add control if A2D used
+**3.3.1 (11/05/2020)**
+ * **ADD**: new format of response on volume request
+ * **FIX**: Installer dependencies with @bugsounet/snowboy
 
+**3.3.0 (08/05/2020)**
+ * **ADD**: update to lpcm16/addbuffermp3 npm library
+ * **FIX**: `soundExec: { say: "some text" }`
+ * **UPD**: with_radio_fr.js
+ 
 ## [**Preview Video**](https://youtu.be/e7Xg95mL8JE)
 
 ## Screenshot
@@ -59,6 +56,28 @@ npm run rebuild
 ```
 
 ## UPDATE HISTORY
+**3.2.3 (30/04/2020)**
+ * **ADD**: New ui -> Simple
+ * **OPT**: Optional Build with Snowboy embed
+ * **ADD**: `A2DStopCommand` for personalize your stop command
+ * **FIX**: some logs
+
+**3.2.2 (17/04/2020)**
+ * **FIX**: Package.json (google-assistant)
+
+**3.2.1 (16/04/2020)**
+ * **FIX**: Send A2D response only on no hooked response
+ * **FIX**: repository change owner
+ * **ADD**: preprared recipe with-radio_fr.js recipe for A2D Radio (FR Only)
+ * **ADD**: npm run rebuild -> REFRESH installation on MagicMirror version change
+
+**3.2.0 (09/04/2020)**
+ * **ADD**: Chinese_simplified translate (thx to @wlmqpsc)
+ * **ADD**: ability to play personnal sound on recipes soundExec command (see wiki)
+ * **FIX**: no fade in animation on first use in Fullscreen ui
+ * **DEL**: full addon code and cleanning
+ * **ADD**: add control if A2D used
+
 **3.1.2 (17/03/2020)**
  * **FIX**: No sound response issue when custom action is used.
  * **FIX**: correct youtube search link.

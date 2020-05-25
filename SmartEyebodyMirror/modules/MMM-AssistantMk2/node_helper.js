@@ -11,7 +11,6 @@ const ScreenParser = require("./components/screenParser.js")
 const ActionManager = require("./components/actionManager.js")
 const Sound = require("./components/sound.js")
 
-
 var _log = function() {
   var context = "[AMK2]"
   return Function.prototype.bind.call(console.log, console, context)
@@ -36,12 +35,18 @@ module.exports = NodeHelper.create({
       case "ACTIVATE_ASSISTANT":
         this.activateAssistant(payload)
         break
+      case "ASSISTANT_BUSY":
+        if (this.config.useSnowboy) this.snowboy.stop()
+        break
+      case "ASSISTANT_READY":
+        if (this.config.useSnowboy) this.snowboy.start()
+        break
       case "SHELLEXEC":
         var command = payload.command
         command += (payload.options) ? (" " + payload.options) : ""
         exec (command, (e,so,se)=> {
           log("ShellExec command:", command)
-          if (e) log("ShellExec Error:", e)
+          if (e) console.log("[AMK2] ShellExec Error:" + e)
           this.sendSocketNotification("SHELLEXEC_RESULT", {
             executed: payload,
             result: {
@@ -121,27 +126,21 @@ module.exports = NodeHelper.create({
     if (!fs.existsSync(this.config.assistantConfig["modulePath"] + "/credentials.json")) {
       console.log("[AMK2][ERROR] credentials.json file not found !")
     }
-    this.loadRecipes(()=>{
-      this.sendSocketNotification("INITIALIZED")
-    })
-    this.cleanUptmp()
     log("Response delay is set to " + this.config.responseConfig.delay + ((this.config.responseConfig.delay > 1) ? " seconds" : " second"))
-    if (!this.config.responseConfig.useHTML5) {
+    if (this.config.responseConfig.useHTML5) console.log("[AMK2] Use HTML5 for audio response")
+    else {
       this.sound = new Sound(this.config.responseConfig, (send) => { this.sendSocketNotification(send) } , this.config.debug )
       this.sound.init()
     }
-    else log("Use HTML5 for audio response")
+    if (this.config.useSnowboy) {
+	  const Snowboy = require("@bugsounet/snowboy").Snowboy
+      this.snowboy = new Snowboy(this.config.snowboy, this.config.micConfig, (detected) => { this.hotwordDetect(detected) } , this.config.debug )
+      this.snowboy.init()
+    }
+    this.loadRecipes(()=> this.sendSocketNotification("INITIALIZED"))
+    if (this.config.useA2D) console.log ("[AMK2] Assistant2Display Server Started")
     this.assistantWeb()
     console.log("[AMK2] AssistantMk2 is initialized.")
-    if (this.config.useA2D) log ("Assistant2Display Started")
-  },
-
-  cleanUptmp: function() {
-    var tmp = path.resolve(this.config.assistantConfig["modulePath"], "tmp")
-    var command = "cd " + tmp + "; rm *.mp3; rm *.html"
-    exec(command, (error,stdout, stderr)=>{
-      log("tmp directory is now cleaned.")
-    })
   },
 
   loadRecipes: function(callback=()=>{}) {
@@ -158,9 +157,9 @@ module.exports = NodeHelper.create({
           var p = require("./recipes/" + recipes[i]).recipe
           this.sendSocketNotification("LOAD_RECIPE", JSON.stringify(p, replacer, 2))
           if (p.actions) this.config.actions = Object.assign({}, this.config.actions, p.actions)
-          log("RECIPE_LOADED:", recipes[i])
+          console.log("[AMK2] RECIPE_LOADED:", recipes[i])
         } catch (e) {
-          log(`RECIPE_ERROR (${recipes[i]}):`, e.message)
+          console.log(`[AMK2] RECIPE_ERROR (${recipes[i]}):`, e.message)
         }
       }
       if (this.config.actions && Object.keys(this.config.actions).length > 0) {
@@ -200,6 +199,12 @@ module.exports = NodeHelper.create({
       }
       return res.send(response)
     })
-    if (this.config.debug) console.log ("[AMK2:WEB] ASSISTANT_WEB Started")
-  }
+    console.log ("[AMK2] ASSISTANT_WEB Started")
+  },
+
+  /** Snowboy Callback **/
+  hotwordDetect: function(detected) {
+    if (detected) this.sendSocketNotification("ASSISTANT_ACTIVATE", { type:"MIC" })
+  },
 })
+

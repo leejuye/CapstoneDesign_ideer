@@ -64,7 +64,7 @@ echo
 Installer_yesno "Do you want to execute automatic intallation ?" || exit 0
 
 # check dependencies
-dependencies=(git wget libasound2-dev sox libsox-fmt-all gcc-7 libsox-fmt-mp3 build-essential mpg321 vlc)
+dependencies=(git wget libasound2-dev sox libsox-fmt-all gcc-7 libsox-fmt-mp3 build-essential mpg321 vlc libmagic-dev libatlas-base-dev)
 Installer_info "Checking all dependencies..."
 Installer_check_dependencies
 Installer_success "All Dependencies needed are installed !"
@@ -87,6 +87,14 @@ Installer_yesno "Do you want to execute electron rebuild" && (
   Installer_success "Electron Rebuild Complete!"
 )
 echo
+
+Installer_info "Snowboy detector embed version"
+Installer_warning "If you want to use it, remove your other detector !"
+Installer_warning "like: MMM-HotWord or MMM-Snowboy"
+Installer_yesno "Do you want to use it ?" && (
+  npm install @bugsounet/snowboy --save-dev
+  Installer_success "@bugsounet/snowboy library installed"
+)
 
 # pulse audio and mmap issue
 if Installer_is_installed "pulseaudio"; then

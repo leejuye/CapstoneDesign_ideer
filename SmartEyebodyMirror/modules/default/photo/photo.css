@@ -1,0 +1,40 @@
+.photo {
+	height: 500px;
+	width: auto;
+	margin-top: 40px;
+}
+
+.info_img_box {
+	width:260px;
+	height: auto;
+	margin: 10px;
+	float: left; 
+}
+
+.info_item {
+	width: 190px;
+	height: 440px;
+	border: 2px solid white;
+	float: left;
+	color: white;
+	font-size: 25px;
+	padding: 10px;
+}
+
+.dif_item {
+	float: left;
+	padding: 5px;
+}
+
+.red_font {
+	color: red;
+}
+
+.green_font {
+	color: green;
+}
+
+.info_img {
+	width: 260px;
+	height: auto;
+}

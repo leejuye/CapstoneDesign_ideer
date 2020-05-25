@@ -150,11 +150,11 @@ var Module = Class.extend({
 	 * argument sender Module - The module that sent the notification.
 	 */
 	notificationReceived: function (notification, payload, sender) {
-		if (sender) {
-			Log.log(this.name + " received a module notification: " + notification + " from sender: " + sender.name);
-		} else {
-			Log.log(this.name + " received a system notification: " + notification);
-		}
+		// if (sender) {
+		// 	Log.log(this.name + " received a module notification: " + notification + " from sender: " + sender.name);
+		// } else {
+		// 	Log.log(this.name + " received a system notification: " + notification);
+		// }
 	},
 
 	/** nunjucksEnvironment()

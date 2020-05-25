@@ -32,11 +32,26 @@ var config = {
 
 	modules: [
 		{
-			module: "MMM-Dynamic-Modules",
+			module: "MMM-pages",
+			config: {
+				modules:
+						[["weight"], ["compliments"],
+						 [ "clock", "compliments", "photo", "MMM-AssistantMk2"]],
+				fixed: [],
+			}
 		},
 		{
-		  module: "compliments",
-		 	position: "lower_third"
+		    module: "MMM-Dynamic-Modules"
+		},
+		{
+		    module: "signIn",
+		},
+		{
+		    module: "weight",
+		},
+		{
+		    module: "compliments",
+			position: "middle_center",
 		},
 		{
 		 	module: "clock",
@@ -44,12 +59,14 @@ var config = {
 		},
 		{
 			module: "photo",
-			position: "middle_center"
+			position: "top_left"
 		},
 		{
 			module: "MMM-AssistantMk2",
 			position: "top_left",  // fullscreen_above, top_left
 			config: {
+				debug: false,
+				useA2D: true,
 				ui: "Simple",	// Fullscreen, Classic, Classic2, Simple
 				assistantConfig: {
 					latitude: 51.508530,
@@ -58,13 +75,11 @@ var config = {
 				responseConfig: {
 					useHTML5: true,
 					useScreenOutput: true,
-					useAudioOutput: true,
+					useAudioOutput: false,
 					useChime: true,
-					timer: 5000,
+					timer: 3000,
 					myMagicWord: true,
 					delay: 0.5,
-					//Your prefer sound play program. By example, if you are running this on OSX, `afplay` could be available.
-					//needed if you don't use HTML5
 					playProgram: "mpg321",
 					chime: {
 					  beep: "beep.mp3",
@@ -78,7 +93,7 @@ var config = {
 				},
 				micConfig: {
 					recorder: "arecord",
-					device: "plughw:0",
+					device: "plughw:2",  // You should use yours
 				},
 				defaultProfile: "default",
 				profiles: {
@@ -87,96 +102,23 @@ var config = {
     					lang: "ko-KR"  // ko-KR, en-US
   					}
 				},
-				/*recipes: [
-					"test_with_soundExec.js",
-					"Reboot-Restart-Shutdown.js",
-					"actions.js"
-				],*/
-				transcriptionHooks: {
-					"HOOK_1": {
-						pattern: [
-							"종료해 줘", "종료해", "종료"
-						],
-						command: "MIRROR_END"
-					},
-					"HOOK_2": {
-						pattern: [
-							"촬영해 줘", "촬영해", "촬영"
-						],
-						command: "CAMERA_START"
-					},
-					"HOOK_TEST": {
-						pattern: [
-							"테스트"
-						],
-						command: "TEST"
-					},
-				},
-				actions: {},
-				commands: {
-					"MIRROR_END": {
-						soundExec: {
-							chime: "close"
-						},
-						shellExec: {
-							exec: "shutdown now"
-						},
-					},
-					"CAMERA_START": {
-						notificationExec: {
-							notification: "TAKE_PIC",
-							payload: "test.jpg"
-							/*payload: {
-								title:"TEST", 
-							  	message:"This is a test."
-							}*/
-						}
-					},
-					"TEST": {
-						moduleExec: {
-							module: ["MMM-AssistantMk2"],
-							exec: (module, params, key) => {
-							  	setTimeout(()=>{
-									module.sendNotification("SHOW_ALERT", { 
-										message:"it's works !", 
-										timer:2000 
-									})
-								}, 100)
-							}
-						},
-						soundExec: {
-							chime: "open",
-							say: "it's really works !" // message should be set to your language !
-						},
-						notificationExec: {
-							notification: "SHOW_ALERT",
-							payload: {
-								title:"TEST", 
-							  	message:"This is a test."
-							}
-						}
-					},
-				},
-				plugins: {},
-				responseHooks: {},
-				useA2D: true,
-			},
+			}
 		},
 		{
-			module: 'MMM-Snowboy',
+			module: "MMM-Snowboy",
 			config: {
 			  debug: false,
 			  AudioGain: 2.0,
 			  Frontend: true,
-			  Model: "smart_mirror",
-			  Sensitivity: null,
+			  Model: "jarvis",
+			  Sensitivity: 1.0,
 			  micConfig: {
-				recorder: "arecord",
-				device: "plughw:0"
+					recorder: "arecord",
+					device: "plughw:2"  // You should use yours
 			  },
 			  onDetected: {
-				notification: "ASSISTANT_ACTIVATE",
-				parameters: {
+					notification: "ASSISTANT_ACTIVATE",
+					parameters: {
 				  type: "MIC",
 				  profile: "default",
 				  chime: true
