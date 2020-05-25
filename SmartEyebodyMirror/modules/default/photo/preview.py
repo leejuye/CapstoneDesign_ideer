@@ -4,9 +4,6 @@ import cv2
 import sys
 import json
 import os
-import contextlib
-with contextlib.redirect_stdout(None):
-    import pygame
 import time
 from picamera import PiCamera
 from PIL import Image
@@ -14,17 +11,6 @@ from picamera.array import PiRGBArray
 
 #path
 curPath = os.path.dirname(os.path.abspath(__file__))
-
-def playSound(sfx, check = False):
-    if check == False:
-        if sfx == "sfx1":
-            sfx1.play()
-            time.sleep(0.1)
-        else:
-            sfx2.play()
-            time.sleep(1)
-            return 0
-    return True
 
 def toInfo():
     try:
@@ -61,10 +47,10 @@ fontSize = 5
 thickness = 2
 
 # sound setting
-pygame.mixer.init()
-sfx1 = pygame.mixer.Sound(curPath + "/sound/bleeper.wav")
-sfx2 = pygame.mixer.Sound(curPath + "/sound/shutter.wav")
-check = [False, False, False]
+#pygame.mixer.init()
+#sfx1 = pygame.mixer.Sound(curPath + "/sound/bleeper.wav")
+#sfx2 = pygame.mixer.Sound(curPath + "/sound/shutter.wav")
+#check = [False, False, False]
 
 # allow the camera to warmup
 time.sleep(0.1)
@@ -94,15 +80,15 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
     #count down text
     cnt = time.time()-start
-    if cnt >= 9:
+    if cnt >= 4:
         cv2.putText(addedImage, "1", location, font, fontSize, color, thickness, cv2.LINE_AA)
-        check[0] = playSound("sfx1", check[0])
-    elif cnt >= 8:
+#        check[0] = playSound("sfx1", check[0])
+    elif cnt >= 3:
         cv2.putText(addedImage, "2", location, font, fontSize, color, thickness, cv2.LINE_AA)
-        check[1] = playSound("sfx1", check[1])
-    elif cnt >= 7:
+#        check[1] = playSound("sfx1", check[1])
+    elif cnt >= 2:
         cv2.putText(addedImage, "3", location, font, fontSize, color, thickness, cv2.LINE_AA)
-        check[2] = playSound("sfx1", check[2])
+#        check[2] = playSound("sfx1", check[2])
     
     # show the frame
     cv2.namedWindow(winName)
@@ -114,8 +100,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     rawCapture.truncate(0)
     
     # if the `q` key was pressed, break from the loop
-    if key == ord("q") or time.time()-start >= 5:
-        playSound("sfx2")
+    if key == ord("q") or time.time()-start >= 7:
+#        playSound("sfx2")
         camera.capture(curPath + "/image/" + sys.argv[2] + "/" + sys.argv[1])
         break
 

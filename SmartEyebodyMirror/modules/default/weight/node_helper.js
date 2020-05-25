@@ -12,6 +12,7 @@ module.exports = NodeHelper.create({
 				"sudo python3 /home/pi/CapstoneDesign_ideer/SmartEyebodyMirror/modules/default/weight/ReverseMiScale/example.py"
 				,function( error, success ) {
 				  if( error ) {
+					  console.log(error);
 						cmd.get(
 							"sudo hciconfig hci0 down && sudo hciconfig hci0 up"
 							,function( error, success ) {
@@ -21,7 +22,7 @@ module.exports = NodeHelper.create({
 							}
 						);
 					} else {
-						self.sendSocketNotification("GET_WEIGHT_SUCCESS", success);
+						self.sendSocketNotification("GET_WEIGHT_SUCCESS", {weight: success});
 				  }
 				}
 			);

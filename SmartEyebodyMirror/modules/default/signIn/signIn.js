@@ -4,7 +4,7 @@ Module.register("signIn",{
 	notificationReceived: function (notification, payload) {
 		switch(notification) {
 		case "CHECK_NAME_IN_DB":
-			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload);
+			Log.log("^^^^^^"+this.name + " received a module notification: " + notification + " payload: " + payload);
 			this.sendSocketNotification("CHECK_USER", {name: payload, isNew: this.isNew} );
 			break;
 		case "SIGN_IN_USER":

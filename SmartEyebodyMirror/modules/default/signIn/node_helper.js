@@ -9,6 +9,7 @@ module.exports = NodeHelper.create({
 		try{
 			conn = await dbHelper.getConnection();
 			results = await conn.query(qry, params);
+			console.log("@@@@@@@@@"+result[0]);
 		} catch(err) {
 			this.sendSocketNotification("SIGN_IN_ERRER");
 			throw err;
@@ -50,6 +51,8 @@ module.exports = NodeHelper.create({
 					this.sendSocketNotification("NOT_EXIST", payload.name);
 				}
 			}
+		} else if(notification === "SIGN_IN") {
+			this.getUser(payload, true);
 		}
 	}
 });

@@ -195,7 +195,7 @@ Module.register("MMM-AssistantMk2", {
 			command: "SIGN_UP_REQUEST"
 		},
 		"SIDE": {
-			pattern: "측면",
+			pattern: "옆면",
 			command: "LOOK_SIDE"
 		},
 		"YES": {
@@ -498,7 +498,7 @@ Module.register("MMM-AssistantMk2", {
 					}
 				} else if (this.config.command.indexOf("정면") >= 0) {
 					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": true});
-				} else if (this.config.command.indexOf("측면") >= 0) {
+				} else if (this.config.command.indexOf("옆면") >= 0) {
 					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": false});
 				} else if (this.config.command.indexOf("기준") >= 0 && this.config.command.indexOf("변경") >= 0) {
 					this.sendNotification("PHOTO", "CHANGE_BASE");
@@ -513,7 +513,7 @@ Module.register("MMM-AssistantMk2", {
 					this.config.date = 0;
 				}
 
-				if (this.config.command.indexOf("측면") >= 0) {
+				if (this.config.command.indexOf("옆면") >= 0) {
 					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": false});
 				}
 				this.config.isLookup = false;

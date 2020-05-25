@@ -19,6 +19,7 @@ Module.register("photo",{
 	id: null,
 	firstBase: false,
 	rightFileName: null,
+	weight: null,
 	
 	start: function() {
 	 	this.current_user = null;
@@ -118,7 +119,10 @@ Module.register("photo",{
 	},
 
 	notificationReceived: function(notification, payload, sender) {
-		if(notification === "SIGN_IN_INFO"){
+		if(notification === "START_MIRROR") {
+			this.weight = payload.weight;
+		}
+		else if(notification === "SIGN_IN_INFO"){
 			this.id = payload.id;
 		}
 		else if(notification === "PHOTO") {
@@ -203,7 +207,8 @@ Module.register("photo",{
 			case "COUNT_FILE":
 				this.sendSocketNotification("SET_INFO", {
 					"fileName": this.fileName,
-					"id": this.id
+					"id": this.id,
+					"weight": this.weight
 				});
 				this.sendSocketNotification("GET_FILE_NUMBER", this.id);
 				break;

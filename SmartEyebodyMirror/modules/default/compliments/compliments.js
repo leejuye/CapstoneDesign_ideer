@@ -371,7 +371,7 @@ Module.register("compliments", {
 							this.config.state = "initial";
 							this.config.badFrontCnt = 0;
 						} else {
-							this.sendNotification("PHOTO", "TAKE_PIC");
+							this.sendNotification("PHOTO", "RE_TAKE_PIC");
 						}
 						break;
 					case "sideResult":
@@ -381,7 +381,7 @@ Module.register("compliments", {
 							this.config.state = "initial";
 							this.config.badSideCnt = 0;
 						} else {
-							this.sendNotification("PHOTO", "TAKE_PIC_SIDE");
+							this.sendNotification("PHOTO", "RE_TAKE_PIC");
 						}
 						break;
 					case "savePictureOrNot":
@@ -551,6 +551,8 @@ Module.register("compliments", {
 	getDom: function() {
 		var wrapper = document.createElement("div");
 		wrapper.className = this.config.classes ? this.config.classes : "thin large bright pre-line";
+		
+		wrapper.style.background = "black"
 		// get the compliment text
 		var complimentText = this.randomCompliment();
 		if(this.descCommand === "savePicture" && complimentText) {

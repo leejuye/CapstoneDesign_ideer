@@ -67,7 +67,7 @@ module.exports = NodeHelper.create({
 			afterFileName = await this.dbConn(qry, [payload.rightFileName, payload.id]);
 		}
 		
-		qry = "SELECT shoulder,chest,waist,hip,thigh,calf,weight,bmi "
+		qry = "SELECT shoulder,waist,hip,thigh,calf,weight,bmi "
 			+ "FROM size_info WHERE is_front = ? and file_name = ?";
 		
 		var beforeData = await this.dbConn(qry, [payload.isFront, beforeFileName]);
@@ -149,16 +149,18 @@ module.exports = NodeHelper.create({
 				self.sendSocketNotification("PREVIEW_DONE", payload.fileName);
 			});
 		} else if(notification === "REMOVE_PIC") {
+			console.log("@@@@@@!!!!%%%modules/default/photo/image/" + payload.id + "/" + payload.fileName);
 			fs.unlinkSync("modules/default/photo/image/" + payload.id + "/" + payload.fileName);
 			this.deleteSizeInfo(payload.fileName);
 		} else if(notification === "SET_INFO") {
 			var self = this;
-			PythonShell.run("modules/default/photo/contour.py", {args: [payload.fileName, payload.id]},
+			PythonShell.run("modules/default/photo/contour.py", {args: [payload.fileName, payload.id, payload.weight]},
 			function (err, result) {
 				if (err) {
 					console.log(err);
 					throw err;
 				}
+				console.log(result);
 				result = JSON.parse(result);
 				
 				self.setSizeInfo(result.front);

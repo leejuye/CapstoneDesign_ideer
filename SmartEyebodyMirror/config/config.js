@@ -35,7 +35,7 @@ var config = {
 			module: "MMM-pages",
 			config: {
 				modules:
-						[[], ["compliments"],
+						[["weight"], ["compliments"],
 						 [ "clock", "compliments", "photo", "MMM-AssistantMk2"]],
 				fixed: [],
 			}
@@ -93,7 +93,7 @@ var config = {
 				},
 				micConfig: {
 					recorder: "arecord",
-					device: "plughw:0",  // You should use yours
+					device: "plughw:2",  // You should use yours
 				},
 				defaultProfile: "default",
 				profiles: {
@@ -114,7 +114,7 @@ var config = {
 			  Sensitivity: 1.0,
 			  micConfig: {
 					recorder: "arecord",
-					device: "plughw:0"  // You should use yours
+					device: "plughw:2"  // You should use yours
 			  },
 			  onDetected: {
 					notification: "ASSISTANT_ACTIVATE",

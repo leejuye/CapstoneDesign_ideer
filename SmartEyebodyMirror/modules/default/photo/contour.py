@@ -19,6 +19,7 @@ curPath += '/image/'
 
 fileName = sys.argv[1]
 userID = sys.argv[2]
+weight = float(sys.argv[3][:4])
 
 frontImage = cv2.imread(curPath + userID + '/' + fileName + '_front.jpg')
 #print(curPath + userID + '/' + fileName + '_front.jpg')
@@ -51,7 +52,7 @@ def contour(backImage, image):
     grayDifImg = cv2.bilateralFilter(grayDifImg, 4, 75, 75)
 
     # adaptiveThreshold(src, maxValue, adaptiveMethod, thresholdType, blockSize, C)
-    th = cv2.adaptiveThreshold(grayDifImg, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 9, 2)
+    th = cv2.adaptiveThreshold(grayDifImg, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 9, 0)
 
     # edge detection
     imgSobelX = cv2.Sobel(th, cv2.CV_64F, 1, 0, ksize=3)
@@ -104,7 +105,7 @@ frontContour, cntsFront = contour(backImage, frontImage)
 sideContour, cntsSide = contour(backImage, sideImage)
 
 bottom, top = 0, 1987654321
-for loc in cntsFront[0]:
+for loc in cntsSide[0]:
     x, y = loc[0]
     top = min(y, top)
     bottom = max(y, bottom)
@@ -117,7 +118,9 @@ frontSizeInfo = {}
 sideSizeInfo = {}
 
 r = bottom - top
+height = r
 r = 161.0/r
+height = height * r
 
 line(frontSizeInfo, frontContour, cntsFront[0], Ypoints, False, r)
 line(sideSizeInfo, sideContour, cntsSide[0], Ypoints, True, r)
@@ -129,11 +132,11 @@ cv2.imwrite(curPath + "_front.jpg", frontContour)
 cv2.imwrite(curPath + "_side.jpg", sideContour)
 
 # temporary data
-frontSizeInfo["weight"] = 0
-sideSizeInfo["weight"] = 0
+frontSizeInfo["weight"] = weight
+sideSizeInfo["weight"] = weight
 
-frontSizeInfo["bmi"] = 0
-sideSizeInfo["bmi"] = 0
+frontSizeInfo["bmi"] = (weight / (height * height)) * 100
+sideSizeInfo["bmi"] = (weight / (height * height)) * 100
 
 frontSizeInfo["chest"] = 0
 sideSizeInfo["chest"] = 0
