@@ -8,6 +8,7 @@ Module.register("photo",{
 		text: "photo module test",
 		imageSrc: ""
 	},
+	isLookUp: false,
 	fileName: null,
 	fileNameSuffix: null,
 	whatPage: null,
@@ -125,6 +126,20 @@ Module.register("photo",{
 		else if(notification === "SIGN_IN_INFO"){
 			this.id = payload.id;
 		}
+		else if(notification === "PHOTO_LOOKUP") {
+			if (isLookUp) {
+				switch(payload) {
+					case "SHOW_NEXT":
+						this.compare(this.isFront, this.term, this.rightFileName, "next");
+						break;
+					case "SHOW_PREV":
+						this.compare(this.isFront, this.term, this.rightFileName, "prev");
+						break;
+				}
+			} else {
+				// TODO: NOT NOW
+			}
+		}
 		else if(notification === "PHOTO") {
 			Log.log(this.name + "received a notification: " + notification + ", payload : " + payload);
 		 	this.initImage();
@@ -213,19 +228,17 @@ Module.register("photo",{
 				this.sendSocketNotification("GET_FILE_NUMBER", this.id);
 				break;
 			case "SHOW_COMPARE":
+				this.isLookUp = true;
 				this.compare(this.isFront, this.term, this.rightFileName, null);
-				break;
-			case "SHOW_PREV":
-				this.compare(this.isFront, this.term, this.rightFileName, "prev");
-				break;
-			case "SHOW_NEXT":
-				this.compare(this.isFront, this.term, this.rightFileName, "next");
 				break;
 			case "CHANGE_BASE":
 				this.sendSocketNotification("CHANGE_BASE", {"id": this.id, "fileName": this.fileName});
 				this.updateDom();																		
 				break;
 			}
+		}
+		else {
+			this.isLookUp = false
 		}
 	},
 
