@@ -334,7 +334,7 @@ Module.register("compliments", {
 				case "changeBase":
 					this.config.state = payload;
 					setTimeout(() => {
-						this.sendNotification("PHOTO", "SHOW_COMPARE");
+						this.sendNotification("PHOTO_LOOKUP", "SHOW_COMPARE");
 					}, 5000);
 					break;
 				case "prev":
