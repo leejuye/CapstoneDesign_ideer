@@ -80,13 +80,13 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
     #count down text
     cnt = time.time()-start
-    if cnt >= 4:
+    if cnt >= 6:
         cv2.putText(addedImage, "1", location, font, fontSize, color, thickness, cv2.LINE_AA)
 #        check[0] = playSound("sfx1", check[0])
-    elif cnt >= 3:
+    elif cnt >= 5:
         cv2.putText(addedImage, "2", location, font, fontSize, color, thickness, cv2.LINE_AA)
 #        check[1] = playSound("sfx1", check[1])
-    elif cnt >= 2:
+    elif cnt >= 4:
         cv2.putText(addedImage, "3", location, font, fontSize, color, thickness, cv2.LINE_AA)
 #        check[2] = playSound("sfx1", check[2])
     

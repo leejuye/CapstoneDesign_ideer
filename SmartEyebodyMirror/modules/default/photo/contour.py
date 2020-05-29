@@ -4,6 +4,8 @@ import imutils
 import sys
 import os
 import json
+import socket
+import numpy
 #import findPos as op
 
 def toInfo(sizeInfo):
@@ -28,8 +30,8 @@ backImage = cv2.imread(curPath + 'background.jpg')
 #print(curPath + 'background.jpg')
 
 ratio = [0.8, 0.62, 0.50, 0.38, 0.2]
-drawCnt = [[2, 2, 1, 1, 1], [1, 1, 1, 1, 1]]
-partName = ["calf", "thigh", "hip", "waist", "shoulder"]
+drawCnt = [[2, 2, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]]
+partName = ["calf", "thigh", "hip", "waist", "chest", "shoulder"]
 
 
 def getYpoints(top, bottom):
@@ -39,6 +41,28 @@ def getYpoints(top, bottom):
         ret.append(int(i * height + top))
     
     return ret
+
+def getYpointsFromServer(frame):
+    TCP_IP = '192.168.0.30'
+    TCP_PORT = 10210
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    s.connect((TCP_IP, TCP_PORT))
+
+    encodeParam = [int(cv2.IMWRITE_JPEG_QUALITY), 100]
+    result, imgEncode = cv2.imencode('.jpg', frame, encodeParam)
+
+    data = numpy.array(imgEncode)
+    stringData = data.tostring()
+
+    s.sendall((str(len(stringData))).encode().ljust(16) + stringData)
+
+    data = s.recv(1024)
+    arr = data.decode('utf-8')
+    arr = eval(arr)
+    arr = list(map(int, arr))
+
+    return arr
 
 def contour(backImage, image):
     # img1 - img2 difference
@@ -52,7 +76,7 @@ def contour(backImage, image):
     grayDifImg = cv2.bilateralFilter(grayDifImg, 4, 75, 75)
 
     # adaptiveThreshold(src, maxValue, adaptiveMethod, thresholdType, blockSize, C)
-    th = cv2.adaptiveThreshold(grayDifImg, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 9, 0)
+    th = cv2.adaptiveThreshold(grayDifImg, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 101, 0)
 
     # edge detection
     imgSobelX = cv2.Sobel(th, cv2.CV_64F, 1, 0, ksize=3)
@@ -79,7 +103,7 @@ def contour(backImage, image):
     return image, cnts
 
 
-def line(dic, image, cnts, Ypoints, isSide, r):
+def line(dic, image, cnts, Ypoints, isSide):
     for j in range(0, len(Ypoints) - isSide):
         arr = []
         for i in cnts:
@@ -94,11 +118,45 @@ def line(dic, image, cnts, Ypoints, isSide, r):
         drawArr = sorted(drawArr, key = lambda x: x[1][0] - x[0][0], reverse=True)
         
         if len(drawArr) >= drawCnt[isSide][j]:
-            dic[partName[j]] = round((drawArr[0][1][0] - drawArr[0][0][0])*r, 2)
+            dic[partName[j]] = int(drawArr[0][1][0] - drawArr[0][0][0])
             for i in range(0, drawCnt[isSide][j]):
+                cv2.putText(image, partName[j], drawArr[i][0],
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1, lineType=cv2.LINE_AA)
                 cv2.line(image, drawArr[i][0], drawArr[i][1], (0, 255, 0), 2)
         else:
             dic[partName[j]] = 0.0
+        #print(type(dic[partName[j]]), dic[partName[j]], partName[j])
+
+def myArr(locArr, toArr):
+    tmp = []
+    aLen = len(locArr)
+
+    tmp.append((locArr[0][0][0], locArr[0][0][1]))
+    for i in range(1, aLen):
+        x, y = locArr[i][0]
+        if y != locArr[i - 1][0][1]:
+            toArr.append(tmp)
+            tmp = []
+        if len(tmp) == 0 or x > locArr[i - 1][0][0] + 3:
+            tmp.append((x, y))
+    toArr.append(tmp)
+
+def findThigh(frontLoc):
+    frontArr, sideArr = [], []
+    myArr(frontLoc, frontArr)
+
+    fLen = len(frontArr)
+    mn, idx = 1987564321, 0
+
+    # find thigh from front image
+    for i in range(int(fLen * 0.9), 0, -1):
+        if len(frontArr[i]) <= 2:
+            idx = frontArr[i][0][1] + 15
+            break
+
+    return idx
+
+
 
 
 frontContour, cntsFront = contour(backImage, frontImage)
@@ -111,19 +169,21 @@ for loc in cntsSide[0]:
     bottom = max(y, bottom)
 
 # find skeleton
-# imageFront = imutils.resize(cv2.imread('./image/front.jpg'), width=400)
+imageFront = imutils.resize(cv2.imread(curPath + userID + '/' + fileName + '_front.jpg'), width=400)
 # y Value
-Ypoints = getYpoints(top, bottom)
+Ypoints = getYpointsFromServer(imageFront)
+#print(Ypoints)
+#Ypoints[1] = findThigh(cntsFront[0])
+
+
 frontSizeInfo = {}
 sideSizeInfo = {}
 
 r = bottom - top
-height = r
-r = 161.0/r
-height = height * r
+height = int(r)
 
-line(frontSizeInfo, frontContour, cntsFront[0], Ypoints, False, r)
-line(sideSizeInfo, sideContour, cntsSide[0], Ypoints, True, r)
+line(frontSizeInfo, frontContour, cntsFront[0], Ypoints, False)
+line(sideSizeInfo, sideContour, cntsSide[0], Ypoints, True)
 
 #cv2.imwrite(curPath + userID + "/" + fileName + "_front.jpg", frontContour)
 #cv2.imwrite(curPath + userID + "/" + fileName + "_side.jpg", sideContour)
@@ -134,14 +194,21 @@ cv2.imwrite(curPath + "_side.jpg", sideContour)
 # temporary data
 frontSizeInfo["weight"] = weight
 sideSizeInfo["weight"] = weight
-
-frontSizeInfo["bmi"] = (weight / (height * height)) * 100
-sideSizeInfo["bmi"] = (weight / (height * height)) * 100
+#print(type(frontSizeInfo["weight"]), frontSizeInfo["weight"])
 
 frontSizeInfo["chest"] = 0
 sideSizeInfo["chest"] = 0
 
+frontSizeInfo["height"] = height
+sideSizeInfo["height"] = height
+#print(type(frontSizeInfo["height"]), frontSizeInfo["height"])
+
+frontSizeInfo["bmi"] = round((weight / (height * height)) * 10000, 2)
+sideSizeInfo["bmi"] = round((weight / (height * height)) * 10000, 2)
+#print(type(frontSizeInfo["bmi"]), frontSizeInfo["bmi"])
+
 sideSizeInfo["shoulder"] = 0
+#print(type(frontSizeInfo["shoulder"]), frontSizeInfo["shoulder"])
 # end
 
 frontSizeInfo["is_front"] = True
@@ -154,5 +221,6 @@ frontSizeInfo["id"] = userID
 sideSizeInfo["id"] = userID
 
 sizeInfo = dict(front=frontSizeInfo, side=sideSizeInfo)
-#print(sizeInfo)
+
+#print(json.dumps(sizeInfo))
 toInfo(sizeInfo)

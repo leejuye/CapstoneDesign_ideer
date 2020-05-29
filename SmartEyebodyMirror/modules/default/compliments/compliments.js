@@ -73,9 +73,9 @@ Module.register("compliments", {
 		// }
 
 		// // Schedule update timer.
-		// this.compInterval = setInterval(function() {
-		// 	self.updateDom(self.config.fadeSpeed);
-		// }, this.config.updateInterval);
+		// setTimeout(() => {
+		// 	this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
+		// }, 8000);
 
 		//TEST
 
@@ -316,14 +316,25 @@ Module.register("compliments", {
 				case "signInSuccess":
 					this.sendNotificationToAssis(payload);
 					break;
+				case "sayName":
 				case "signUpRequest":
 				case "notExistUserName":
 					this.sendNotificationToAssis(payload, true);
 					break;
+				case "logOutRequest":
+					this.sendNotificationToAssis(payload, false);
+
+					break;
+				case "logOutSuccess":
+					this.config.state = payload;
+					setTimeout(() => {
+						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
+					}, 7000);
+					break;
 				case "changeBase":
 					this.config.state = payload;
 					setTimeout(() => {
-						this.sendNotification("PHOTO", "SHOW_COMPARE");
+						this.sendNotification("PHOTO_LOOKUP", "SHOW_COMPARE");
 					}, 5000);
 					break;
 				case "prev":
@@ -356,6 +367,9 @@ Module.register("compliments", {
 						break;
 					case "alreadyExistName":
 						this.sendNotification("SIGN_IN_USER", this.config.tmpName);
+						break;
+					case "logOutRequest":
+						this.sendNotification("LOGOUT_REQUEST");
 						break;
 					}
 					break;
@@ -390,9 +404,7 @@ Module.register("compliments", {
 					case "shutdownRequest":
 						break;
 					case "checkUserName":
-						this.sendNotification("ASSISTANT_COMMAND", {
-							command: "SIGN_UP_REQUEST"
-						});
+						this.sendNotification("CHECK_NAME_NO");
 						break;
 					default:
 						this.config.state = payload;

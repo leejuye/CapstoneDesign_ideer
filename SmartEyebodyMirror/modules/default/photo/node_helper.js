@@ -6,7 +6,7 @@ const fs = require('fs');
 
 var pythonStarted = false;
 const parts = ["id", "shoulder", "chest", "waist", "hip", "thigh", "calf",
-	"weight", "bmi", "is_front", "file_name"]
+	"weight", "height", "bmi", "is_front", "file_name"]
 
 module.exports = NodeHelper.create({
 	numberOfFiles: async function(id) {
@@ -67,7 +67,7 @@ module.exports = NodeHelper.create({
 			afterFileName = await this.dbConn(qry, [payload.rightFileName, payload.id]);
 		}
 		
-		qry = "SELECT shoulder,waist,hip,thigh,calf,weight,bmi "
+		qry = "SELECT shoulder,waist,hip,thigh,calf,weight,height,bmi "
 			+ "FROM size_info WHERE is_front = ? and file_name = ?";
 		
 		var beforeData = await this.dbConn(qry, [payload.isFront, beforeFileName]);
@@ -114,7 +114,7 @@ module.exports = NodeHelper.create({
 	},
 
 	setSizeInfo: async function(data) {
-		const qry = "INSERT INTO size_info VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+		const qry = "INSERT INTO size_info VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
 		const params = [];
 		
 		//data = JSON.parse(data);
