@@ -232,10 +232,10 @@ Module.register("photo",{
 	drawResultPage: function() {
 		var wrapper = document.createElement("div");
 		var img1 = document.createElement("img");
-		img1.src = "/modules/default/photo/image/" + this.id + "/" + this.fileName + "_front.jpg"
+		img1.src = "/modules/default/photo/image/" + this.id + "/" + this.fileName + "_front.jpg" + "?version=" + this.ver++;
 
 		var img2 = document.createElement("img");
-		img2.src = "/modules/default/photo/image/" + this.id + "/" + this.fileName + "_side.jpg";
+		img2.src = "/modules/default/photo/image/" + this.id + "/" + this.fileName + "_side.jpg" + "?version=" + this.ver++;
 
 		wrapper.appendChild(img1);
 		wrapper.appendChild(img2);
@@ -254,6 +254,7 @@ Module.register("photo",{
 			"thigh": '허벅지',
 			"calf": '종아리',
 			"weight": '몸무게',
+			"height": '키',
 			"bmi":'BMI'
 		}
 
