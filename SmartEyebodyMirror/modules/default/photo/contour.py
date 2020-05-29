@@ -4,6 +4,8 @@ import imutils
 import sys
 import os
 import json
+import socket
+import numpy
 #import findPos as op
 
 def toInfo(sizeInfo):
@@ -39,6 +41,28 @@ def getYpoints(top, bottom):
         ret.append(int(i * height + top))
     
     return ret
+
+def getYpointsFromServer(frame):
+    TCP_IP = '192.168.0.30'
+    TCP_PORT = 10210
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    s.connect((TCP_IP, TCP_PORT))
+
+    encodeParam = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+    result, imgEncode = cv2.imencode('.jpg', frame, encodeParam)
+
+    data = numpy.array(imgEncode)
+    stringData = data.tostring()
+
+    s.sendall((str(len(stringData))).encode().ljust(16) + stringData)
+
+    data = s.recv(1024)
+    arr = data.decode('utf-8')
+    arr = eval(arr)
+    arr = list(map(int, arr))
+
+    return arr
 
 def contour(backImage, image):
     # img1 - img2 difference
@@ -111,9 +135,10 @@ for loc in cntsSide[0]:
     bottom = max(y, bottom)
 
 # find skeleton
-# imageFront = imutils.resize(cv2.imread('./image/front.jpg'), width=400)
+imageFront = imutils.resize(cv2.imread(curPath + userID + '/' + fileName + '_front.jpg'), width=400)
 # y Value
-Ypoints = getYpoints(top, bottom)
+Ypoints = getYpointsFromServer(imageFront)
+
 frontSizeInfo = {}
 sideSizeInfo = {}
 
@@ -154,5 +179,5 @@ frontSizeInfo["id"] = userID
 sideSizeInfo["id"] = userID
 
 sizeInfo = dict(front=frontSizeInfo, side=sideSizeInfo)
-#print(sizeInfo)
-toInfo(sizeInfo)
+print(sizeInfo)
+#toInfo(sizeInfo)
