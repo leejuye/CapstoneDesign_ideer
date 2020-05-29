@@ -16,6 +16,20 @@ Module.register("signIn",{
 				this.isNew = true;
 			}
 			break;
+		case "CHECK_NAME_NO":
+			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload);
+			if(this.isNew) {
+				this.sendNotification("ASSISTANT_COMMAND", {
+					command: "SIGN_UP_REQUEST"
+				});
+			} else {
+				this.sendNotification("COMPLIMENTS", "sayName");
+			}
+			break;
+		case "LOGOUT_REQUEST":
+			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload);
+			this.sendNotification("COMPLIMENTS", "logOutSuccess");
+			break;
 		default:
 			break;
 		}

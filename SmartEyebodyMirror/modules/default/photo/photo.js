@@ -85,7 +85,7 @@ Module.register("photo",{
 			}
 			setTimeout(() => {
 				this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-			}, 8000)
+			}, 3000)
 		} else if(notification === "HERE_INFO") {
 			this.whatPage = "comparePage";
 			this.fileName = payload.afterFileName;
@@ -190,7 +190,7 @@ Module.register("photo",{
 				this.sendNotification("COMPLIMENTS", "savePictureOrNot");
 				setTimeout(() => {
 					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-				}, 8000);
+				}, 3000);
 				this.updateDom();
 				break;
 			case "REMOVE_RESULT":
