@@ -5,9 +5,20 @@ import sys
 import json
 import os
 import time
+import RPi.GPIO as GPIO
 from picamera import PiCamera
 from PIL import Image
 from picamera.array import PiRGBArray
+
+# Use GPIO numbering
+GPIO.setmode(GPIO.BCM)
+ 
+# Set GPIO for camera LED
+# Use 5 for Model A/B and 32 for Model B+
+CAMLED = 5 
+ 
+# Set GPIO to output
+GPIO.setup(CAMLED, GPIO.OUT, initial=False) 
 
 #path
 curPath = os.path.dirname(os.path.abspath(__file__))
