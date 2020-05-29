@@ -8,6 +8,7 @@ Module.register("photo",{
 		text: "photo module test",
 		imageSrc: ""
 	},
+	isLookUp: false,
 	fileName: null,
 	fileNameSuffix: null,
 	whatPage: null,
@@ -101,6 +102,7 @@ Module.register("photo",{
 				this.firstBase = true;
 			}
 		} else if (notification === "CONTOUR_DONE") {
+			this.isLookUp = true;
 			this.compare(this.isFront, this.term, this.rightFileName, null);
 		} else if(notification === "CHANGE_COMPLETE") {
 			if(this.firstBase === false) {
@@ -125,10 +127,12 @@ Module.register("photo",{
 		else if(notification === "SIGN_IN_INFO"){
 			this.id = payload.id;
 		}
-		else if(notification === "PHOTO") {
-			Log.log(this.name + "received a notification: " + notification + ", payload : " + payload);
-		 	this.initImage();
-
+		else if(notification === "PHOTO_LOOKUP") {
+			// SAY LOOKUP
+			if(payload.isLookUp) {
+				this.isLookUp = true;
+				payload = payload.payload;
+			}
 			//SHOW_COMPARE
 			if(payload.hasOwnProperty("isFront")) {
 				this.isFront = payload.isFront;
@@ -138,7 +142,30 @@ Module.register("photo",{
 				payload = payload.payload;
 				console.log(this.isFront + "&&&&&" + payload + "&&&&" + this.term);
 			}
-			
+			if (isLookUp) {
+				switch(payload) {
+					case "SHOW_COMPARE":
+						this.compare(this.isFront, this.term, this.rightFileName, null);
+						break;
+					case "SHOW_NEXT":
+						this.compare(this.isFront, this.term, this.rightFileName, "next");
+						break;
+					case "SHOW_PREV":
+						this.compare(this.isFront, this.term, this.rightFileName, "prev");
+						break;
+					case "CHANGE_BASE":
+						this.sendSocketNotification("CHANGE_BASE", {"id": this.id, "fileName": this.fileName});
+						this.updateDom();																		
+						break;
+				}
+			} else {
+				// TODO: NOT NOW
+			}
+		}
+		else if(notification === "PHOTO") {
+			Log.log(this.name + "received a notification: " + notification + ", payload : " + payload);
+		 	this.initImage();
+
 			switch(payload) {
 			case "TAKE_PIC":
 				this.initFileName();
@@ -212,20 +239,10 @@ Module.register("photo",{
 				});
 				this.sendSocketNotification("GET_FILE_NUMBER", this.id);
 				break;
-			case "SHOW_COMPARE":
-				this.compare(this.isFront, this.term, this.rightFileName, null);
-				break;
-			case "SHOW_PREV":
-				this.compare(this.isFront, this.term, this.rightFileName, "prev");
-				break;
-			case "SHOW_NEXT":
-				this.compare(this.isFront, this.term, this.rightFileName, "next");
-				break;
-			case "CHANGE_BASE":
-				this.sendSocketNotification("CHANGE_BASE", {"id": this.id, "fileName": this.fileName});
-				this.updateDom();																		
-				break;
 			}
+		}
+		else {
+			this.isLookUp = false
 		}
 	},
 
