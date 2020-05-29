@@ -172,7 +172,7 @@ for loc in cntsSide[0]:
 imageFront = imutils.resize(cv2.imread(curPath + userID + '/' + fileName + '_front.jpg'), width=400)
 # y Value
 Ypoints = getYpointsFromServer(imageFront)
-print(Ypoints)
+#print(Ypoints)
 #Ypoints[1] = findThigh(cntsFront[0])
 
 
@@ -222,5 +222,5 @@ sideSizeInfo["id"] = userID
 
 sizeInfo = dict(front=frontSizeInfo, side=sideSizeInfo)
 
-print(json.dumps(sizeInfo))
-#toInfo(sizeInfo)
+#print(json.dumps(sizeInfo))
+toInfo(sizeInfo)

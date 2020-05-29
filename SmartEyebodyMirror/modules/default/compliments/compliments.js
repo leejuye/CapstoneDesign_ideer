@@ -62,20 +62,20 @@ Module.register("compliments", {
 	start: function() {
 		Log.info("Starting module: " + this.name);
 
-		this.lastComplimentIndex = -1;
+		// this.lastComplimentIndex = -1;
 
-		var self = this;
-		if (this.config.remoteFile !== null) {
-			this.complimentFile(function(response) {
-				self.config.compliments = JSON.parse(response);
-				//self.updateDom();
-			});
-		}
+		// var self = this;
+		// if (this.config.remoteFile !== null) {
+		// 	this.complimentFile(function(response) {
+		// 		self.config.compliments = JSON.parse(response);
+		// 		//self.updateDom();
+		// 	});
+		// }
 
-		// Schedule update timer.
-		setTimeout(() => {
-			this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
-		}, 8000);
+		// // Schedule update timer.
+		// setTimeout(() => {
+		// 	this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
+		// }, 8000);
 
 		//TEST
 
