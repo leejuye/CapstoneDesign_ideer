@@ -9,7 +9,8 @@ module.exports = NodeHelper.create({
 		try{
 			conn = await dbHelper.getConnection();
 			results = await conn.query(qry, params);
-			console.log("@@@@@@@@@"+result[0]);
+			console.log("@!@#!@#!@#!@$@!#%!%#$%");
+			console.log(results);
 		} catch(err) {
 			this.sendSocketNotification("SIGN_IN_ERRER");
 			throw err;

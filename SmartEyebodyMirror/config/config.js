@@ -31,7 +31,7 @@ var config = {
 			     // true, force serveronly mode, because you want to.. no UI on this device
 
 	modules: [
-		{
+		/*{
 			module: "MMM-pages",
 			config: {
 				modules:
@@ -39,16 +39,16 @@ var config = {
 						 [ "clock", "compliments", "photo", "MMM-AssistantMk2"]],
 				fixed: [],
 			}
-		},
+		},*/
 		{
 		    module: "MMM-Dynamic-Modules"
 		},
 		{
 		    module: "signIn",
 		},
-		{
+		/*{
 		    module: "weight",
-		},
+		},*/
 		{
 		    module: "compliments",
 			position: "middle_center",
@@ -93,7 +93,7 @@ var config = {
 				},
 				micConfig: {
 					recorder: "arecord",
-					device: "plughw:2",  // You should use yours
+					device: "plughw:1",  // You should use yours
 				},
 				defaultProfile: "default",
 				profiles: {
@@ -114,7 +114,7 @@ var config = {
 			  Sensitivity: 1.0,
 			  micConfig: {
 					recorder: "arecord",
-					device: "plughw:2"  // You should use yours
+					device: "plughw:1"  // You should use yours
 			  },
 			  onDetected: {
 					notification: "ASSISTANT_ACTIVATE",

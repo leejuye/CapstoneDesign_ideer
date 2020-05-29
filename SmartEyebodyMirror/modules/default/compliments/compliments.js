@@ -62,20 +62,20 @@ Module.register("compliments", {
 	start: function() {
 		Log.info("Starting module: " + this.name);
 
-		// this.lastComplimentIndex = -1;
+		this.lastComplimentIndex = -1;
 
-		// var self = this;
-		// if (this.config.remoteFile !== null) {
-		// 	this.complimentFile(function(response) {
-		// 		self.config.compliments = JSON.parse(response);
-		// 		//self.updateDom();
-		// 	});
-		// }
+		var self = this;
+		if (this.config.remoteFile !== null) {
+			this.complimentFile(function(response) {
+				self.config.compliments = JSON.parse(response);
+				//self.updateDom();
+			});
+		}
 
-		// // Schedule update timer.
-		// this.compInterval = setInterval(function() {
-		// 	self.updateDom(self.config.fadeSpeed);
-		// }, this.config.updateInterval);
+		// Schedule update timer.
+		setTimeout(() => {
+			this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
+		}, 8000);
 
 		//TEST
 
@@ -316,9 +316,20 @@ Module.register("compliments", {
 				case "signInSuccess":
 					this.sendNotificationToAssis(payload);
 					break;
+				case "sayName":
 				case "signUpRequest":
 				case "notExistUserName":
 					this.sendNotificationToAssis(payload, true);
+					break;
+				case "logOutRequest":
+					this.sendNotificationToAssis(payload, false);
+
+					break;
+				case "logOutSuccess":
+					this.config.state = payload;
+					setTimeout(() => {
+						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
+					}, 7000);
 					break;
 				case "changeBase":
 					this.config.state = payload;
@@ -357,6 +368,9 @@ Module.register("compliments", {
 					case "alreadyExistName":
 						this.sendNotification("SIGN_IN_USER", this.config.tmpName);
 						break;
+					case "logOutRequest":
+						this.sendNotification("LOGOUT_REQUEST");
+						break;
 					}
 					break;
 				case "sayNo":
@@ -390,9 +404,7 @@ Module.register("compliments", {
 					case "shutdownRequest":
 						break;
 					case "checkUserName":
-						this.sendNotification("ASSISTANT_COMMAND", {
-							command: "SIGN_UP_REQUEST"
-						});
+						this.sendNotification("CHECK_NAME_NO");
 						break;
 					default:
 						this.config.state = payload;

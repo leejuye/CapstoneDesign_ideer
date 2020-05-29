@@ -154,6 +154,20 @@ Module.register("MMM-AssistantMk2", {
 				payload: "payload"
 			},
 		},
+		"LOG_OUT_REQUEST": {
+			soundExec: {
+				chime: "open"
+			},
+			notificationExec: {
+				notification: "COMPLIMENTS",
+				payload: "logOutRequest"
+			},
+		},
+		"CANCEL": {
+			soundExec: {
+				chime: "close"
+			}
+		},
 		"YES": {
 			soundExec: {
 				chime: "open"
@@ -197,6 +211,14 @@ Module.register("MMM-AssistantMk2", {
 		"SIDE": {
 			pattern: "옆면",
 			command: "LOOK_SIDE"
+		},
+		"LOG_OUT": {
+			pattern: "(로그아웃|로그 아웃)",
+			command: "LOG_OUT_REQUEST"
+		},
+		"CANCEL": {
+			pattern: "취소",
+			command: "CANCEL"
 		},
 		"YES": {
 			pattern: "응",

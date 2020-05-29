@@ -218,6 +218,12 @@ class AssistantResponseClass {
 		}
 
 		var command = response.transcription.transcription;
+		
+		if(command.indexOf("취소") >= 0) {
+			this.showing = false;
+			this.end();
+			return;
+		}
     
 		if (command.indexOf(" 전 사진 보여 줘") >= 0) {
 			var string;

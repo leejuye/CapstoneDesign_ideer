@@ -18,7 +18,7 @@
 - [附加组件](https://github.com/bugsounet/addons)
 ---
 ## 杂项
-- [个性唤醒词](./myMagicWord.md)
+- [自定义回复内容(myMagicWorld)](./myMagicWord.md)
 - [预备好的方法 (Prepared recipes)](./Prepared-recipes.md)
 - [魔镜音量大小](./MagicMirror-volume-level.md)
 ---
