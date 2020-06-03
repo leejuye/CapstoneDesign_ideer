@@ -11,21 +11,21 @@ Module.register("compliments", {
 	// Module config defaults.
 	defaults: {
 		compliments: {
-			morning: [
+			"morning": [
 				"안녕하세요",
 				"좋은 아침입니다!",
-				"원하는 기능을 \n말해주세요."
+				"이름을 말씀해주세요.\n신규 사용자라면 '신규등록'이라고 말씀해주세요."
 			],
-			afternoon: [
+			"afternoon": [
 				"안녕하세요",
 				"좋은 점심입니다!",
-				"원하는 기능을 \n말해주세요."
+				"이름을 말씀해주세요.\n신규 사용자라면 '신규등록'이라고 말씀해주세요."
 			],
-			evening: [
+			"evening": [
 				"안녕하세요",
 				"좋은 저녁입니다!",
-				"원하는 기능을 \n말해주세요."
-			]
+				"이름을 말씀해주세요.\n신규 사용자라면 '신규등록'이라고 말씀해주세요."
+			],
 		},
 		updateInterval: 2500,
 		remoteFile: "description.json",
@@ -48,8 +48,8 @@ Module.register("compliments", {
 	lastIndexUsed:-1,
 	// Set currentweather from module
 	currentWeatherType: "",
-	commandState = 0, // 0: defalut, 1: yes/no, 2: function, 3: I'm here
 	isNotNow: false,
+	lastCompliments: [],
 
 	compInterval: null,
 	descCommand: null,
@@ -75,9 +75,9 @@ Module.register("compliments", {
 		 }
 
 		 // Schedule update timer.
-		 setTimeout(() => {
+/*		 setTimeout(() => {
 		 	this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
-		 }, 8000);
+		 }, 5000); */
 
 		//TEST
 
@@ -120,68 +120,6 @@ Module.register("compliments", {
 		}, 100);
 	},
 
-	// Set what commands to receive
-	checkPossibleCommand: function(state, payload) {
-		switch (state) {
-		// only take_pic, lookup, shutdown
-		case "initial":
-			switch (payload) {
-			case "dressCheck":
-			case "lookup":
-			case "shutdownRequest":
-				this.config.pass = false;
-				break;
-			case "imHere":
-			case "sayYes":
-			case "sayNo":
-				this.config.pass = true;
-				this.makeNotNow(command);
-				break;
-			}
-			break;
-
-		// only yes or no
-		case "dressCheck":
-		case "frontResult":
-		case "sideResult":
-		case "savePictureOrNot":
-		case "savePicture":
-		case "shutdownRequest":
-			switch (payload) {
-			case "sayYes":
-			case "sayNo":
-				this.config.pass = false;
-				break;
-			case "dressCheck":
-			case "imHere":
-			case "lookup":
-			case "shutdownRequest":
-				this.config.pass = true;
-				this.makeNotNow(command);
-				break;
-			}
-			break;
-
-		// only I'm here
-		case "dressWait":
-			switch (payload) {
-			case "imHere":
-				this.config.pass = false;
-				break;
-			case "dressCheck":
-			case "lookup":
-			case "shutdownRequest":
-			case "sayYes":
-			case "sayNo":
-				this.config.pass = true;
-				this.makeNotNow(command);
-				break;
-			}
-			break;
-
-		}
-	},
-
 	sendNotificationToAssis: function(payload, isName=false) {
 		this.config.state = payload;
 		setTimeout(() => {
@@ -209,6 +147,8 @@ Module.register("compliments", {
 			}, this.config.updateInterval);
 		} else if(notification === "COMPLIMENTS") {
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload + ", from: " + sender);
+
+			// Log.log(this.config.state +"@@@@" + payload);
 
 			// Execute commands
 			if (!this.config.pass) {
@@ -245,7 +185,7 @@ Module.register("compliments", {
 						}
 					}
 				);
-		
+
 				switch(payload){
 				case "CURRENTWEATHER_DATA":
 					this.setCurrentWeatherType(payload.data);
@@ -321,6 +261,7 @@ Module.register("compliments", {
 					}, 5000);
 					break;
 				case "sayYes":
+					Log.log("sayYes_state" + this.config.state);
 					switch(this.config.state){
 					case "dressCheck":
 						this.sendNotification("PHOTO", "TAKE_PIC");
@@ -347,6 +288,7 @@ Module.register("compliments", {
 						this.sendNotification("LOGOUT_REQUEST");
 						break;
 					default:
+						Log.log("NOTNOWNOTNOWNOTNOWNOTNOW");
 						this.isNotNow = true;
 						break;
 					}
@@ -388,9 +330,9 @@ Module.register("compliments", {
 						this.config.state = payload;
 						break;
 					}
-					//~ if (this.config.state !== "dressWait") {
-						//~ this.config.state = "initial";
-					//~ }
+					if (this.config.state !== "dressWait") {
+						this.config.state = "initial";
+					}
 					break;
 				}
 			}
@@ -521,6 +463,15 @@ Module.register("compliments", {
 		// variable for index to next message to display
 		let index=0;
 		// are we randomizing
+		if(this.isNotNow) {
+			compliments = ["지금은 할 수 없는 명령입니다.\n다시 말씀해 주세요."];
+			this.lastCompliments.forEach(E => compliments.push(E));
+			Log.log(compliments);
+			this.lastIndexUsed = -1;
+			this.isNotNow = false;
+		}
+		this.lastCompliments = compliments;
+				
 		if(this.config.random){
 			// yes
 			index = this.randomIndex(compliments);
@@ -533,6 +484,8 @@ Module.register("compliments", {
 				return "";
 			}
 		}
+		
+		Log.log(compliments[index]);
 
 		return compliments[index];
 	},
@@ -558,6 +511,7 @@ Module.register("compliments", {
 		// create a span to hold it all
 		var compliment=document.createElement("span");
 		// process all the parts of the compliment text
+
 		for (part of parts){
 			// create a text element for each partzzz
 			compliment.appendChild(document.createTextNode(part));

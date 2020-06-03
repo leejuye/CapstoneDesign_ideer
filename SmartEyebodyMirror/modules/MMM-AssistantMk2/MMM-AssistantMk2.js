@@ -661,6 +661,7 @@ Module.register("MMM-AssistantMk2", {
 			isName: payload.isName,
 		};
 		var options = Object.assign({}, options, payload);
+		Log.log(options);
 		if (payload.hasOwnProperty("profile") && typeof this.config.profiles[payload.profile] !== "undefined") {
 			options.profile = this.config.profiles[payload.profile];
 		}

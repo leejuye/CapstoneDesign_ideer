@@ -87,6 +87,7 @@ module.exports = NodeHelper.create({
     assistantConfig.useScreenOutput = payload.useScreenOutput
     assistantConfig.useAudioOutput = payload.useAudioOutput
     assistantConfig.useHTML5 = payload.useHTML5
+    assistantConfig.isName = payload.isName
     assistantConfig.micConfig = this.config.micConfig
     this.assistant = new Assistant(assistantConfig, (obj)=>{this.tunnel(obj)})
 

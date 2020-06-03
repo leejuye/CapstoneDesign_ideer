@@ -141,10 +141,7 @@ Module.register("photo",{
 				}
 				payload = payload.payload;
 			}
-			Log.log("$$$$$$$$$$$$$");
-			Log.log(this.isLookUp);
 			if (this.isLookUp) {
-				Log.log("###########"+payload);
 				switch(payload) {
 					case "SHOW_COMPARE":
 						this.compare(this.isFront, this.term, this.rightFileName, null);
