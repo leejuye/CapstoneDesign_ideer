@@ -128,10 +128,10 @@ Module.register("photo",{
 			this.id = payload.id;
 		}
 		else if(notification === "PHOTO_LOOKUP") {
+			Log.log(this.name + "received a notification: " + notification + ", payload : " + payload);
 			// SAY LOOKUP
 			if(payload.isLookUp) {
 				this.isLookUp = true;
-				payload = payload.payload;
 			}
 			//SHOW_COMPARE
 			if(payload.hasOwnProperty("isFront")) {
@@ -140,9 +140,8 @@ Module.register("photo",{
 					this.term = payload.term;
 				}
 				payload = payload.payload;
-				console.log(this.isFront + "&&&&&" + payload + "&&&&" + this.term);
 			}
-			if (isLookUp) {
+			if (this.isLookUp) {
 				switch(payload) {
 					case "SHOW_COMPARE":
 						this.compare(this.isFront, this.term, this.rightFileName, null);
@@ -240,9 +239,6 @@ Module.register("photo",{
 				this.sendSocketNotification("GET_FILE_NUMBER", this.id);
 				break;
 			}
-		}
-		else {
-			this.isLookUp = false
 		}
 	},
 

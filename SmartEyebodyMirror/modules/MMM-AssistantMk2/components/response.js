@@ -1,8 +1,8 @@
 /* Common AMk2 Class */
 
 class AssistantResponseClass {
-	constructor (responseConfig, callbacks, isName) {
-		this.isName = isName;
+	constructor (responseConfig, callbacks) {
+		this.isName = false;
 		this.config = responseConfig;
 		this.callbacks = callbacks;
 		this.showing = false;
@@ -251,14 +251,6 @@ class AssistantResponseClass {
 			}
 		}
 
-		if (response.lastQuery.text === "NOT_NOW") {
-				this.showing = false
-				this.status("error")
-				this.showError(this.callbacks.translate("NOT_NOW"))
-				this.end()
-				return;
-		}																									
-			
 		var normalResponse = (response) => {
 			if(!this.isName) {
 				this.showing = false;
