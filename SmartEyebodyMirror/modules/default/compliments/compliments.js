@@ -73,6 +73,9 @@ Module.register("compliments", {
 		 		//self.updateDom();
 		 	});
 		 }
+		 this.compInterval = setInterval(function() {
+			self.updateDom(self.config.fadeSpeed);
+		}, this.config.updateInterval);
 
 		 // Schedule update timer.
 /*		 setTimeout(() => {
