@@ -48,6 +48,8 @@ Module.register("compliments", {
 	lastIndexUsed:-1,
 	// Set currentweather from module
 	currentWeatherType: "",
+	commandState = 0, // 0: defalut, 1: yes/no, 2: function, 3: I'm here
+	isNotNow: false,
 
 	compInterval: null,
 	descCommand: null,
@@ -62,20 +64,20 @@ Module.register("compliments", {
 	start: function() {
 		Log.info("Starting module: " + this.name);
 
-		// this.lastComplimentIndex = -1;
+		 this.lastComplimentIndex = -1;
 
-		// var self = this;
-		// if (this.config.remoteFile !== null) {
-		// 	this.complimentFile(function(response) {
-		// 		self.config.compliments = JSON.parse(response);
-		// 		//self.updateDom();
-		// 	});
-		// }
+		 var self = this;
+		 if (this.config.remoteFile !== null) {
+		 	this.complimentFile(function(response) {
+		 		self.config.compliments = JSON.parse(response);
+		 		//self.updateDom();
+		 	});
+		 }
 
-		// // Schedule update timer.
-		// setTimeout(() => {
-		// 	this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
-		// }, 8000);
+		 // Schedule update timer.
+		 setTimeout(() => {
+		 	this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
+		 }, 8000);
 
 		//TEST
 
@@ -119,7 +121,7 @@ Module.register("compliments", {
 	},
 
 	// Set what commands to receive
-	checkPossibleCommand: function(state, payload, command) {
+	checkPossibleCommand: function(state, payload) {
 		switch (state) {
 		// only take_pic, lookup, shutdown
 		case "initial":
@@ -177,24 +179,6 @@ Module.register("compliments", {
 			}
 			break;
 
-		// in lookup case
-		// case "lookup":
-		// 	if (command.indexOf(" 전 사진 보여 줘") >= 0) {
-		// 		this.config.pass = false;
-		// 	} else if (command.indexOf("정면") >= 0) {
-		// 		this.config.pass = false;
-		// 	} else if (command.indexOf("측면") >= 0) {
-		// 		this.config.pass = false;
-		// 	} else if (command.indexOf("기준") >= 0 && command.indexOf("변경") >= 0) {
-		// 		this.config.pass = false;
-		// 	} else if (command.indexOf("이전") >= 0) {
-		// 		this.config.pass = false;
-		// 	} else if (command.indexOf("다음") >= 0) {
-		// 		this.config.pass = false;
-		// 	} else {
-		// 		this.config.pass = true;
-		// 		this.makeNotNow(command);
-		// 	}
 		}
 	},
 
@@ -225,15 +209,6 @@ Module.register("compliments", {
 			}, this.config.updateInterval);
 		} else if(notification === "COMPLIMENTS") {
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload + ", from: " + sender);
-
-			if (payload.payload === "command") {
-				this.config.command = payload.command;
-				this.checkPossibleCommand(this.config.state, payload, this.config.command);
-			} else {
-			  this.checkPossibleCommand(this.config.state, payload);
-			}
-
-			// Log.log(this.config.state +"@@@@" + payload);
 
 			// Execute commands
 			if (!this.config.pass) {
@@ -270,7 +245,7 @@ Module.register("compliments", {
 						}
 					}
 				);
-
+		
 				switch(payload){
 				case "CURRENTWEATHER_DATA":
 					this.setCurrentWeatherType(payload.data);
@@ -371,6 +346,9 @@ Module.register("compliments", {
 					case "logOutRequest":
 						this.sendNotification("LOGOUT_REQUEST");
 						break;
+					default:
+						this.isNotNow = true;
+						break;
 					}
 					break;
 				case "sayNo":
@@ -410,9 +388,9 @@ Module.register("compliments", {
 						this.config.state = payload;
 						break;
 					}
-					if (this.config.state !== "dressWait") {
-						this.config.state = "initial";
-					}
+					//~ if (this.config.state !== "dressWait") {
+						//~ this.config.state = "initial";
+					//~ }
 					break;
 				}
 			}

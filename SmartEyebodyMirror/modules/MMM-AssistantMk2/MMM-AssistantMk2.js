@@ -123,8 +123,8 @@ Module.register("MMM-AssistantMk2", {
 				chime: "open"
 			},
 			notificationExec: {
-				notification: "PHOTO",
-				payload: "SHOW_COMPARE"
+				notification: "PHOTO_LOOKUP",
+				payload: { payload: "SHOW_COMPARE", isLookUp: true, isFront: true },
 			}
 		},
 		"SHUTDOWN_REQUEST": {
@@ -144,15 +144,36 @@ Module.register("MMM-AssistantMk2", {
 				notification: "COMPLIMENTS",
 				payload: "signUpRequest"
 			},
-		},
-		"LOOK_SIDE": {
-			soundExec: {
-				chime: "open"
-			},
+		},	
+		"SHOW_NEXT": {
 			notificationExec: {
-				notification: "PHOTO_CHANGE",
-				payload: "payload"
-			},
+				notification: "PHOTO_LOOKUP",
+				payload: "SHOW_NEXT"
+			}
+		},
+		"SHOW_PREV": {
+			notificationExec: {
+				notification: "PHOTO_LOOKUP",
+				payload: "SHOW_PREV"
+			}
+		},
+		"SHOW_FRONT": {
+			notificationExec: {
+				notification: "PHOTO_LOOKUP",
+				payload: {"payload": "SHOW_COMPARE", "isFront": true}
+			}
+		},
+		"SHOW_SIDE": {
+			notificationExec: {
+				notification: "PHOTO_LOOKUP",
+				payload: {"payload": "SHOW_COMPARE", "isFront": false}
+			}
+		},
+		"CHANGE_BASE": {
+			notificationExec: {
+				notification: "PHOTO_LOOKUP",
+				payload: "CHANGE_BASE"
+			}
 		},
 		"LOG_OUT_REQUEST": {
 			soundExec: {
@@ -208,9 +229,25 @@ Module.register("MMM-AssistantMk2", {
 			pattern: "(신규 등록|회원 가입|신규등록)",
 			command: "SIGN_UP_REQUEST"
 		},
+		"FRONT": {
+			pattern: "정면",
+			command: "SHOW_FRONT"
+		},
 		"SIDE": {
 			pattern: "옆면",
-			command: "LOOK_SIDE"
+			command: "SHOW_SIDE"
+		},
+		"BASE": {
+			pattern: "기준",
+			command: "CHANGE_BASE"
+		},
+		"NEXT": {
+			pattern: "다음",
+			command: "SHOW_NEXT"
+		},
+		"PREV": {
+			pattern: "이전",
+			command: "SHOW_PREV"
 		},
 		"LOG_OUT": {
 			pattern: "(로그아웃|로그 아웃)",
@@ -518,25 +555,10 @@ Module.register("MMM-AssistantMk2", {
 						this.config.strArray = string.split("년");
 						this.config.date = this.config.strArray[0] * 365;
 					}
-				} else if (this.config.command.indexOf("정면") >= 0) {
-					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": true});
-				} else if (this.config.command.indexOf("옆면") >= 0) {
-					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": false});
-				} else if (this.config.command.indexOf("기준") >= 0 && this.config.command.indexOf("변경") >= 0) {
-					this.sendNotification("PHOTO", "CHANGE_BASE");
-				} else if (this.config.command.indexOf("이전") >= 0) {
-					this.sendNotification("PHOTO", "SHOW_PREV");
-				} else if (this.config.command.indexOf("다음") >= 0) {
-					this.sendNotification("PHOTO", "SHOW_NEXT");
 				}
-
 				if (this.config.date > 0) {
-					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "term": this.config.date, "isFront": true});
+					this.sendNotification("PHOTO_LOOKUP", {"payload": "SHOW_COMPARE", "term": this.config.date, "isFront": true});
 					this.config.date = 0;
-				}
-
-				if (this.config.command.indexOf("옆면") >= 0) {
-					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": false});
 				}
 				this.config.isLookup = false;
 			}
