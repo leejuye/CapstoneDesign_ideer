@@ -138,8 +138,14 @@ module.exports = NodeHelper.create({
 		this.dbConn(qry, [fileName, id]);
 		this.sendSocketNotification("CHANGE_COMPLETE", "complete");
 	},
+	
+	setYpoints: function(id, ypoints) {
+		var qry = "INSERT INTO ypoints VALUES(?,?,?,?,?,?,?)";
+		console.log("^^^Ypoints" + ypoints);
+		this.dbConn(qry, ypoints);
+	},
 
-	socketNotificationReceived: function(notification, payload) {
+	socketNotificationReceived: async function(notification, payload) {
 		console.log("!!!!! noti: " + notification + " pay: " + payload);
 		if(notification === "PREVIEW") {
 			var self = this;
@@ -151,10 +157,22 @@ module.exports = NodeHelper.create({
 		} else if(notification === "REMOVE_PIC") {
 			console.log("@@@@@@!!!!%%%modules/default/photo/image/" + payload.id + "/" + payload.fileName);
 			fs.unlinkSync("modules/default/photo/image/" + payload.id + "/" + payload.fileName);
-			this.deleteSizeInfo(payload.fileName);
+			//this.deleteSizeInfo(payload.fileName);
 		} else if(notification === "SET_INFO") {
+			var num = await this.numberOfFiles(payload.id);
+			var ob = {args: [payload.fileName, payload.id, payload.weight]};
+			if(num >= 2) {
+				var qry = "SELECT calf,thigh,hip,waist,chest,shoulder FROM ypoints "
+					+ "WHERE id = ?";
+				var result = await this.dbConn(qry, [payload.id]);
+				
+				for (var i in result) {
+					ob.args.push(result[i]);
+				}
+			}
+			
 			var self = this;
-			PythonShell.run("modules/default/photo/contour.py", {args: [payload.fileName, payload.id, payload.weight]},
+			PythonShell.run("modules/default/photo/contour.py", ob,
 			function (err, result) {
 				if (err) {
 					console.log(err);
@@ -165,6 +183,10 @@ module.exports = NodeHelper.create({
 				
 				self.setSizeInfo(result.front);
 				self.setSizeInfo(result.side);
+				if(result.hasOwnProperty("ypoints")){
+					console.log("^^^hasOwn");
+					self.setYpoints(payload.id, result.ypoints);
+				}
 				self.sendSocketNotification("CONTOUR_DONE");
 			});
 		} else if(notification === "GET_INFO") {

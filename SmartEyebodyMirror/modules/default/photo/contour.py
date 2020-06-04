@@ -163,7 +163,7 @@ frontContour, cntsFront = contour(backImage, frontImage)
 sideContour, cntsSide = contour(backImage, sideImage)
 
 bottom, top = 0, 1987654321
-for loc in cntsSide[0]:
+for loc in cntsFront[0]:
     x, y = loc[0]
     top = min(y, top)
     bottom = max(y, bottom)
@@ -171,7 +171,12 @@ for loc in cntsSide[0]:
 # find skeleton
 imageFront = imutils.resize(cv2.imread(curPath + userID + '/' + fileName + '_front.jpg'), width=400)
 # y Value
-Ypoints = getYpointsFromServer(imageFront)
+Ypoints = []
+if len(sys.argv) <= 4:
+    Ypoints = getYpointsFromServer(imageFront)
+else:
+    for i in range(4, len(sys.argv)):
+        Ypoints.append(int(sys.argv[i]))
 #print(Ypoints)
 #Ypoints[1] = findThigh(cntsFront[0])
 
@@ -185,11 +190,11 @@ height = int(r)
 line(frontSizeInfo, frontContour, cntsFront[0], Ypoints, False)
 line(sideSizeInfo, sideContour, cntsSide[0], Ypoints, True)
 
-#cv2.imwrite(curPath + userID + "/" + fileName + "_front.jpg", frontContour)
-#cv2.imwrite(curPath + userID + "/" + fileName + "_side.jpg", sideContour)
+cv2.imwrite(curPath + userID + "/" + fileName + "_front.jpg", frontContour)
+cv2.imwrite(curPath + userID + "/" + fileName + "_side.jpg", sideContour)
 
-cv2.imwrite(curPath + "_front.jpg", frontContour)
-cv2.imwrite(curPath + "_side.jpg", sideContour)
+#cv2.imwrite(curPath + "_front.jpg", frontContour)
+#cv2.imwrite(curPath + "_side.jpg", sideContour)
 
 # temporary data
 frontSizeInfo["weight"] = weight
@@ -221,6 +226,10 @@ frontSizeInfo["id"] = userID
 sideSizeInfo["id"] = userID
 
 sizeInfo = dict(front=frontSizeInfo, side=sideSizeInfo)
+if len(sys.argv) <= 4:
+    Ypoints.append(userID)
+    Ypoints.reverse()
+    sizeInfo["ypoints"] = Ypoints
 
 #print(json.dumps(sizeInfo))
 toInfo(sizeInfo)

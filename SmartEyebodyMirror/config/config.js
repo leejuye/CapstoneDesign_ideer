@@ -31,7 +31,7 @@ var config = {
 			     // true, force serveronly mode, because you want to.. no UI on this device
 
 	modules: [
-		/*{
+		{
 			module: "MMM-pages",
 			config: {
 				modules:
@@ -42,13 +42,13 @@ var config = {
 		},
 		{
 		    module: "MMM-Dynamic-Modules"
-		},*/
+		},
 		{
 		    module: "signIn",
 		},
-		/*{
+		{
 		    module: "weight",
-		},*/
+		},
 		{
 		    module: "compliments",
 			position: "middle_center",

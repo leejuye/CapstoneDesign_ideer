@@ -64,7 +64,7 @@ Module.register("compliments", {
 	start: function() {
 		Log.info("Starting module: " + this.name);
 
-		 this.lastComplimentIndex = -1;
+		 /*this.lastComplimentIndex = -1;
 
 		 var self = this;
 		 if (this.config.remoteFile !== null) {
@@ -75,7 +75,7 @@ Module.register("compliments", {
 		 }
 		 this.compInterval = setInterval(function() {
 			self.updateDom(self.config.fadeSpeed);
-		}, this.config.updateInterval);
+		}, this.config.updateInterval);*/
 
 		 // Schedule update timer.
 /*		 setTimeout(() => {
