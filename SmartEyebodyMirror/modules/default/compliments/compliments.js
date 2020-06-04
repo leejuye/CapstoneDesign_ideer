@@ -78,7 +78,7 @@ Module.register("compliments", {
 		}, this.config.updateInterval);*/
 
 		 // Schedule update timer.
-/*		 setTimeout(() => {
+		 setTimeout(() => {
 		 	this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
 		 }, 5000); */
 
@@ -122,6 +122,200 @@ Module.register("compliments", {
 			});
 		}, 100);
 	},
+	
+	checkPossibleCommand: function(state, payload) {
+		switch (state) {
+		// yes or no
+		case "checkUserName":
+		case "alreadyExistName":
+		case "dressCheck":
+		case "frontResult":
+		case "sideResult":
+		case "savePictureOrNot":
+		case "shutdownRequest":
+		case "logOutRequest":
+			switch (payload) {
+			case "sayYes":
+			case "sayNo":
+				this.config.isNotNow = false;
+				break;
+			case "dressCheck":
+				this.config.isNotNow = true;
+				this.makeNotNow("촬영");
+				break;
+			case "imHere":
+				this.config.isNotNow = true;
+				this.makeNotNow("나 왔어");
+				break;
+			case "lookup":
+				this.config.isNotNow = true;
+				this.makeNotNow("조회");
+				break;
+			case "showPrev":
+				this.config.isNotNow = true;
+				this.makeNotNow("이전");
+				break;
+			case "showNext":
+				this.config.isNotNow = true;
+				this.makeNotNow("다음");
+				break;
+			case "changeBaseRequest":
+				this.config.isNotNow = true;
+				this.makeNotNow("기준");
+				break;
+			case "showFront":
+				this.config.isNotNow = true;
+				this.makeNotNow("정면");
+				break;
+			case "showSide":
+				this.config.isNotNow = true;
+				this.makeNotNow("옆면");
+				break;
+			case "logOutRequest":
+				this.config.isNotNow = true;
+				this.makeNotNow("로그아웃");
+				break;
+			case "shutdownRequest":
+				this.config.isNotNow = true;
+				this.makeNotNow("종료");
+				break;
+			}
+			break;
+			
+		// only functions
+		case "signInSuccess":
+		case "tryAgain":
+		case "requestGuide":
+			switch (payload) {
+			case "dressCheck":
+			case "lookup":
+			case "logOutRequest":
+			case "shutdownRequest":
+				this.config.isNotNow = false;
+				break;
+			case "imHere":
+				this.config.isNotNow = true;
+				this.makeNotNow("나 왔어");
+				break;
+			case "showPrev":
+				this.config.isNotNow = true;
+				this.makeNotNow("이전");
+				break;
+			case "showNext":
+				this.config.isNotNow = true;
+				this.makeNotNow("다음");
+				break;
+			case "changeBaseRequest":
+				this.config.isNotNow = true;
+				this.makeNotNow("기준");
+				break;
+			case "showFront":
+				this.config.isNotNow = true;
+				this.makeNotNow("정면");
+				break;
+			case "showSide":
+				this.config.isNotNow = true;
+				this.makeNotNow("옆면");
+				break;
+			case "sayYes":
+				this.config.isNotNow = true;
+				this.makeNotNow("응");
+				break;
+			case "sayNo":
+				this.config.isNotNow = true;
+				this.makeNotNow("아니");
+				break;
+			}
+			break;
+		
+		// I'm here
+		case "dressWait":
+			switch (payload) {
+			case "imHere":
+				this.config.isNotNow = false;
+				break;
+			case "dressCheck":
+				this.config.isNotNow = true;
+				this.makeNotNow("촬영");
+				break;
+			case "imHere":
+				this.config.isNotNow = true;
+				this.makeNotNow("나 왔어");
+				break;
+			case "lookup":
+				this.config.isNotNow = true;
+				this.makeNotNow("조회");
+				break;
+			case "showPrev":
+				this.config.isNotNow = true;
+				this.makeNotNow("이전");
+				break;
+			case "showNext":
+				this.config.isNotNow = true;
+				this.makeNotNow("다음");
+				break;
+			case "changeBaseRequest":
+				this.config.isNotNow = true;
+				this.makeNotNow("기준");
+				break;
+			case "showFront":
+				this.config.isNotNow = true;
+				this.makeNotNow("정면");
+				break;
+			case "showSide":
+				this.config.isNotNow = true;
+				this.makeNotNow("옆면");
+				break;
+			case "logOutRequest":
+				this.config.isNotNow = true;
+				this.makeNotNow("로그아웃");
+				break;
+			case "shutdownRequest":
+				this.config.isNotNow = true;
+				this.makeNotNow("종료");
+				break;
+			case "sayYes":
+				this.config.isNotNow = true;
+				this.makeNotNow("응");
+				break;
+			case "sayNo":
+				this.config.isNotNow = true;
+				this.makeNotNow("아니");
+				break;
+			}
+			break;
+		
+		// lookup
+		case "lookup":
+			switch (payload) {
+			case "dressCheck":
+			case "lookup":
+			case "showPrev":
+			case "showNext":
+			case "changeBaseRequest":
+			case "showFront":
+			case "showSide":
+			case "logOutRequest":
+			case "shutdownRequest":
+				this.config.isNotNow = false;
+				break;
+			case "imHere":
+				this.config.isNotNow = true;
+				this.makeNotNow("나 왔어");
+				break;
+			case "sayYes":
+				this.config.isNotNow = true;
+				this.makeNotNow("응");
+				break;
+			case "sayNo":
+				this.config.isNotNow = true;
+				this.makeNotNow("아니");
+				break;
+			}
+			break;
+		}
+		
+	},
 
 	sendNotificationToAssis: function(payload, isName=false) {
 		this.config.state = payload;
@@ -152,9 +346,11 @@ Module.register("compliments", {
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload + ", from: " + sender);
 
 			// Log.log(this.config.state +"@@@@" + payload);
+			
+			this.checkPossibleCommand(this.config.state, payload);
 
 			// Execute commands
-			if (!this.config.pass) {
+			if (!this.config.isNotNow) {
 				clearInterval(this.compInterval);
 
 				// Remove last compliment
@@ -224,7 +420,7 @@ Module.register("compliments", {
 					break;
 				case "lookup":
 					this.config.state = payload;
-					this.sendNotification("ASSISTANT", "lookup");
+					this.sendNotification("PHOTO_LOOKUP", { payload: "SHOW_COMPARE", isLookUp: true, isFront: true });
 					break;
 				case "checkUserName":
 					this.config.tmpName = this.config.userName;
@@ -263,8 +459,28 @@ Module.register("compliments", {
 						this.updateDom();
 					}, 5000);
 					break;
+				case "showFront":
+					this.config.state = payload;
+					this.sendNotification("PHOTO_LOOKUP", {"payload": "SHOW_COMPARE", "isFront": true});
+					break;
+				case "showSide":
+					this.config.state = payload;
+					this.sendNotification("PHOTO_LOOKUP", {"payload": "SHOW_COMPARE", "isFront": false});
+					break;
+				case "showPrev":
+					this.config.state = payload;
+					this.sendNotification("PHOTO_LOOKUP", "SHOW_PREV");
+					break;
+				case "showNext":
+					this.config.state = payload;
+					this.sendNotification("PHOTO_LOOKUP", "SHOW_NEXT");
+					break;
+				case "changeBaseRequest":
+					this.config.state = payload;
+					this.sendNotification("PHOTO_LOOKUP", "CHANGE_BASE");
+					break;
 				case "sayYes":
-					Log.log("sayYes_state" + this.config.state);
+					Log.log("sayYes_state: " + this.config.state);
 					switch(this.config.state){
 					case "dressCheck":
 						this.sendNotification("PHOTO", "TAKE_PIC");
@@ -292,7 +508,6 @@ Module.register("compliments", {
 						break;
 					default:
 						Log.log("NOTNOWNOTNOWNOTNOWNOTNOW");
-						this.isNotNow = true;
 						break;
 					}
 					break;
@@ -466,13 +681,13 @@ Module.register("compliments", {
 		// variable for index to next message to display
 		let index=0;
 		// are we randomizing
-		if(this.isNotNow) {
+		/*if(this.isNotNow) {
 			compliments = ["지금은 할 수 없는 명령입니다.\n다시 말씀해 주세요."];
 			this.lastCompliments.forEach(E => compliments.push(E));
 			Log.log(compliments);
 			this.lastIndexUsed = -1;
 			this.isNotNow = false;
-		}
+		}*/
 		this.lastCompliments = compliments;
 				
 		if(this.config.random){

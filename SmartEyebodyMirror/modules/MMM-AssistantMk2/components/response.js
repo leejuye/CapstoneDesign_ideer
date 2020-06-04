@@ -216,6 +216,14 @@ class AssistantResponseClass {
 			this.end();
 			return;
 		}
+		
+		if (response.lastQuery.text === "NOT_NOW") {
+			this.showing = false;
+			this.status("error");
+			this.showError(this.callbacks.translate("NOT_NOW"));
+			this.end();
+			return
+		}
 
 		var command = response.transcription.transcription;
 		

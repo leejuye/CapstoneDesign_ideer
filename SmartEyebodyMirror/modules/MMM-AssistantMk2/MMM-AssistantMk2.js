@@ -123,8 +123,8 @@ Module.register("MMM-AssistantMk2", {
 				chime: "open"
 			},
 			notificationExec: {
-				notification: "PHOTO_LOOKUP",
-				payload: { payload: "SHOW_COMPARE", isLookUp: true, isFront: true },
+				notification: "COMPLIMENTS",
+				payload: "lookup",
 			}
 		},
 		"SHUTDOWN_REQUEST": {
@@ -147,32 +147,32 @@ Module.register("MMM-AssistantMk2", {
 		},	
 		"SHOW_NEXT": {
 			notificationExec: {
-				notification: "PHOTO_LOOKUP",
-				payload: "SHOW_NEXT"
+				notification: "COMPLIMENTS",
+				payload: "showNext"
 			}
 		},
 		"SHOW_PREV": {
 			notificationExec: {
-				notification: "PHOTO_LOOKUP",
-				payload: "SHOW_PREV"
+				notification: "COMPLIMENTS",
+				payload: "showPrev"
 			}
 		},
 		"SHOW_FRONT": {
 			notificationExec: {
-				notification: "PHOTO_LOOKUP",
-				payload: {"payload": "SHOW_COMPARE", "isFront": true}
+				notification: "COMPLIMENTS",
+				payload: "showFront"
 			}
 		},
 		"SHOW_SIDE": {
 			notificationExec: {
-				notification: "PHOTO_LOOKUP",
-				payload: {"payload": "SHOW_COMPARE", "isFront": false}
+				notification: "COMPLIMENTS",
+				payload: "showSide"
 			}
 		},
 		"CHANGE_BASE": {
 			notificationExec: {
-				notification: "PHOTO_LOOKUP",
-				payload: "CHANGE_BASE"
+				notification: "COMPLIMENTS",
+				payload: "changeBaseRequest"
 			}
 		},
 		"LOG_OUT_REQUEST": {
