@@ -174,7 +174,7 @@ module.exports = NodeHelper.create({
 		this.dbConn(qry, ypoints);
 	},
 	
-	result = null,
+	result: null,
 
 	socketNotificationReceived: async function(notification, payload) {
 		console.log("!!!!! noti: " + notification + " pay: " + payload);
@@ -215,10 +215,10 @@ module.exports = NodeHelper.create({
 		} else if(notification === "GET_INFO") {
 			this.getSizeInfo(payload);
 		} else if(notification === "SET_INFO") {
-			await self.setSizeInfo(this.result.front);
-			await self.setSizeInfo(this.result.side);
+			this.setSizeInfo(this.result.front);
+			this.setSizeInfo(this.result.side);
 			if(this.result.hasOwnProperty("ypoints")){
-				await self.setYpoints(payload.id, this.result.ypoints);
+				this.setYpoints(payload.id, this.result.ypoints);
 			}
 			result = null;
 		} else if(notification === "CHANGE_BASE") {

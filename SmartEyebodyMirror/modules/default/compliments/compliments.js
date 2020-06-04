@@ -53,7 +53,8 @@ Module.register("compliments", {
 
 	compInterval: null,
 	descCommand: null,
-	waitInterval: null,
+	dressInterval: null,
+	shutdownInterval: null,
 
 	// Define required scripts.
 	getScripts: function() {
@@ -356,7 +357,11 @@ Module.register("compliments", {
 				// Remove last compliment
 				this.lastIndexUsed = 123;
 				var self = this;
-				self.updateDom();
+				Log.log("### payload: "+payload);
+				if (payload != "shutdownRequest" && payload != "logOutRequest") {
+					Log.log("$$$ updateDom");
+					self.updateDom();
+				}
 
 				// savePicture
 				if(payload.hasOwnProperty("number")) {
@@ -391,8 +396,9 @@ Module.register("compliments", {
 					break;
 				case "dressWait":
 					this.config.state = payload;
-					this.waitInterval = setInterval(function() {
-					// shutdown now
+					var self = this;
+					this.dressInterval = setInterval(function() {
+						self.sendNotification("SHUTDOWN_MIRROR");
 					}, 600000);  // wait 10 minutes = 600000
 					break;
 				case "imHere":
@@ -416,6 +422,8 @@ Module.register("compliments", {
 					this.config.state = payload;
 					break;
 				case "savePicture":
+					this.config.state = payload;
+					break;
 				case "lookup":
 					this.config.state = payload;
 					this.sendNotification("PHOTO_LOOKUP", { payload: "SHOW_COMPARE", isLookUp: true, isFront: true });
@@ -557,9 +565,12 @@ Module.register("compliments", {
 			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 			this.config.assistState = "listen";
 			this.config.sayTF = false;
-			if (this.config.state === "dressWait") {
-				clearInterval(this.waitInterval);
-			}
+			clearInterval(this.dressInterval);
+			clearInterval(this.shutdownInterval);
+			var self = this;
+			this.shutdownInterval = setInterval(function() {
+				self.sendNotification("SHUTDOWN_MIRROR");
+			}, 300000);  // wait 5 minutes = 300000
 		} else if (notification === "ASSISTANT_CONFIRMATION") {  // You said something
 			Log.log(this.name + " received a 'module' notification: " + notification + " from sender: " + sender.name);
 			this.config.sayTF = true;
@@ -717,6 +728,9 @@ Module.register("compliments", {
 		if(this.descCommand === "savePicture" && complimentText) {
 			complimentText = [complimentText.slice(0,13), this.filenumber, complimentText.slice(13)].join("");
 			this.filenumber = null;
+			setTimeout(() => {
+				this.sendNotification("PHOTO_LOOKUP", { payload: "SHOW_COMPARE", isLookUp: true, isFront: true });
+			}, 3500)
 		}
 		if(this.config.userName && complimentText) {
 			complimentText = `${this.config.userName}${complimentText}`;

@@ -93,7 +93,6 @@ Module.register("photo",{
 			this.rightFileName = payload.afterFileName;
 			this.comparePageData = payload;
 		} else if(notification === "HERE_FILE_NUMBER") {
-			this.sendNotification("COMPLIMENTS", {"payload": "savePicture", "number": payload});
 			if(payload == 1) {
 				this.sendSocketNotification("CHANGE_BASE", {
 					"id": this.id,
@@ -101,6 +100,9 @@ Module.register("photo",{
 				});
 				this.firstBase = true;
 			}
+			setTimeout(() => {
+				this.sendNotification("COMPLIMENTS", {"payload": "savePicture", "number": payload});
+			}, 3000)
 		} else if (notification === "CONTOUR_DONE") {
 			this.whatPage = "resultPage";
 			this.sendNotification("COMPLIMENTS", "savePictureOrNot");
@@ -118,6 +120,7 @@ Module.register("photo",{
 			this.whatPage = "comparePage";
 			this.sendNotification("COMPLIMENTS", payload);
 		}
+		this.updateDom();
 	},
 
 	notificationReceived: function(notification, payload, sender) {
