@@ -43,6 +43,26 @@ module.exports = NodeHelper.create({
 			});
 		}
 	},
+	
+	pixelToCm: function(data) {
+		var h = 0.39077;
+		//var r = 0.4782;
+		var r = 0.3666;
+		for(var key in data) {
+			if(key === "weight") {
+				continue;
+			} else if(key === "bmi") {
+				data[key] /= (h*h);
+			} else if(key === "height"){
+				data[key] *= h;
+			} else {
+				data[key] *= r;
+			}
+		}
+		return new Promise(function(resolve){
+				resolve(data);
+			});
+	},
 
 	getSizeInfo: async function(payload) {
 		var fileNum = await this.numberOfFiles(payload.id);
@@ -67,10 +87,17 @@ module.exports = NodeHelper.create({
 			afterFileName = await this.dbConn(qry, [payload.rightFileName, payload.id]);
 		}
 		
-		qry = "SELECT shoulder,waist,hip,thigh,calf,weight,height,bmi "
+		if(payload.isFront) {
+			qry = "SELECT shoulder,chest,waist,hip,thigh,calf,weight,height,bmi "
 			+ "FROM size_info WHERE is_front = ? and file_name = ?";
+		} else {
+			qry = "SELECT chest,waist,hip,thigh,calf,weight,height,bmi "
+			+ "FROM size_info WHERE is_front = ? and file_name = ?";
+		}
+		
 		
 		var beforeData = await this.dbConn(qry, [payload.isFront, beforeFileName]);
+		beforeData = await this.pixelToCm(beforeData);
 		
 		if(afterFileName.hasOwnProperty("dfchange") && (afterFileName.dfchange === null)){
 			this.sendSocketNotification("CHANGE_NULL", payload.command);
@@ -82,6 +109,8 @@ module.exports = NodeHelper.create({
 			} else {
 				var afterData = await this.dbConn(qry, [payload.isFront, afterFileName]);
 			}
+			
+			afterData = await this.pixelToCm(afterData);
 			this.sendSocketNotification("HERE_INFO", {
 				"beforeFileName": beforeFileName,
 				"beforeData": beforeData,

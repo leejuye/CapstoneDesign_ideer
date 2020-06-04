@@ -201,8 +201,8 @@ frontSizeInfo["weight"] = weight
 sideSizeInfo["weight"] = weight
 #print(type(frontSizeInfo["weight"]), frontSizeInfo["weight"])
 
-frontSizeInfo["chest"] = 0
-sideSizeInfo["chest"] = 0
+#frontSizeInfo["chest"] = 0
+#sideSizeInfo["chest"] = 0
 
 frontSizeInfo["height"] = height
 sideSizeInfo["height"] = height

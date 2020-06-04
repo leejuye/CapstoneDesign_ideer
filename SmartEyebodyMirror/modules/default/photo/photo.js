@@ -142,6 +142,7 @@ Module.register("photo",{
 				payload = payload.payload;
 			}
 			if (this.isLookUp) {
+				Log.log("@#$@#$@#$!#%$%@#$^^@$%$#%" + payload);
 				switch(payload) {
 					case "SHOW_COMPARE":
 						this.compare(this.isFront, this.term, this.rightFileName, null);
@@ -270,7 +271,7 @@ Module.register("photo",{
 			"height": '키',
 			"bmi":'BMI'
 		}
-
+		
 		for(key in data) {
 			if(key === "weight") {
 				box.appendChild(document.createTextNode(ko[key] + ": " + data[key].toFixed(2) + "kg"));
