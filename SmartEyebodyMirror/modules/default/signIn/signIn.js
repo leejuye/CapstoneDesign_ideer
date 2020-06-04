@@ -29,6 +29,7 @@ Module.register("signIn",{
 		case "LOGOUT_REQUEST":
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload);
 			this.sendNotification("COMPLIMENTS", "logOutSuccess");
+			this.sendNotification("PHOTO", "LOGOUT");
 			break;
 		default:
 			break;

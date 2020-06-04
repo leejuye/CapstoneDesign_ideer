@@ -240,6 +240,11 @@ Module.register("photo",{
 				});
 				this.sendSocketNotification("GET_FILE_NUMBER", this.id);
 				break;
+			case "LOGOUT":
+				this.id = null;
+				this.weight = null;
+				this.updateDom();
+				break;
 			}
 		}
 	},
@@ -348,7 +353,8 @@ Module.register("photo",{
 		this.fillBox(info1, data.beforeData);
 
 		imgBox1.appendChild(img1);
-		imgBox1.appendChild(document.createTextNode(this.makeDateFormat(data.beforeFileName)));
+		imgBox1.appendChild(document.createTextNode(this.makeDateFormat(data.beforeFileName) + 
+					" (기준사진)"));
 
 		wrapper.appendChild(imgBox1);
 		wrapper.appendChild(info1);
