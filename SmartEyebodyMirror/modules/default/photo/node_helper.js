@@ -173,6 +173,8 @@ module.exports = NodeHelper.create({
 		console.log("^^^Ypoints" + ypoints);
 		this.dbConn(qry, ypoints);
 	},
+	
+	result = null,
 
 	socketNotificationReceived: async function(notification, payload) {
 		console.log("!!!!! noti: " + notification + " pay: " + payload);
@@ -184,10 +186,9 @@ module.exports = NodeHelper.create({
 				self.sendSocketNotification("PREVIEW_DONE", payload.fileName);
 			});
 		} else if(notification === "REMOVE_PIC") {
-			console.log("@@@@@@!!!!%%%modules/default/photo/image/" + payload.id + "/" + payload.fileName);
 			fs.unlinkSync("modules/default/photo/image/" + payload.id + "/" + payload.fileName);
-			//this.deleteSizeInfo(payload.fileName);
-		} else if(notification === "SET_INFO") {
+			this.deleteSizeInfo(payload.fileName);
+		} else if(notification === "CONTOUR") {
 			var num = await this.numberOfFiles(payload.id);
 			var ob = {args: [payload.fileName, payload.id, payload.weight]};
 			if(num >= 2) {
@@ -208,18 +209,18 @@ module.exports = NodeHelper.create({
 					throw err;
 				}
 				console.log(result);
-				result = JSON.parse(result);
-				
-				self.setSizeInfo(result.front);
-				self.setSizeInfo(result.side);
-				if(result.hasOwnProperty("ypoints")){
-					console.log("^^^hasOwn");
-					self.setYpoints(payload.id, result.ypoints);
-				}
+				self.result = JSON.parse(result);
 				self.sendSocketNotification("CONTOUR_DONE");
 			});
 		} else if(notification === "GET_INFO") {
 			this.getSizeInfo(payload);
+		} else if(notification === "SET_INFO") {
+			await self.setSizeInfo(this.result.front);
+			await self.setSizeInfo(this.result.side);
+			if(this.result.hasOwnProperty("ypoints")){
+				await self.setYpoints(payload.id, this.result.ypoints);
+			}
+			result = null;
 		} else if(notification === "CHANGE_BASE") {
 			this.changeBaseFile(payload.id, payload.fileName);
 		} else if(notification === "GET_FILE_NUMBER") {

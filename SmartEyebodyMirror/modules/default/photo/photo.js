@@ -102,8 +102,11 @@ Module.register("photo",{
 				this.firstBase = true;
 			}
 		} else if (notification === "CONTOUR_DONE") {
-			this.isLookUp = true;
-			this.compare(this.isFront, this.term, this.rightFileName, null);
+			this.whatPage = "resultPage";
+			this.sendNotification("COMPLIMENTS", "savePictureOrNot");
+			setTimeout(() => {
+				this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+			}, 3000);
 		} else if(notification === "CHANGE_COMPLETE") {
 			if(this.firstBase === false) {
 				this.sendNotification("COMPLIMENTS","changeBase");
@@ -114,9 +117,6 @@ Module.register("photo",{
 		} else if(notification === "CHANGE_NULL") {
 			this.whatPage = "comparePage";
 			this.sendNotification("COMPLIMENTS", payload);
-		}
-		if(notification !== "CONTOUR_DONE") {
-			this.updateDom();
 		}
 	},
 
@@ -142,7 +142,6 @@ Module.register("photo",{
 				payload = payload.payload;
 			}
 			if (this.isLookUp) {
-				Log.log("@#$@#$@#$!#%$%@#$^^@$%$#%" + payload);
 				switch(payload) {
 					case "SHOW_COMPARE":
 						this.compare(this.isFront, this.term, this.rightFileName, null);
@@ -213,12 +212,13 @@ Module.register("photo",{
 				});
 				break;
 			case "SHOW_RESULT":
-				this.whatPage = "resultPage";
-				this.sendNotification("COMPLIMENTS", "savePictureOrNot");
-				setTimeout(() => {
-					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-				}, 3000);
-				this.updateDom();
+				this.sendNotification("COMPLIMENTS", "waitPlease");
+				
+				this.sendSocketNotification("CONTOUR", {
+					"fileName": this.fileName,
+					"id": this.id,
+					"weight": this.weight
+				});
 				break;
 			case "REMOVE_RESULT":
 				this.sendSocketNotification("REMOVE_PIC",{
@@ -233,9 +233,7 @@ Module.register("photo",{
 				break;
 			case "COUNT_FILE":
 				this.sendSocketNotification("SET_INFO", {
-					"fileName": this.fileName,
-					"id": this.id,
-					"weight": this.weight
+					"id": this.id
 				});
 				this.sendSocketNotification("GET_FILE_NUMBER", this.id);
 				break;

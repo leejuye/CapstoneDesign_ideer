@@ -416,8 +416,6 @@ Module.register("compliments", {
 					this.config.state = payload;
 					break;
 				case "savePicture":
-					this.config.state = payload;
-					break;
 				case "lookup":
 					this.config.state = payload;
 					this.sendNotification("PHOTO_LOOKUP", { payload: "SHOW_COMPARE", isLookUp: true, isFront: true });
