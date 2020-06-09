@@ -183,7 +183,7 @@ Module.register("compliments", {
 			}
 			break;
 			
-		// only functions
+		// functions
 		case "signInSuccess":
 		case "tryAgain":
 		case "requestGuide":

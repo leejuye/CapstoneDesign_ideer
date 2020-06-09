@@ -233,6 +233,12 @@ Module.register("photo",{
 					"id": this.id
 				});
 				this.sendNotification("COMPLIMENTS", "deletePicture");
+				setTimeout(() => {
+					this.sendNotification("COMPLIMENTS", "signInSuccess");
+				}, 3000);
+				setTimeout(() => {
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+				}, 7000);
 				break;
 			case "COUNT_FILE":
 				this.sendSocketNotification("SET_INFO", {
