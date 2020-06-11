@@ -45,9 +45,9 @@ module.exports = NodeHelper.create({
 	},
 	
 	pixelToCm: function(data) {
-		var h = 0.39077;
+		var h = 0.37;
 		//var r = 0.4782;
-		var r = 0.3666;
+		var r = 0.402985;
 		for(var key in data) {
 			if(key === "weight") {
 				continue;

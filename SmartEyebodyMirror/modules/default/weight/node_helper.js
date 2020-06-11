@@ -20,7 +20,7 @@ module.exports = NodeHelper.create({
 				"sudo python3 /home/pi/CapstoneDesign_ideer/SmartEyebodyMirror/modules/default/weight/ReverseMiScale/example.py"
 				,function( error, success ) {
 				  if( error ) {
-					  console.log(error);
+					  self.sendSocketNotification("GET_WEIGHT_ERROR", error);
 					} else {
 						self.sendSocketNotification("GET_WEIGHT_SUCCESS", {weight: success});
 				  }

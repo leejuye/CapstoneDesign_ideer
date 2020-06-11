@@ -21,12 +21,18 @@ def toInfo():
 
 # overlay
 overlay = None
+userID = ''
+
+if sys.argv[2][0] != '.':
+    userID = '/' + sys.argv[2]
+
 if sys.argv[1][len(sys.argv[1])-5] == 't':
     overlay = cv2.imread(curPath + '/overlay_front.png')
-else:
+elif sys.argv[1][len(sys.argv[1])-5] == 'e':
     overlay = cv2.imread(curPath + '/overlay_side.png')
-
-overlay = cv2.resize(overlay, (480, 640))
+    
+if overlay != None:
+    overlay = cv2.resize(overlay, (480, 640))
 
 # initialize the camera and grab a reference to the raw camera capture
 camera = PiCamera()
@@ -73,10 +79,11 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     x,y,w,h = roi
     dst = dst[y:y+h, x:x+w]
 
-    image = dst
-    addedImage = cv2.add(image,overlay)
-    addedImage = np.fliplr(addedImage)
-    addedImage = np.array(addedImage)
+    addedImage = dst
+    if overlay != None:
+        addedImage = cv2.add(addedImage,overlay)
+        addedImage = np.fliplr(addedImage)
+        addedImage = np.array(addedImage)
 
     #count down text
     cnt = time.time()-start
@@ -102,11 +109,11 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     # if the `q` key was pressed, break from the loop
     if key == ord("q") or time.time()-start >= 7:
 #        playSound("sfx2")
-        camera.capture(curPath + "/image/" + sys.argv[2] + "/" + sys.argv[1])
+        camera.capture(curPath + "/image" + userID + "/" + sys.argv[1])
         break
 
-img = cv2.imread(curPath + "/image/" + sys.argv[2] + "/" + sys.argv[1])
-
+img = cv2.imread(curPath + "/image" + userID + "/" + sys.argv[1])
+# cv2.imwrite(curPath + "before" + sys.argv[1] ,img)
 # undistort image
 h,  w = img.shape[:2]
 newcameramtx, roi=cv2.getOptimalNewCameraMatrix(mtx,dist,(w,h),0,(w,h))
@@ -120,7 +127,8 @@ x,y,w,h = roi
 dst = dst[y:y+h, x:x+w]
 
 dst = np.fliplr(dst)
-cv2.imwrite(curPath + "/image/" + sys.argv[2] + "/" + sys.argv[1], dst)
+#cv2.imwrite(curPath + "after" + sys.argv[1] ,dst)
+cv2.imwrite(curPath + "/image" + userID + "/" + sys.argv[1], dst)
 #cv2.imwrite(curPath + "/image/calibresult.png",dst)
 
 toInfo()

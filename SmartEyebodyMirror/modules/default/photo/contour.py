@@ -106,9 +106,13 @@ def contour(backImage, image):
 def line(dic, image, cnts, Ypoints, isSide):
     for j in range(0, len(Ypoints) - isSide):
         arr = []
+        wantY = Ypoints[j]
+        if isSide and j == len(Ypoints) - 2:
+            wantY -= 24
+            
         for i in cnts:
             x, y = i[0]
-            if y == Ypoints[j] and (len(arr) == 0 or arr[-1][0] + 3 <= x):
+            if y == wantY and (len(arr) == 0 or arr[-1][0] + 3 <= x):
                 arr.append((x, y))
         arrLen = len(arr) - len(arr) % 2
         

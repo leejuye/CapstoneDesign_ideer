@@ -18,9 +18,10 @@ Module.register("photo",{
 	fileNumber: 0,
 	ver: 1,
 	id: null,
-	firstBase: false,
+	userName: '',
 	rightFileName: null,
 	weight: null,
+	
 	
 	start: function() {
 	 	this.current_user = null;
@@ -78,15 +79,30 @@ Module.register("photo",{
 
 	socketNotificationReceived: function(notification, payload){
 		if(notification === "PREVIEW_DONE") {
-			this.config.imageSrc = "/modules/default/photo/image/" + this.id + "/" + payload + "?version=" + this.ver++;
 			if(payload.indexOf("front") != -1) {
 				this.sendNotification("COMPLIMENTS","frontResult");
-			} else {
+				this.config.imageSrc = "/modules/default/photo/image/" + this.id + "/" + payload + "?version=" + this.ver++;
+				
+				setTimeout(() => {
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+				}, 3000)
+			} else if(payload.indexOf("side") != -1) {
 				this.sendNotification("COMPLIMENTS","sideResult");
+				this.config.imageSrc = "/modules/default/photo/image/" + this.id + "/" + payload + "?version=" + this.ver++;
+				
+				setTimeout(() => {
+					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
+				}, 3000)
+			} else {
+				this.sendNotification("COMPLIMENTS","bgResult");
+				this.config.imageSrc = "/modules/default/photo/image/" + payload + "?version=" + this.ver++;
+				var self = this;
+				setTimeout(() => {
+					self.initImage();
+					self.updateDom();
+				}, 5000)
+				
 			}
-			setTimeout(() => {
-				this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-			}, 3000)
 		} else if(notification === "HERE_INFO") {
 			this.whatPage = "comparePage";
 			this.fileName = payload.afterFileName;
@@ -98,11 +114,10 @@ Module.register("photo",{
 					"id": this.id,
 					"fileName": this.fileName
 				});
-				this.firstBase = true;
 			}
 			setTimeout(() => {
 				this.sendNotification("COMPLIMENTS", {"payload": "savePicture", "number": payload});
-			}, 3000)
+			}, 2000)
 		} else if (notification === "CONTOUR_DONE") {
 			this.whatPage = "resultPage";
 			this.sendNotification("COMPLIMENTS", "savePictureOrNot");
@@ -110,12 +125,9 @@ Module.register("photo",{
 				this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
 			}, 3000);
 		} else if(notification === "CHANGE_COMPLETE") {
-			if(this.firstBase === false) {
-				this.sendNotification("COMPLIMENTS","changeBase");
-			}
+			this.sendNotification("COMPLIMENTS","changeBase");
 			this.initImage();
 			this.term = 0;
-			this.firstBase === false;
 		} else if(notification === "CHANGE_NULL") {
 			this.whatPage = "comparePage";
 			this.sendNotification("COMPLIMENTS", payload);
@@ -129,6 +141,7 @@ Module.register("photo",{
 		}
 		else if(notification === "SIGN_IN_INFO"){
 			this.id = payload.id;
+			this.userName = payload.name;
 		}
 		else if(notification === "PHOTO_LOOKUP") {
 			Log.log(this.name + "received a notification: " + notification + ", payload : " + payload);
@@ -169,6 +182,13 @@ Module.register("photo",{
 		 	this.initImage();
 
 			switch(payload) {
+			case "TAKE_BG":
+				this.sendNotification("COMPLIMENTS", "bgStart");
+				this.sendSocketNotification("PREVIEW", {
+					"fileName": "background.jpg",
+					"id": "."
+				});
+				break;
 			case "TAKE_PIC":
 				this.initFileName();
 				this.fileNameSuffix = '_front.jpg';
@@ -182,7 +202,7 @@ Module.register("photo",{
 				this.sendNotification("COMPLIMENTS", "tryAgain");
 				setTimeout(() => {
 					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-				}, 10000);
+				}, 5000);
 				break;
 			case "TAKE_PIC_SIDE":
 				this.fileNameSuffix = '_side.jpg';
@@ -234,11 +254,8 @@ Module.register("photo",{
 				});
 				this.sendNotification("COMPLIMENTS", "deletePicture");
 				setTimeout(() => {
-					this.sendNotification("COMPLIMENTS", "signInSuccess");
+					this.sendNotification("COMPLIMENTS", {payload: "signInSuccess", userName: this.userName});
 				}, 3000);
-				setTimeout(() => {
-					this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC"});
-				}, 7000);
 				break;
 			case "COUNT_FILE":
 				this.sendSocketNotification("SET_INFO", {
@@ -248,7 +265,7 @@ Module.register("photo",{
 				break;
 			case "LOGOUT":
 				this.id = null;
-				this.weight = null;
+				this.weight = 0;
 				this.updateDom();
 				break;
 			}
@@ -357,10 +374,13 @@ Module.register("photo",{
 		var info1 = document.createElement("div");
 		info1.className = "info_item";
 		this.fillBox(info1, data.beforeData);
+		
+		var br = document.createElement("br");
 
 		imgBox1.appendChild(img1);
-		imgBox1.appendChild(document.createTextNode(this.makeDateFormat(data.beforeFileName) + 
-					" (기준사진)"));
+		imgBox1.appendChild(document.createTextNode(this.makeDateFormat(data.beforeFileName)));
+		imgBox1.appendChild(br);
+		imgBox1.appendChild(document.createTextNode("<기준사진>"));
 
 		wrapper.appendChild(imgBox1);
 		wrapper.appendChild(info1);

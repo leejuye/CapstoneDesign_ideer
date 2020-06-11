@@ -49,7 +49,6 @@ Module.register("compliments", {
 	// Set currentweather from module
 	currentWeatherType: "",
 	isNotNow: false,
-	lastCompliments: [],
 
 	compInterval: null,
 	descCommand: null,
@@ -64,33 +63,14 @@ Module.register("compliments", {
 	// Define start sequence.
 	start: function() {
 		Log.info("Starting module: " + this.name);
-
-		/*this.lastComplimentIndex = -1;
-
-		 var self = this;
-		 if (this.config.remoteFile !== null) {
-		 	this.complimentFile(function(response) {
-		 		self.config.compliments = JSON.parse(response);
-		 		//self.updateDom();
-		 	});
-		 }
-		 this.compInterval = setInterval(function() {
-			self.updateDom(self.config.fadeSpeed);
-		}, this.config.updateInterval);
-
-		 // Schedule update timer.
-		 setTimeout(() => {
-		 	this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
-		 }, 5000);*/
-
-		//TEST
-
-		// var self = this;
-		// setTimeout(function() {
-		// 	self.sendNotification("PHOTO", "SHOW_COMPARE");
-		// 	Log.log("@@@@@@@");
-		// }, 5000);
-
+		
+		var self = this;
+		if (this.config.remoteFile !== null) {
+			this.complimentFile(function(response) {
+				self.config.compliments = JSON.parse(response);
+			//self.updateDom();
+			});
+		}
 	},
 	// Module location
 	getLocation: function() {
@@ -101,6 +81,7 @@ Module.register("compliments", {
 		case "sideStart":
 		case "sideResult":
 		case "savePictureOrNot":
+		case "bgStart":
 			ret = "bottom_right";
 			break;
 		case "requestGuide":
@@ -330,14 +311,9 @@ Module.register("compliments", {
 
 		if (notification === "START_MIRROR") {
 			this.lastComplimentIndex = -1;
-
+			this.lastIndexUsed = 0;
+			this.descCommand = null;
 			var self = this;
-			if (this.config.remoteFile !== null) {
-				this.complimentFile(function(response) {
-					self.config.compliments = JSON.parse(response);
-				//self.updateDom();
-				});
-			}
 
 			// Schedule update timer.
 			this.compInterval = setInterval(function() {
@@ -359,7 +335,6 @@ Module.register("compliments", {
 				var self = this;
 				Log.log("### payload: "+payload);
 				if (payload != "shutdownRequest" && payload != "logOutRequest") {
-					Log.log("$$$ updateDom");
 					self.updateDom();
 				}
 
@@ -370,7 +345,7 @@ Module.register("compliments", {
 				}
 				//checkUserName, signInSuccess
 				if(payload.userName) {
-					Log.log(payload);
+					//Log.log(payload);
 					this.config.userName = payload.userName;
 					payload = payload.payload;
 				}
@@ -447,9 +422,6 @@ Module.register("compliments", {
 					break;
 				case "logOutSuccess":
 					this.config.state = payload;
-					setTimeout(() => {
-						this.sendNotification("ASSISTANT_ACTIVATE", {type: "MIC", isName: true});
-					}, 7000);
 					break;
 				case "changeBase":
 					this.config.state = payload;
@@ -461,9 +433,7 @@ Module.register("compliments", {
 				case "next":
 					this.config.state = payload;
 					var self = this;
-					setTimeout(() => {
-						this.updateDom();
-					}, 5000);
+
 					break;
 				case "showFront":
 					this.config.state = payload;
@@ -502,6 +472,9 @@ Module.register("compliments", {
 						break;
 					case "shutdownRequest":
 						this.sendNotification("SHUTDOWN_MIRROR");
+						setTimeout(() => {
+							this.updateDom();
+						}, 5000);
 						break;
 					case "checkUserName":
 						this.sendNotification("CHECK_NAME_IN_DB", this.config.tmpName);
@@ -689,15 +662,6 @@ Module.register("compliments", {
 		var compliments = this.complimentArray();
 		// variable for index to next message to display
 		let index=0;
-		// are we randomizing
-		/*if(this.isNotNow) {
-			compliments = ["지금은 할 수 없는 명령입니다.\n다시 말씀해 주세요."];
-			this.lastCompliments.forEach(E => compliments.push(E));
-			Log.log(compliments);
-			this.lastIndexUsed = -1;
-			this.isNotNow = false;
-		}*/
-		this.lastCompliments = compliments;
 				
 		if(this.config.random){
 			// yes
@@ -712,7 +676,7 @@ Module.register("compliments", {
 			}
 		}
 		
-		Log.log(compliments[index]);
+		//Log.log(compliments[index]);
 
 		return compliments[index];
 	},

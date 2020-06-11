@@ -184,6 +184,12 @@ Module.register("MMM-AssistantMk2", {
 				payload: "logOutRequest"
 			},
 		},
+		"TAKE_BG": {
+			notificationExec: {
+				notification: "PHOTO",
+				payload: "TAKE_BG"
+			}
+		},
 		"CANCEL": {
 			soundExec: {
 				chime: "close"
@@ -238,7 +244,7 @@ Module.register("MMM-AssistantMk2", {
 			command: "SHOW_SIDE"
 		},
 		"BASE": {
-			pattern: "기준",
+			pattern: "(기준|변경)",
 			command: "CHANGE_BASE"
 		},
 		"NEXT": {
@@ -256,6 +262,10 @@ Module.register("MMM-AssistantMk2", {
 		"CANCEL": {
 			pattern: "취소",
 			command: "CANCEL"
+		},
+		"TAKE_BG": {
+			pattern: "배경",
+			command: "TAKE_BG"
 		},
 		"YES": {
 			pattern: "응",
@@ -454,6 +464,8 @@ Module.register("MMM-AssistantMk2", {
 			break;
 		case "ASSISTANT_ACTIVATE":
 			var session = Date.now();
+			Log.log("!!!!!!!!!!!!!!!!!!!!@@@@@@@@@@@@@@@@@@@@@@");
+			Log.log(sender);
 			if(payload.isName) {this.config.isName = true;}
 			payload.secretMode = (payload.secretMode) ? payload.secretMode : false;
 			payload.sayMode = (payload.sayMode) ? payload.sayMode : false;
@@ -661,7 +673,7 @@ Module.register("MMM-AssistantMk2", {
 			isName: payload.isName,
 		};
 		var options = Object.assign({}, options, payload);
-		Log.log(options);
+		//Log.log(options);
 		if (payload.hasOwnProperty("profile") && typeof this.config.profiles[payload.profile] !== "undefined") {
 			options.profile = this.config.profiles[payload.profile];
 		}
