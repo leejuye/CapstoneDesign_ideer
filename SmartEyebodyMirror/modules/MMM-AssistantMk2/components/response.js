@@ -1,8 +1,8 @@
 /* Common AMk2 Class */
 
 class AssistantResponseClass {
-	constructor (responseConfig, callbacks, isName) {
-		this.isName = isName;
+	constructor (responseConfig, callbacks) {
+		this.isName = false;
 		this.config = responseConfig;
 		this.callbacks = callbacks;
 		this.showing = false;
@@ -216,8 +216,17 @@ class AssistantResponseClass {
 			this.end();
 			return;
 		}
+		
+		if (response.lastQuery.text === "NOT_NOW") {
+			this.showing = false;
+			this.status("error");
+			this.showError(this.callbacks.translate("NOT_NOW"));
+			this.end();
+			return
+		}
 
 		var command = response.transcription.transcription;
+		
     
 		if (command.indexOf(" 전 사진 보여 줘") >= 0) {
 			var string;
@@ -248,36 +257,8 @@ class AssistantResponseClass {
 					return;
 				}
 			}
-		} else if (command.indexOf("정면") >= 0) {
-			this.showing = false;
-			this.end();
-			return;
-		} else if (command.indexOf("측면") >= 0) {
-			this.showing = false;
-			this.end();
-			return;
-		} else if (command.indexOf("기준") >= 0 && command.indexOf("변경") >= 0) {
-			this.showing = false;
-			this.end();
-			return;
-		} else if (command.indexOf("이전") >= 0) {
-			this.showing = false;
-			this.end();
-			return;
-		} else if (command.indexOf("다음") >= 0) {
-			this.showing = false;
-			this.end();
-			return;
 		}
 
-		if (response.lastQuery.text === "NOT_NOW") {
-				this.showing = false
-				this.status("error")
-				this.showError(this.callbacks.translate("NOT_NOW"))
-				this.end()
-				return;
-		}																									
-			
 		var normalResponse = (response) => {
 			if(!this.isName) {
 				this.showing = false;

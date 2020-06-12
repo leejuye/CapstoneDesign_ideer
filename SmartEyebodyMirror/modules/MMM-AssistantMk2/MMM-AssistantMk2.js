@@ -123,8 +123,8 @@ Module.register("MMM-AssistantMk2", {
 				chime: "open"
 			},
 			notificationExec: {
-				notification: "PHOTO",
-				payload: "SHOW_COMPARE"
+				notification: "COMPLIMENTS",
+				payload: "lookup",
 			}
 		},
 		"SHUTDOWN_REQUEST": {
@@ -144,15 +144,56 @@ Module.register("MMM-AssistantMk2", {
 				notification: "COMPLIMENTS",
 				payload: "signUpRequest"
 			},
+		},	
+		"SHOW_NEXT": {
+			notificationExec: {
+				notification: "COMPLIMENTS",
+				payload: "showNext"
+			}
 		},
-		"LOOK_SIDE": {
+		"SHOW_PREV": {
+			notificationExec: {
+				notification: "COMPLIMENTS",
+				payload: "showPrev"
+			}
+		},
+		"SHOW_FRONT": {
+			notificationExec: {
+				notification: "COMPLIMENTS",
+				payload: "showFront"
+			}
+		},
+		"SHOW_SIDE": {
+			notificationExec: {
+				notification: "COMPLIMENTS",
+				payload: "showSide"
+			}
+		},
+		"CHANGE_BASE": {
+			notificationExec: {
+				notification: "COMPLIMENTS",
+				payload: "changeBaseRequest"
+			}
+		},
+		"LOG_OUT_REQUEST": {
 			soundExec: {
 				chime: "open"
 			},
 			notificationExec: {
-				notification: "PHOTO_CHANGE",
-				payload: "payload"
+				notification: "COMPLIMENTS",
+				payload: "logOutRequest"
 			},
+		},
+		"TAKE_BG": {
+			notificationExec: {
+				notification: "PHOTO",
+				payload: "TAKE_BG"
+			}
+		},
+		"CANCEL": {
+			soundExec: {
+				chime: "close"
+			}
 		},
 		"YES": {
 			soundExec: {
@@ -194,9 +235,37 @@ Module.register("MMM-AssistantMk2", {
 			pattern: "(신규 등록|회원 가입|신규등록)",
 			command: "SIGN_UP_REQUEST"
 		},
+		"FRONT": {
+			pattern: "정면",
+			command: "SHOW_FRONT"
+		},
 		"SIDE": {
 			pattern: "옆면",
-			command: "LOOK_SIDE"
+			command: "SHOW_SIDE"
+		},
+		"BASE": {
+			pattern: "(기준|변경)",
+			command: "CHANGE_BASE"
+		},
+		"NEXT": {
+			pattern: "다음",
+			command: "SHOW_NEXT"
+		},
+		"PREV": {
+			pattern: "이전",
+			command: "SHOW_PREV"
+		},
+		"LOG_OUT": {
+			pattern: "(로그아웃|로그 아웃)",
+			command: "LOG_OUT_REQUEST"
+		},
+		"CANCEL": {
+			pattern: "취소",
+			command: "CANCEL"
+		},
+		"TAKE_BG": {
+			pattern: "배경",
+			command: "TAKE_BG"
 		},
 		"YES": {
 			pattern: "응",
@@ -395,6 +464,8 @@ Module.register("MMM-AssistantMk2", {
 			break;
 		case "ASSISTANT_ACTIVATE":
 			var session = Date.now();
+			Log.log("!!!!!!!!!!!!!!!!!!!!@@@@@@@@@@@@@@@@@@@@@@");
+			Log.log(sender);
 			if(payload.isName) {this.config.isName = true;}
 			payload.secretMode = (payload.secretMode) ? payload.secretMode : false;
 			payload.sayMode = (payload.sayMode) ? payload.sayMode : false;
@@ -496,25 +567,10 @@ Module.register("MMM-AssistantMk2", {
 						this.config.strArray = string.split("년");
 						this.config.date = this.config.strArray[0] * 365;
 					}
-				} else if (this.config.command.indexOf("정면") >= 0) {
-					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": true});
-				} else if (this.config.command.indexOf("옆면") >= 0) {
-					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": false});
-				} else if (this.config.command.indexOf("기준") >= 0 && this.config.command.indexOf("변경") >= 0) {
-					this.sendNotification("PHOTO", "CHANGE_BASE");
-				} else if (this.config.command.indexOf("이전") >= 0) {
-					this.sendNotification("PHOTO", "SHOW_PREV");
-				} else if (this.config.command.indexOf("다음") >= 0) {
-					this.sendNotification("PHOTO", "SHOW_NEXT");
 				}
-
 				if (this.config.date > 0) {
-					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "term": this.config.date, "isFront": true});
+					this.sendNotification("PHOTO_LOOKUP", {"payload": "SHOW_COMPARE", "term": this.config.date, "isFront": true});
 					this.config.date = 0;
-				}
-
-				if (this.config.command.indexOf("옆면") >= 0) {
-					this.sendNotification("PHOTO", {"payload": "SHOW_COMPARE", "isFront": false});
 				}
 				this.config.isLookup = false;
 			}
@@ -617,6 +673,7 @@ Module.register("MMM-AssistantMk2", {
 			isName: payload.isName,
 		};
 		var options = Object.assign({}, options, payload);
+		//Log.log(options);
 		if (payload.hasOwnProperty("profile") && typeof this.config.profiles[payload.profile] !== "undefined") {
 			options.profile = this.config.profiles[payload.profile];
 		}

@@ -12,6 +12,9 @@ Module.register("weight",{
 		switch(notification) {
 		case "RESTART_GET_WEIGHT":
 			Log.log(this.name + " received a module notification: " + notification + " payload: " + payload);
+			setTimeout(() => {
+				this.sendNotification("PAGE_CHANGED", 0);
+			}, 8000);
 			this.sendSocketNotification("START_GET_WEIGHT");
 			break;
 		case "SHUTDOWN_MIRROR":
@@ -20,6 +23,10 @@ Module.register("weight",{
 			setTimeout(() => {
 				this.sendNotification("PAGE_CHANGED", 0);
 			}, 5000);
+			this.sendStart();
+			break;
+		case "COMPLIMENTS":
+			if(payload === "logOutSuccess") this.sendStart();
 			break;
 		default:
 			break;

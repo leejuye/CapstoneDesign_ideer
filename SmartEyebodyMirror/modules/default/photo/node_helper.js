@@ -6,7 +6,7 @@ const fs = require('fs');
 
 var pythonStarted = false;
 const parts = ["id", "shoulder", "chest", "waist", "hip", "thigh", "calf",
-	"weight", "bmi", "is_front", "file_name"]
+	"weight", "height", "bmi", "is_front", "file_name"]
 
 module.exports = NodeHelper.create({
 	numberOfFiles: async function(id) {
@@ -43,6 +43,26 @@ module.exports = NodeHelper.create({
 			});
 		}
 	},
+	
+	pixelToCm: function(data) {
+		var h = 0.372;
+		//var r = 0.4782;
+		var r = 0.402985;
+		for(var key in data) {
+			if(key === "weight") {
+				continue;
+			} else if(key === "bmi") {
+				data[key] /= (h*h);
+			} else if(key === "height"){
+				data[key] *= h;
+			} else {
+				data[key] *= r;
+			}
+		}
+		return new Promise(function(resolve){
+				resolve(data);
+			});
+	},
 
 	getSizeInfo: async function(payload) {
 		var fileNum = await this.numberOfFiles(payload.id);
@@ -67,10 +87,17 @@ module.exports = NodeHelper.create({
 			afterFileName = await this.dbConn(qry, [payload.rightFileName, payload.id]);
 		}
 		
-		qry = "SELECT shoulder,waist,hip,thigh,calf,weight,bmi "
+		if(payload.isFront) {
+			qry = "SELECT shoulder,chest,waist,hip,thigh,calf,weight,height,bmi "
 			+ "FROM size_info WHERE is_front = ? and file_name = ?";
+		} else {
+			qry = "SELECT chest,waist,hip,thigh,calf,weight,height,bmi "
+			+ "FROM size_info WHERE is_front = ? and file_name = ?";
+		}
+		
 		
 		var beforeData = await this.dbConn(qry, [payload.isFront, beforeFileName]);
+		beforeData = await this.pixelToCm(beforeData);
 		
 		if(afterFileName.hasOwnProperty("dfchange") && (afterFileName.dfchange === null)){
 			this.sendSocketNotification("CHANGE_NULL", payload.command);
@@ -82,6 +109,8 @@ module.exports = NodeHelper.create({
 			} else {
 				var afterData = await this.dbConn(qry, [payload.isFront, afterFileName]);
 			}
+			
+			afterData = await this.pixelToCm(afterData);
 			this.sendSocketNotification("HERE_INFO", {
 				"beforeFileName": beforeFileName,
 				"beforeData": beforeData,
@@ -114,7 +143,7 @@ module.exports = NodeHelper.create({
 	},
 
 	setSizeInfo: async function(data) {
-		const qry = "INSERT INTO size_info VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+		const qry = "INSERT INTO size_info VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
 		const params = [];
 		
 		//data = JSON.parse(data);
@@ -138,8 +167,16 @@ module.exports = NodeHelper.create({
 		this.dbConn(qry, [fileName, id]);
 		this.sendSocketNotification("CHANGE_COMPLETE", "complete");
 	},
+	
+	setYpoints: function(id, ypoints) {
+		var qry = "INSERT INTO ypoints VALUES(?,?,?,?,?,?,?)";
+		console.log("^^^Ypoints" + ypoints);
+		this.dbConn(qry, ypoints);
+	},
+	
+	result: null,
 
-	socketNotificationReceived: function(notification, payload) {
+	socketNotificationReceived: async function(notification, payload) {
 		console.log("!!!!! noti: " + notification + " pay: " + payload);
 		if(notification === "PREVIEW") {
 			var self = this;
@@ -149,26 +186,41 @@ module.exports = NodeHelper.create({
 				self.sendSocketNotification("PREVIEW_DONE", payload.fileName);
 			});
 		} else if(notification === "REMOVE_PIC") {
-			console.log("@@@@@@!!!!%%%modules/default/photo/image/" + payload.id + "/" + payload.fileName);
 			fs.unlinkSync("modules/default/photo/image/" + payload.id + "/" + payload.fileName);
 			this.deleteSizeInfo(payload.fileName);
-		} else if(notification === "SET_INFO") {
+		} else if(notification === "CONTOUR") {
+			var num = await this.numberOfFiles(payload.id);
+			var ob = {args: [payload.fileName, payload.id, payload.weight]};
+			if(num >= 2) {
+				var qry = "SELECT calf,thigh,hip,waist,chest,shoulder FROM ypoints "
+					+ "WHERE id = ?";
+				var result = await this.dbConn(qry, [payload.id]);
+				
+				for (var i in result) {
+					ob.args.push(result[i]);
+				}
+			}
+			
 			var self = this;
-			PythonShell.run("modules/default/photo/contour.py", {args: [payload.fileName, payload.id, payload.weight]},
+			PythonShell.run("modules/default/photo/contour.py", ob,
 			function (err, result) {
 				if (err) {
 					console.log(err);
 					throw err;
 				}
 				console.log(result);
-				result = JSON.parse(result);
-				
-				self.setSizeInfo(result.front);
-				self.setSizeInfo(result.side);
+				self.result = JSON.parse(result);
 				self.sendSocketNotification("CONTOUR_DONE");
 			});
 		} else if(notification === "GET_INFO") {
 			this.getSizeInfo(payload);
+		} else if(notification === "SET_INFO") {
+			this.setSizeInfo(this.result.front);
+			this.setSizeInfo(this.result.side);
+			if(this.result.hasOwnProperty("ypoints")){
+				this.setYpoints(payload.id, this.result.ypoints);
+			}
+			result = null;
 		} else if(notification === "CHANGE_BASE") {
 			this.changeBaseFile(payload.id, payload.fileName);
 		} else if(notification === "GET_FILE_NUMBER") {

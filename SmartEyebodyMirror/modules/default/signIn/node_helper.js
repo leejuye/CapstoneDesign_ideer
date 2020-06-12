@@ -9,9 +9,10 @@ module.exports = NodeHelper.create({
 		try{
 			conn = await dbHelper.getConnection();
 			results = await conn.query(qry, params);
-			console.log("@@@@@@@@@"+result[0]);
+			console.log("RESULT:" + JSON.stringify(results));
 		} catch(err) {
 			this.sendSocketNotification("SIGN_IN_ERRER");
+			console.log("ERROR!!!!!: " + err);
 			throw err;
 		} finally {
 			if(conn) {conn.end();}
@@ -42,7 +43,7 @@ module.exports = NodeHelper.create({
 		if(notification === "CHECK_USER") {
 			var user = await this.getUser(payload.name);
 			if(user) {
-				this.sendSocketNotification("ALREADY_EXIST");
+				this.sendSocketNotification("ALREADY_EXIST", payload.name);
 				if(!payload.isNew){this.getUser(payload.name, true);}
 			} else {
 				if (payload.isNew) {
