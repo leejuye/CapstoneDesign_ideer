@@ -28,11 +28,11 @@ if sys.argv[2][0] != '.':
 
 if sys.argv[1][len(sys.argv[1])-5] == 't':
     overlay = cv2.imread(curPath + '/overlay_front.png')
+    overlay = cv2.resize(overlay, (480, 640))
 elif sys.argv[1][len(sys.argv[1])-5] == 'e':
     overlay = cv2.imread(curPath + '/overlay_side.png')
-    
-if overlay != None:
     overlay = cv2.resize(overlay, (480, 640))
+    
 
 # initialize the camera and grab a reference to the raw camera capture
 camera = PiCamera()
@@ -80,7 +80,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     dst = dst[y:y+h, x:x+w]
 
     addedImage = dst
-    if overlay != None:
+    if userID != '':
         addedImage = cv2.add(addedImage,overlay)
         addedImage = np.fliplr(addedImage)
         addedImage = np.array(addedImage)

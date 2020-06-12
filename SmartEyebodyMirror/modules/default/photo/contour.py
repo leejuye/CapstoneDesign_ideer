@@ -43,7 +43,7 @@ def getYpoints(top, bottom):
     return ret
 
 def getYpointsFromServer(frame):
-    TCP_IP = '192.168.0.30'
+    TCP_IP = '192.168.0.21'
     TCP_PORT = 10210
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -167,7 +167,7 @@ frontContour, cntsFront = contour(backImage, frontImage)
 sideContour, cntsSide = contour(backImage, sideImage)
 
 bottom, top = 0, 1987654321
-for loc in cntsFront[0]:
+for loc in cntsSide[0]:
     x, y = loc[0]
     top = min(y, top)
     bottom = max(y, bottom)

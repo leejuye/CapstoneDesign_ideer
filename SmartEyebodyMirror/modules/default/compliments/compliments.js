@@ -384,19 +384,14 @@ Module.register("compliments", {
 					this.config.state = payload;
 					this.sendNotification("RESTART_GET_WEIGHT");
 					break;
+				case "bgStart":
 				case "frontStart":
-					this.config.state = payload;
-					break;
 				case "frontResult":
-					this.config.state = payload;
-					break;
 				case "sideResult":
-					this.config.state = payload;
-					break;
 				case "savePictureOrNot":
-					this.config.state = payload;
-					break;
 				case "savePicture":
+				case "logOutSuccess":
+				case "signInSuccess":
 					this.config.state = payload;
 					break;
 				case "lookup":
@@ -408,20 +403,14 @@ Module.register("compliments", {
 				case "dressCheck":
 				case "shutdownRequest":
 				case "alreadyExistName":
-				case "signInSuccess":
+				//case "signInSuccess":
+				case "logOutRequest":
 					this.sendNotificationToAssis(payload);
 					break;
 				case "sayName":
 				case "signUpRequest":
 				case "notExistUserName":
 					this.sendNotificationToAssis(payload, true);
-					break;
-				case "logOutRequest":
-					this.sendNotificationToAssis(payload, false);
-
-					break;
-				case "logOutSuccess":
-					this.config.state = payload;
 					break;
 				case "changeBase":
 					this.config.state = payload;
@@ -527,9 +516,9 @@ Module.register("compliments", {
 						this.config.state = payload;
 						break;
 					}
-					if (this.config.state !== "dressWait") {
-						this.config.state = "initial";
-					}
+					//if (this.config.state !== "dressWait") {
+						//this.config.state = "initial";
+					//}
 					break;
 				}
 			}
