@@ -45,7 +45,7 @@
     "grunt-stylelint": "latest",
     "grunt-yamllint": "latest",
     "http-auth": "^3.2.3",
-    "jsdom": "^11.6.2",
+    "jsdom": "^16.5.0",
     "jshint": "^2.10.2",
     "mocha": "^7.1.2",
     "mocha-each": "^1.1.0",
